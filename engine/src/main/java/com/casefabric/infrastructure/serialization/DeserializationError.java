@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
 /**
  * This exception is thrown when a json structure cannot be deserialized to an object structure.

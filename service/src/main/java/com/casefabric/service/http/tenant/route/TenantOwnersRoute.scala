@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tenant.route
+package com.casefabric.service.http.tenant.route
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
@@ -25,12 +25,12 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.{ConsentGroupUser, TenantUser}
-import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup
-import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI.ConsentGroupFormat
-import org.cafienne.service.http.tenant.model.TenantAPI._
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command._
+import com.casefabric.actormodel.identity.{ConsentGroupUser, TenantUser}
+import com.casefabric.consentgroup.actorapi.command.CreateConsentGroup
+import com.casefabric.service.http.consentgroup.model.ConsentGroupAPI.ConsentGroupFormat
+import com.casefabric.service.http.tenant.model.TenantAPI._
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.command._
 
 import jakarta.ws.rs._
 import scala.jdk.CollectionConverters._

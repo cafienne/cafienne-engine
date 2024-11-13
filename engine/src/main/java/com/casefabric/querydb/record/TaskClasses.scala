@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.record
+package com.casefabric.querydb.record
 
-import org.cafienne.json._
+import com.casefabric.json._
 
 import java.time.Instant
 
@@ -37,7 +37,7 @@ final case class TaskRecord(id: String,
                             input: String = "",
                             output: String = "",
                             taskModel: String = ""
-                     ) extends CafienneJson {
+                     ) extends CaseFabricJson {
 
   def getJSON(value: String): Value[_] = {
     if (value == "" || value == null) new ValueMap else {

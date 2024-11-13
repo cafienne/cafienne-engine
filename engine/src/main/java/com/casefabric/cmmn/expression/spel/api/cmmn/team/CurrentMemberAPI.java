@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.team;
+package com.casefabric.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Case;
 
 /**
  * Wrapper around the current user's case team membership, including the JWT token of the user.

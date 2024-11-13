@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.result
+package com.casefabric.querydb.query.result
 
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
-final case class Documentation(text: String, textFormat: String = "text/plain") extends CafienneJson {
+final case class Documentation(text: String, textFormat: String = "text/plain") extends CaseFabricJson {
   override def toValue: Value[_] = {
     text.isBlank match {
       case true => Value.NULL

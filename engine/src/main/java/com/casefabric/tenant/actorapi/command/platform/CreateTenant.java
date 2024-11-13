@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.command.platform;
+package com.casefabric.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.PlatformOwner;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.exception.TenantException;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.PlatformOwner;
+import com.casefabric.actormodel.identity.TenantUser;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
+import com.casefabric.tenant.actorapi.exception.TenantException;
 
 import java.io.IOException;
 import java.util.List;

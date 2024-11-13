@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.event;
+package com.casefabric.tenant.actorapi.event;
 
-import org.cafienne.actormodel.event.ActorModified;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
+import com.casefabric.actormodel.event.ActorModified;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
 
 /**
- * Event that is published after an {@link org.cafienne.tenant.actorapi.command.TenantCommand} has been fully handled by a {@link TenantActor} instance.
+ * Event that is published after an {@link com.casefabric.tenant.actorapi.command.TenantCommand} has been fully handled by a {@link TenantActor} instance.
  * Contains information about the last modified moment.
  *
  */

@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival
+package com.casefabric.storage.archival
 
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.infrastructure.serialization.{CafienneSerializer, Fields}
-import org.cafienne.json.ValueMap
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.infrastructure.serialization.{CaseFabricSerializer, Fields}
+import com.casefabric.json.ValueMap
 
 object ModelEventSerializer {
 
   // Write a ModelEvent and it's sequenceNr to JSON
   def serializeEventToJson(event: ModelEvent, sequenceNr: Long): ValueMap = {
-    new ValueMap(Fields.sequenceNr, sequenceNr, Fields.manifest, CafienneSerializer.getManifestString(event), Fields.content, event.rawJson())
+    new ValueMap(Fields.sequenceNr, sequenceNr, Fields.manifest, CaseFabricSerializer.getManifestString(event), Fields.content, event.rawJson())
   }
 
   def deserializeEvent(json: ValueMap): AnyRef = {
     val manifest = json.readString(Fields.manifest)
     val content = json.readMap(Fields.content)
-    new CafienneSerializer().fromJson(content, manifest)
+    new CaseFabricSerializer().fromJson(content, manifest)
   }
 }

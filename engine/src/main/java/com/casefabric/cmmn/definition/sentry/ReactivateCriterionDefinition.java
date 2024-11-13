@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.sentry;
+package com.casefabric.cmmn.definition.sentry;
 
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.instance.Transition;
+import com.casefabric.cmmn.definition.*;
+import com.casefabric.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
 public class ReactivateCriterionDefinition extends CriterionDefinition {

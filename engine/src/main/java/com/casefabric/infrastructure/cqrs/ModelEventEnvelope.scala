@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package com.casefabric.infrastructure.cqrs
 
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
-import org.cafienne.actormodel.event.ModelEvent
+import com.casefabric.actormodel.event.ModelEvent
 
 case class ModelEventEnvelope(envelope: EventEnvelope) {
   lazy val offset: Offset = envelope.offset

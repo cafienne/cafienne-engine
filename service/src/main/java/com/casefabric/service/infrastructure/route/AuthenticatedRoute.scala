@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import org.apache.pekko.http.scaladsl.model.{HttpResponse, StatusCodes}
 import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
-import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
-import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.exception.SearchFailure
-import org.cafienne.service.infrastructure.authentication.{AuthenticatedUser, AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.actormodel.exception.{AuthorizationException, InvalidCommandException}
+import com.casefabric.actormodel.identity.{IdentityProvider, PlatformUser}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.querydb.query.exception.SearchFailure
+import com.casefabric.service.infrastructure.authentication.{AuthenticatedUser, AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
+import com.casefabric.system.health.HealthMonitor
 
 import scala.concurrent.ExecutionContext
 
@@ -92,7 +92,7 @@ trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives 
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route): Route = {
-    if (Cafienne.config.developerRouteOpen) {
+    if (CaseFabric.config.developerRouteOpen) {
       subRoute(null)
     } else {
       validUser(subRoute)

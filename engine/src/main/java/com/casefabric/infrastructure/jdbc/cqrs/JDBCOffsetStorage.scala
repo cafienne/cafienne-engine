@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.cqrs
+package com.casefabric.infrastructure.jdbc.cqrs
 
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.infrastructure.cqrs.offset.{OffsetRecord, OffsetStorage}
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import com.casefabric.infrastructure.cqrs.offset.{OffsetRecord, OffsetStorage}
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with CafienneJDBCConfig {
+trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with CaseFabricJDBCConfig {
 
   val storageName: String
 
@@ -49,12 +49,12 @@ trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with Cafien
   }
 }
 
-trait OffsetStoreTables extends CafienneJDBCConfig {
+trait OffsetStoreTables extends CaseFabricJDBCConfig {
   import dbConfig.profile.api._
 
   import java.sql.Timestamp
 
-  final class OffsetStoreTable(tag: Tag) extends CafienneTable[OffsetRecord](tag, "offset_storage") {
+  final class OffsetStoreTable(tag: Tag) extends CaseFabricTable[OffsetRecord](tag, "offset_storage") {
     def name = idColumn[String]("name", O.PrimaryKey)
 
     def offsetType = column[String]("offset-type")

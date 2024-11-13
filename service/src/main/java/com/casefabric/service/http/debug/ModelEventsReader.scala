@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.debug
+package com.casefabric.service.http.debug
 
 import org.apache.pekko.persistence.query.EventEnvelope
 import org.apache.pekko.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.infrastructure.cqrs.ReadJournalProvider
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.json.{ValueList, ValueMap}
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.actormodel.identity.PlatformUser
+import com.casefabric.infrastructure.cqrs.ReadJournalProvider
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.json.{ValueList, ValueMap}
+import com.casefabric.system.CaseSystem
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.state
+package com.casefabric.storage.archival.state
 
-import org.cafienne.storage.actormodel.state.CaseState
-import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ModelActorArchived}
+import com.casefabric.storage.actormodel.state.CaseState
+import com.casefabric.storage.archival.ActorDataArchiver
+import com.casefabric.storage.archival.event.cmmn.{CaseArchived, ModelActorArchived}
 
 class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseState {
   override def createModelActorStorageEvent: ModelActorArchived = new CaseArchived(metadata)

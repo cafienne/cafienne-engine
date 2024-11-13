@@ -1,12 +1,12 @@
 <process name="humantaskvalidator" description="" id="humantaskvalidator.process">
     <extensionElements>
-        <cafienne:implementation xmlns:cafienne="org.cafienne" async="false" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+        <casefabric:implementation xmlns:casefabric="com.casefabric" async="false" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
             <url>http://localhost:17382/validate</url>
             <method>POST</method>
             <http-headers>
                 <http-header name="Accept">application/json</http-header>
             </http-headers>
             <post-content/>
-        </cafienne:implementation>
+        </casefabric:implementation>
     </extensionElements>
 </process>

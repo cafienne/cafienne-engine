@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tenant.model
+package com.casefabric.service.http.tenant.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
-import org.cafienne.service.infrastructure.payload.PayloadValidator
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.infrastructure.payload.PayloadValidator
 
 import scala.annotation.meta.field
 

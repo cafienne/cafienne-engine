@@ -15,31 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.event.platform;
+package com.casefabric.tenant.actorapi.event.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
 
 import java.io.IOException;
 
 @Manifest
 public class TenantCreated extends PlatformBaseEvent implements BootstrapMessage {
-    public final CafienneVersion engineVersion;
+    public final CaseFabricVersion engineVersion;
 
     public TenantCreated(TenantActor tenant) {
         super(tenant);
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = CaseFabric.version();
     }
 
     public TenantCreated(ValueMap json) {
         super(json);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, CaseFabricVersion::new);
     }
 
     @Override

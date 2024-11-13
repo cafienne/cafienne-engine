@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.instance;
+package com.casefabric.humantask.instance;
 
 public enum TaskAction {
     Null("null"),

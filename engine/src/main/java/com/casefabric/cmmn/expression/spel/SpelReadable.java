@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel;
+package com.casefabric.cmmn.expression.spel;
 
 /**
  * Interface to make case file values readable for the spel engine.

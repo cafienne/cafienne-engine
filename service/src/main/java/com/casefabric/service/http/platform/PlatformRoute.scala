@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.platform
+package com.casefabric.service.http.platform
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
@@ -25,14 +25,14 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.PlatformOwner
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.http.tenant.model.TenantAPI._
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
+import com.casefabric.actormodel.identity.PlatformOwner
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.service.http.tenant.model.TenantAPI._
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
 import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.CommandRoute
+import com.casefabric.service.infrastructure.route.CommandRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")
@@ -134,7 +134,7 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 
   def platformOwner(subRoute: PlatformOwner => Route): Route = {
     authenticatedUser { user =>
-      if (Cafienne.isPlatformOwner(user.id)) {
+      if (CaseFabric.isPlatformOwner(user.id)) {
         subRoute(PlatformOwner(user.id))
       } else {
         complete(StatusCodes.Unauthorized, "Only platform owners can access this route")

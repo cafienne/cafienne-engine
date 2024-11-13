@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.response;
+package com.casefabric.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.humantask.actorapi.command.HumanTaskCommand;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.humantask.actorapi.command.HumanTaskCommand;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

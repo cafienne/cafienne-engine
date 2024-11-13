@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions.file;
+package com.casefabric.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
-import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
-import org.cafienne.cmmn.test.filter.EventFilter;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.CaseTestCommand;
+import com.casefabric.cmmn.test.assertions.ModelTestCommandAssertion;
+import com.casefabric.cmmn.test.assertions.PublishedEventsAssertion;
+import com.casefabric.cmmn.test.filter.EventFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

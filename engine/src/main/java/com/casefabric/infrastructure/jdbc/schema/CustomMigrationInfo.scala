@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.schema
+package com.casefabric.infrastructure.jdbc.schema
 
 import slick.migration.api.Migration
 import slick.migration.api.flyway.MigrationInfo
@@ -23,12 +23,12 @@ import slick.migration.api.flyway.MigrationInfo.Provider
 
 /**
   * Due to an earlier bug in slick flyway migration library, description did not give repeated predictable outcome.
-  * Therefore in Cafienne we made a CustomMigrationInfo (called MigrationInfoHack) to overcome this problem.
+  * Therefore in CaseFabric we made a CustomMigrationInfo (called MigrationInfoHack) to overcome this problem.
   *
   * Original ticket: https://github.com/nafg/slick-migration-api-flyway/issues/26
   *
   * The bug has been fixed in the library; however, in the new version, the construction of the description is done
-  * in a different manner than in the Cafienne version. Hence we need to continue to use our own version.
+  * in a different manner than in the CaseFabric version. Hence we need to continue to use our own version.
   * So we have renamed it to CustomMigrationInfo instead of MigrationInfoHack...
   */
 object CustomMigrationInfo {

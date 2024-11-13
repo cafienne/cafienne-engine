@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.event;
+package com.casefabric.processtask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.command.MigrateProcessDefinition;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.command.MigrateProcessDefinition;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.io.IOException;
 

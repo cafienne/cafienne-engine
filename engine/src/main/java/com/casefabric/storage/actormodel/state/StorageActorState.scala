@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.state
+package com.casefabric.storage.actormodel.state
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
+import com.casefabric.actormodel.event.{ModelEvent, ModelEventCollection}
 import org.apache.pekko.actor.ActorRef
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.processtask.actorapi.event.ProcessEvent
-import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
-import org.cafienne.tenant.actorapi.event.TenantEvent
+import com.casefabric.cmmn.actorapi.event.CaseEvent
+import com.casefabric.consentgroup.actorapi.event.ConsentGroupEvent
+import com.casefabric.processtask.actorapi.event.ProcessEvent
+import com.casefabric.storage.actormodel.message.{StorageActionStarted, StorageEvent}
+import com.casefabric.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
+import com.casefabric.tenant.actorapi.event.TenantEvent
 
 trait StorageActorState extends ModelEventCollection with LazyLogging {
   val actor: BaseStorageActor

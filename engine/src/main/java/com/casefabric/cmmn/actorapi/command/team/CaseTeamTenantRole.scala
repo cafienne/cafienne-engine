@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.cmmn.actorapi.event.team.deprecated.member.{CaseOwnerAdded, CaseOwnerRemoved, TeamRoleCleared, TeamRoleFilled}
-import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{TeamMemberAdded, TeamMemberRemoved}
-import org.cafienne.cmmn.instance.team.{MemberType, Team}
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json._
+import com.casefabric.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
+import com.casefabric.cmmn.actorapi.event.team.deprecated.member.{CaseOwnerAdded, CaseOwnerRemoved, TeamRoleCleared, TeamRoleFilled}
+import com.casefabric.cmmn.actorapi.event.team.deprecated.user.{TeamMemberAdded, TeamMemberRemoved}
+import com.casefabric.cmmn.instance.team.{MemberType, Team}
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json._
 
 import java.util
 import scala.jdk.CollectionConverters._
@@ -59,7 +59,7 @@ case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Se
 
 object CaseTeamTenantRole extends LazyLogging {
   def getDeserializer(parent: ValueMap): CaseTeamMemberDeserializer[CaseTeamTenantRole] = {
-    // Special deserializer that can migrate rolesRemoved from parent json for older event format (Cafienne versions 1.1.16 - 1.1.18)
+    // Special deserializer that can migrate rolesRemoved from parent json for older event format (CaseFabric versions 1.1.16 - 1.1.18)
     (json: ValueMap) => {
       if (parent.has(Fields.rolesRemoved)) {
         parent.withArray(Fields.rolesRemoved).getValue.asScala.foreach(json.withArray(Fields.rolesRemoved).add(_))

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation.operation;
+package com.casefabric.processtask.implementation.calculation.operation;
 
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.processtask.implementation.calculation.Calculation;
+import com.casefabric.processtask.implementation.calculation.Result;
+import com.casefabric.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
 
 public class InputSource extends Source<InputParameterSourceDefinition> {
     private final InputParameterDefinition parameter;

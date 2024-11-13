@@ -1,4 +1,4 @@
-<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:casefabric="com.casefabric">
     <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
     <case id="task/testhumantask.case" name="TestHumanTask" expressionLanguage="spel">
         <caseFileModel>
@@ -22,7 +22,7 @@
                 <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
                 <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask">
                         <input id="_ydL3_Owner" name="Owner"/>
                         <input id="_67M8_Content" name="Content"/>
                         <output id="_DtOu_Decision" name="Decision"/>
@@ -41,7 +41,7 @@
                                 </body>
                             </transformation>
                         </parameterMapping>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__kBPkc_1" name="AdminTask" isBlocking="true" performerRef="_kBPkc_17"/>

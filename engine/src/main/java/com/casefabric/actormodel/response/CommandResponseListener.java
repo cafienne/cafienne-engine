@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.response;
+package com.casefabric.actormodel.response;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.cmmn.instance.Case;
 
 /**
  * When sending a message to another model instance from within a model,

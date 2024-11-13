@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.test.assertions.PublishedEventsAssertion;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
-import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.actormodel.exception.{AuthorizationException, MissingTenantException}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[ConsentGroupMembership] = Seq()) extends UserIdentity {
   def tenants: Seq[String] = users.map(u => u.tenant)
@@ -57,7 +57,7 @@ final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[Co
     if (tenants.length == 1) {
       tenants.head
     } else {
-      val configuredDefaultTenant = Cafienne.config.platform.defaultTenant
+      val configuredDefaultTenant = CaseFabric.config.platform.defaultTenant
       if (configuredDefaultTenant.isEmpty) {
         throw new MissingTenantException("Tenant property must have a value")
       }
@@ -91,7 +91,7 @@ final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[Co
 
   def isTenantMember(tenant: String): Boolean = users.find(_.tenant == tenant).fold(false)(_.enabled)
 
-  def isPlatformOwner: Boolean = Cafienne.isPlatformOwner(id)
+  def isPlatformOwner: Boolean = CaseFabric.isPlatformOwner(id)
 
   def getTenantUser(tenant: String): TenantUser = users.find(u => u.tenant == tenant).getOrElse({
     val message = tenants.isEmpty match {
@@ -106,7 +106,7 @@ object PlatformUser {
   def from(user: UserIdentity) = new PlatformUser(user.id, Seq())
 }
 
-case class ConsentGroupMembership(groupId: String, roles: Set[String], isOwner: Boolean) extends CafienneJson {
+case class ConsentGroupMembership(groupId: String, roles: Set[String], isOwner: Boolean) extends CaseFabricJson {
   override def toValue: Value[_] = {
     val json = new ValueMap(Fields.groupId, groupId, Fields.isOwner, isOwner, Fields.roles, roles)
     json

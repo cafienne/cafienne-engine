@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.actorapi.event.CaseOutputFilled
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
-import org.cafienne.cmmn.instance.State
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.cmmn.actorapi.event.CaseOutputFilled
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemTransitioned
+import com.casefabric.cmmn.instance.State
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.{Value, ValueMap}
 
 @Manifest
-case class CaseCompleted(caseInstanceId: String, output: ValueMap) extends CafiennePublicEventContent {
+case class CaseCompleted(caseInstanceId: String, output: ValueMap) extends CaseFabricPublicEventContent {
   override def toValue: Value[_] = new ValueMap(Fields.caseInstanceId, caseInstanceId, Fields.output, output)
 }
 

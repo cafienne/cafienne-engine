@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.json.Value;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.cmmn.expression.spel.SpelReadable;
+import com.casefabric.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

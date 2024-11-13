@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.http.cors.scaladsl.model.HttpHeaderRange
@@ -24,10 +24,10 @@ import org.apache.pekko.http.scaladsl.model.HttpMethods._
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server._
-import org.cafienne.json.{CafienneJson, Value}
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.system.CaseSystem
-import org.cafienne.util.XMLHelper
+import com.casefabric.json.{CaseFabricJson, Value}
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.system.CaseSystem
+import com.casefabric.util.XMLHelper
 import org.w3c.dom.Node
 
 /**
@@ -107,9 +107,9 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
-  def completeJson(seq: Seq[CafienneJson]): Route = completeJson(StatusCodes.OK, Value.convert(seq.map(_.toValue)))
+  def completeJson(seq: Seq[CaseFabricJson]): Route = completeJson(StatusCodes.OK, Value.convert(seq.map(_.toValue)))
 
-  def completeJson(c: CafienneJson): Route = completeJson(StatusCodes.OK, c.toValue)
+  def completeJson(c: CaseFabricJson): Route = completeJson(StatusCodes.OK, c.toValue)
 
   def completeJson(v: Value[_]): Route = completeJson(StatusCodes.OK, v)
 

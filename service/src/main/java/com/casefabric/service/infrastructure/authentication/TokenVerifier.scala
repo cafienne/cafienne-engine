@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import com.nimbusds.jose.RemoteKeySourceException
 import com.nimbusds.jose.proc.{BadJOSEException, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.system.health.HealthMonitor
 
 import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}

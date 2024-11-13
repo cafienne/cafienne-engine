@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.schema.QueryDBSchema
-import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables}
-import org.cafienne.querydb.schema.versions.util.Projections
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.schema.table.{CaseTables, ConsentGroupTables}
+import com.casefabric.querydb.schema.versions.util.Projections
 import slick.migration.api.TableMigration
 
 object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
-  with CafienneTablesV2
+  with CaseFabricTablesV2
   with ConsentGroupTables
   with CaseTables {
 

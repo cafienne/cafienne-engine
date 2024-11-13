@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
+import com.casefabric.cmmn.definition.sentry.EntryCriterionDefinition;
 
 public class EntryCriterion extends Criterion<EntryCriterionDefinition> {
     public EntryCriterion(CriteriaListener<EntryCriterionDefinition, ?> listener, EntryCriterionDefinition definition) {

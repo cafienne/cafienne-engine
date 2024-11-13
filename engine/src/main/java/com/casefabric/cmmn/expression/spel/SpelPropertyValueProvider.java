@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel;
+package com.casefabric.cmmn.expression.spel;
 
 /**
  * Interface that is implemented by objects that can return the value from their own defined location,

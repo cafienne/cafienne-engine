@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.team.group;
+package com.casefabric.cmmn.actorapi.event.team.group;
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamGroup;
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberEvent;
-import org.cafienne.cmmn.instance.team.CaseTeamError;
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamGroup;
+import com.casefabric.cmmn.actorapi.event.team.CaseTeamMemberEvent;
+import com.casefabric.cmmn.instance.team.CaseTeamError;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Event caused when a consent group is given access to the case.

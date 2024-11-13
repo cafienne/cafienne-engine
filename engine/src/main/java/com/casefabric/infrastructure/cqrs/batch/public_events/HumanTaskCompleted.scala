@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskOutputFilled
+import com.casefabric.cmmn.instance.Path
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.{Value, ValueMap}
 
 @Manifest
-case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, caseInstanceId: String, output: ValueMap) extends CafiennePublicEventContent {
+case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, caseInstanceId: String, output: ValueMap) extends CaseFabricPublicEventContent {
   override def toValue: Value[_] = new ValueMap(Fields.taskId, taskId, Fields.path, path, Fields.taskName, taskName, Fields.caseInstanceId, caseInstanceId, Fields.output, output)
 
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
@@ -31,7 +31,7 @@ case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, case
 
 object HumanTaskCompleted {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
-    .filterMap(classOf[org.cafienne.humantask.actorapi.event.HumanTaskCompleted])
+    .filterMap(classOf[com.casefabric.humantask.actorapi.event.HumanTaskCompleted])
     .map(event => {
       val output = batch.filterMap(classOf[TaskOutputFilled]).filter(_.getTaskId == event.getTaskId).head.getTaskOutputParameters
       PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskCompleted(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId, output))

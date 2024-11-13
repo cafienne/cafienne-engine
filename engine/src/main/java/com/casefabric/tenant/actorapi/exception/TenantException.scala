@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.exception
+package com.casefabric.tenant.actorapi.exception
 
-import org.cafienne.actormodel.exception.InvalidCommandException
+import com.casefabric.actormodel.exception.InvalidCommandException
 
 case class TenantException(msg: String) extends InvalidCommandException(msg)

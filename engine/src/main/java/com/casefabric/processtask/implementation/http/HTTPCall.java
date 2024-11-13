@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.http;
+package com.casefabric.processtask.implementation.http;
 
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

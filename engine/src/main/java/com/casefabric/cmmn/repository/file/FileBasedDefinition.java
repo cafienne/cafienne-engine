@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository.file;
+package com.casefabric.cmmn.repository.file;
 
-import org.cafienne.cmmn.definition.DefinitionsDocument;
+import com.casefabric.cmmn.definition.DefinitionsDocument;
 
 class FileBasedDefinition {
 

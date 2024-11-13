@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.response;
+package com.casefabric.cmmn.actorapi.response;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Response when a StartCase command is sent

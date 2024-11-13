@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.plan
+package com.casefabric.service.http.cases.plan
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
 
 import scala.annotation.meta.field
 

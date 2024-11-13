@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.http.definition;
+package com.casefabric.processtask.implementation.http.definition;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.processtask.definition.ProcessInputResolver;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.processtask.definition.ProcessInputResolver;
 import org.w3c.dom.Element;
 
 public class MethodDefinition extends ProcessInputResolver {

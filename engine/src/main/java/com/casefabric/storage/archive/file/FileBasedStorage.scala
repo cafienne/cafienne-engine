@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archive.file
+package com.casefabric.storage.archive.file
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.config.engine.FileStorageConfig
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.archival.Archive
-import org.cafienne.storage.archive.Storage
-import org.cafienne.json.{JSONReader, ValueMap}
+import com.casefabric.infrastructure.config.engine.FileStorageConfig
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.archival.Archive
+import com.casefabric.storage.archive.Storage
+import com.casefabric.json.{JSONReader, ValueMap}
 
 import java.io.{File, FileInputStream, FileWriter}
 import scala.concurrent.Future

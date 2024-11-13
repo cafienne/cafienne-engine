@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice
+package com.casefabric.timerservice
 
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
+import com.casefabric.actormodel.identity.{CaseUserIdentity, Origin}
 
 import java.time.Instant
 

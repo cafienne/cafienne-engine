@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.casefile;
+package com.casefabric.cmmn.actorapi.command.casefile;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemCollection;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

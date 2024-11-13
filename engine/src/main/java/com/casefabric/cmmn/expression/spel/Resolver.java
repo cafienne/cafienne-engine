@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel;
+package com.casefabric.cmmn.expression.spel;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.expression.ResolverDefinition;
-import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.cmmn.expression.spel.api.APIRootObject;
-import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.expression.ResolverDefinition;
+import com.casefabric.cmmn.expression.InvalidExpressionException;
+import com.casefabric.cmmn.expression.spel.api.APIRootObject;
+import com.casefabric.cmmn.expression.spel.api.process.InputMappingRoot;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.util.LinkedHashMap;
 

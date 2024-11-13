@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice
+package com.casefabric.timerservice
 
 import org.apache.pekko.actor.{Cancellable, Scheduler}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
-import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
+import com.casefabric.actormodel.response.{CommandFailure, ModelResponse}
+import com.casefabric.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global

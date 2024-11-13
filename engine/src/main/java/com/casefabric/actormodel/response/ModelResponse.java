@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.response;
+package com.casefabric.actormodel.response;
 
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.time.Instant;
 

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.definition;
+package com.casefabric.processtask.definition;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.TaskDefinition;
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.TaskDefinition;
+import com.casefabric.cmmn.definition.parameter.OutputParameterDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.util.*;
@@ -55,13 +55,13 @@ import java.util.*;
  * <br/>&nbsp;&nbsp;&lt;input id=&quot;inputParameter1&quot;&gt;
  * <br/>&nbsp;&nbsp;&lt;input id=&quot;inputParameter2&quot;&gt;
  * <br/>&nbsp;&nbsp;&lt;output id=&quot;outputParameter1&quot;&gt;
- * <br/>&nbsp;&nbsp;&lt;extensionElements xmlns:cafienne=&quot;org.cafienne&quot;&gt;
- * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;cafienne:implementation class=&quot;HTTPCallDefinition&quot;&gt;
+ * <br/>&nbsp;&nbsp;&lt;extensionElements xmlns:casefabric=&quot;com.casefabric&quot;&gt;
+ * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;casefabric:implementation class=&quot;HTTPCallDefinition&quot;&gt;
  * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	      ... custom content here, responsibility of the SubProcessDefinition
  * <br/>
  * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;              ... output parameter mappings for SubProcessDefinition will be parsed and validated by SubProcessDefinition
  * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;parameterMapping targetRef=&quot;outputParameter1&quot; sourceRef=&quot;outputParameter1&quot; /&gt;
- * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/cafienne:implementation&gt;
+ * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/casefabric:implementation&gt;
  * <br/>&nbsp;&nbsp;	&lt;/extensionElements&gt;
  * <br/> &lt;/process&gt;
  * </code>

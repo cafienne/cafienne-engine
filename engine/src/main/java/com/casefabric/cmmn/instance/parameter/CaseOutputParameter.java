@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.parameter;
+package com.casefabric.cmmn.instance.parameter;
 
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.definition.parameter.OutputParameterDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Parameter;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
 
 /**
  * CaseOutputParameters are bound to the case file. They are filled at the moment the CasePlan completes.

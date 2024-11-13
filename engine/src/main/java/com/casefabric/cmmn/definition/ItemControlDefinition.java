@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
 import org.w3c.dom.Element;
 

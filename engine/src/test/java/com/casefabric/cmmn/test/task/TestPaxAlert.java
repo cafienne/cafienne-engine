@@ -1,19 +1,19 @@
 /* 
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.test.task;
+package com.casefabric.cmmn.test.task;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestPaxAlert {
     private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/paxalert.xml");

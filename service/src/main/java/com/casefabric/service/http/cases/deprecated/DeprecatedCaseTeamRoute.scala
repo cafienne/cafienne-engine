@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.deprecated
+package com.casefabric.service.http.cases.deprecated
 
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
-import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.team.CaseTeamAPI.Compatible._
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.team.DeprecatedUpsert
+import com.casefabric.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.team.CaseTeamAPI.Compatible._
+import com.casefabric.system.CaseSystem
 
 class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   override val addToSwaggerRoutes = false

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.casefile;
+package com.casefabric.cmmn.definition.casefile;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.Multiplicity;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemArray;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.Multiplicity;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemArray;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemCollection;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.json.Value;
 import org.w3c.dom.Element;
 
 import java.util.Collection;

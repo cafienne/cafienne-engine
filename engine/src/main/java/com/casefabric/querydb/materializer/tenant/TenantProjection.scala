@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package com.casefabric.querydb.materializer.tenant
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.querydb.record.TenantRecord
-import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
+import com.casefabric.querydb.record.TenantRecord
+import com.casefabric.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
 import scala.concurrent.Future
 

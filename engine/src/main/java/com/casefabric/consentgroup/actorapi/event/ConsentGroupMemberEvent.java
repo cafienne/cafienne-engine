@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.event;
+package com.casefabric.consentgroup.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.consentgroup.actorapi.ConsentGroupMember;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

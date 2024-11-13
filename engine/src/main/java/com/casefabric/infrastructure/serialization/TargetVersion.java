@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

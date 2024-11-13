@@ -22,7 +22,7 @@
                 <inputs id="_X87XC_4" name="Container" bindingRef="cfi_X87XC_0"/>
                 <outputs id="_iWNoI" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation name="simplehumantask" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+                    <casefabric:implementation name="simplehumantask" xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
                         <input id="_sr1Z_Input2" name="Input2"/>
                         <output id="_SkQG_Result" name="Result"/>
@@ -41,20 +41,20 @@
                                 </body>
                             </transformation>
                         </parameterMapping>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
         </casePlanModel>
         <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_X87XC_0"/>
         <extensionElements mustUnderstand="false">
-            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+            <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
     "properties":{
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
         </extensionElements>
     </case>
     <CMMNDI>

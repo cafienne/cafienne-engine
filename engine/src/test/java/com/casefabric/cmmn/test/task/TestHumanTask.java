@@ -1,22 +1,22 @@
-package org.cafienne.cmmn.test.task;
+package com.casefabric.cmmn.test.task;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
-import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
-import org.cafienne.humantask.actorapi.command.*;
-import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.cmmn.test.TestUser;
+import com.casefabric.cmmn.test.assertions.HumanTaskAssertion;
+import com.casefabric.humantask.actorapi.command.*;
+import com.casefabric.humantask.instance.TaskState;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 import org.junit.Test;
 
 import java.time.Instant;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestHumanTask {
     @Test

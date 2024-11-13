@@ -1,9 +1,9 @@
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
-import org.cafienne.json.ValueMap
-import org.cafienne.querydb.materializer.TestQueryDB
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition
+import com.casefabric.json.ValueMap
+import com.casefabric.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 
@@ -26,8 +26,8 @@ class CaseFileWriterTest extends CaseEventSinkTest {
                              |    "From" : "admin"
                              |  }
                              |}""".stripMargin
-      import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-      import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
+      import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+      import com.casefabric.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 
       eventually {
         assert(TestQueryDB.hasTransaction(caseInstanceId))

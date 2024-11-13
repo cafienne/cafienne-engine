@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.response
+package com.casefabric.storage.deletion.response
 
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionRejected
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.ValueMap
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.actormodel.message.StorageActionRejected
 
 @Manifest
 case class RemovalRejected(metadata: ActorMetadata, msg: String, override val optionalJson: Option[ValueMap] = None) extends StorageActionRejected

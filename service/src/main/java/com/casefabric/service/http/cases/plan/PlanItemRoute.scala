@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.plan
+package com.casefabric.service.http.cases.plan
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
@@ -25,12 +25,12 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
-import org.cafienne.cmmn.instance.Transition
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.plan.PlanItemAPIFormat.PlanItemResponseFormat
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition
+import com.casefabric.cmmn.instance.Transition
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.plan.PlanItemAPIFormat.PlanItemResponseFormat
+import com.casefabric.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")

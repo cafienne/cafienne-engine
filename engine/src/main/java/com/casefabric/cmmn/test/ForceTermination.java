@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
 import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.TerminateModelActor;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.TerminateModelActor;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ import java.io.IOException;
 @Manifest
 public class ForceTermination extends TestScriptCommand {
     static {
-        CafienneSerializer.addManifestWrapper(ForceTermination.class, ForceTermination::new);
+        CaseFabricSerializer.addManifestWrapper(ForceTermination.class, ForceTermination::new);
     }
 
     public ForceTermination(String tenant, CaseUserIdentity user, String caseInstanceId) {

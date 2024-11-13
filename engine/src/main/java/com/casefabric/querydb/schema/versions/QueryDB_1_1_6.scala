@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.schema.QueryDBSchema
-import org.cafienne.querydb.schema.table.{CaseTables, TaskTables}
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.schema.table.{CaseTables, TaskTables}
 import slick.migration.api.{SqlMigration, TableMigration}
 
-trait CafienneTablesV2 extends CafienneTablesV3 {
+trait CaseFabricTablesV2 extends CaseFabricTablesV3 {
 
   import dbConfig.profile.api._
 
   case class TenantOwnerRecord(tenant: String, userId: String, enabled: Boolean = true)
   case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
 
-  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+  class CaseInstanceTeamMemberTable(tag: Tag) extends CaseFabricTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -52,7 +52,7 @@ trait CafienneTablesV2 extends CafienneTablesV3 {
   }
 
   // Schema for the "tenant-owner" table:
-  final class TenantOwnersTable(tag: Tag) extends CafienneTenantTable[TenantOwnerRecord](tag, "tenant_owners") {
+  final class TenantOwnersTable(tag: Tag) extends CaseFabricTenantTable[TenantOwnerRecord](tag, "tenant_owners") {
 
     lazy val * = (tenant, userId, enabled).mapTo[TenantOwnerRecord]
 
@@ -68,7 +68,7 @@ trait CafienneTablesV2 extends CafienneTablesV3 {
 object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
   with TaskTables
-  with CafienneTablesV1 {
+  with CaseFabricTablesV1 {
 
   val version = "1.1.6"
   val migrations = (

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.ValueMap
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.ValueMap
 
 case class PlatformOwner(id: String) extends UserIdentity {
   def asTenantUser(tenant: String): TenantUser = TenantUser(id = id, tenant = tenant)

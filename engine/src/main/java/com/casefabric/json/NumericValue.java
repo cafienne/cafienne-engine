@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 public abstract class NumericValue<T extends Number> extends PrimitiveValue<T> {
     public NumericValue(T value) {

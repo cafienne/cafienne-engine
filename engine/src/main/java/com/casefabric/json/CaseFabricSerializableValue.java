@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable;
 
 import java.io.IOException;
 
-public class CafienneSerializableValue extends PrimitiveValue<CafienneSerializable> {
-    public CafienneSerializableValue(CafienneSerializable value) {
+public class CaseFabricSerializableValue extends PrimitiveValue<CaseFabricSerializable> {
+    public CaseFabricSerializableValue(CaseFabricSerializable value) {
         super(value);
     }
 
     @Override
-    public CafienneSerializableValue cloneValueNode() {
-        return new CafienneSerializableValue(value);
+    public CaseFabricSerializableValue cloneValueNode() {
+        return new CaseFabricSerializableValue(value);
     }
 
     @Override

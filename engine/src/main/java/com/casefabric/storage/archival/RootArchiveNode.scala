@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival
+package com.casefabric.storage.archival
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.archival.event.ArchiveStored
-import org.cafienne.storage.archive.Storage
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.archival.event.ArchiveStored
+import com.casefabric.storage.archive.Storage
 
 import scala.concurrent.ExecutionContext
 
@@ -37,7 +37,7 @@ class RootArchiveNode(metadata: ActorMetadata, actor: RootArchiver) extends Arch
       if (!startedExporting) { //  Use the system dispatcher for handling the export success
         implicit val ec: ExecutionContext = actor.caseSystem.system.dispatcher
 
-        val storage: Storage = Cafienne.config.engine.storage.archive.plugin
+        val storage: Storage = CaseFabric.config.engine.storage.archive.plugin
         storage.store(archive).map(_ => actor.self ! ArchiveStored(metadata))
         startedExporting = true
       }

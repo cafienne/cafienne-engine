@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.response;
+package com.casefabric.processtask.actorapi.response;
 
-import org.cafienne.actormodel.response.BaseModelResponse;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.ProcessActorMessage;
-import org.cafienne.processtask.actorapi.command.ProcessCommand;
+import com.casefabric.actormodel.response.BaseModelResponse;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.ProcessActorMessage;
+import com.casefabric.processtask.actorapi.command.ProcessCommand;
 
 @Manifest
 public class ProcessResponse extends BaseModelResponse implements ProcessActorMessage {

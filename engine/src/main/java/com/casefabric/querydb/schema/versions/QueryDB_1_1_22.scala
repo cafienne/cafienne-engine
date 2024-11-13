@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.record.PlanItemHistoryRecord
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.record.PlanItemHistoryRecord
+import com.casefabric.querydb.schema.QueryDBSchema
 import slick.migration.api.TableMigration
 
 import java.time.Instant
 
 object QueryDB_1_1_22 extends DbSchemaVersion
   with QueryDBSchema
-  with CafienneTablesV3 {
+  with CaseFabricTablesV3 {
 
   val version = "1.1.22"
   val migrations = dropPlanItemHistoryTable
@@ -37,11 +37,11 @@ object QueryDB_1_1_22 extends DbSchemaVersion
 
 }
 
-trait CafienneTablesV3 extends QueryDBSchema {
+trait CaseFabricTablesV3 extends QueryDBSchema {
 
   import dbConfig.profile.api._
 
-  final class PlanItemHistoryTable(tag: Tag) extends CafienneTenantTable[PlanItemHistoryRecord](tag, "plan_item_history") {
+  final class PlanItemHistoryTable(tag: Tag) extends CaseFabricTenantTable[PlanItemHistoryRecord](tag, "plan_item_history") {
 
     lazy val id = idColumn[String]("id", O.PrimaryKey)
 

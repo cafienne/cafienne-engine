@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression;
+package com.casefabric.cmmn.expression;
 
-import org.cafienne.actormodel.exception.CommandException;
+import com.casefabric.actormodel.exception.CommandException;
 
 public class InvalidExpressionException extends CommandException {
     public InvalidExpressionException(String message, Throwable t) {

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 class AuthenticationException(msg: String) extends RuntimeException(msg) {
   def this(msg: String, cause: Throwable) = {

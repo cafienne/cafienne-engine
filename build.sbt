@@ -6,8 +6,8 @@ val basicSettings = {
   val supportedScalaVersions = List(scala213)
 
   Seq(
-    name := "Cafienne Engine",
-    organization := "org.cafienne",
+    name := "Case Engine",
+    organization := "com.casefabric",
     organizationName := "Batav B.V.",
     startYear := Some(2014),
 
@@ -45,8 +45,8 @@ val basicSettings = {
     /**
       * Publishing information for Sonatype and Maven
       */
-    homepage := Some(url("https://cafienne.org")),
-    scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git")),
+    homepage := Some(url("https://casefabric.com")),
+    scmInfo := Some(ScmInfo(url("https://github.com/casefabric/case-engine.git"), "git@github.com:casefabric/case-engine.git")),
     licenses += ("AGPL-3.0", url("https://www.gnu.org/licenses/agpl-3.0.txt")),
     developers := List(Developer(
       "tpetter",
@@ -91,7 +91,7 @@ val basicSettings = {
     sbtbuildinfo.BuildInfoKeys.buildInfoKeys := Seq[BuildInfoKey](name, organization, version, description, git.gitHeadCommit, git.gitCurrentBranch, git.gitUncommittedChanges),
     sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.BuildTime,
     sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.ToMap,
-    sbtbuildinfo.BuildInfoKeys.buildInfoPackage := "org.cafienne",
+    sbtbuildinfo.BuildInfoKeys.buildInfoPackage := "com.casefabric",
     sbtbuildinfo.BuildInfoKeys.buildInfoObject := "BuildInfo"
   )
 }
@@ -123,16 +123,16 @@ val service = (project in file("service"))
   .settings(
     name := "case-service",
     libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps,
-    Compile / mainClass := Some("org.cafienne.service.Main"),
+    Compile / mainClass := Some("com.casefabric.service.Main"),
     // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
-    packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("org.cafienne.service.Main"),
+    packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("com.casefabric.service.Main"),
     /**
       * Docker packaging
       */
-    Docker / packageName := "cafienne/engine",
+    Docker / packageName := "casefabric/engine",
     Docker / version := "latest",
-    Docker / maintainer := """Cafienne <info@cafienne.io>""",
-    Docker / defaultLinuxInstallLocation := "/opt/cafienne",
+    Docker / maintainer := """CaseFabric <info@casefabric.com>""",
+    Docker / defaultLinuxInstallLocation := "/opt/casefabric",
     dockerBaseImage := "eclipse-temurin:21.0.4_7-jre-jammy",
     dockerExposedPorts := Seq(2027, 9999),
     bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value,

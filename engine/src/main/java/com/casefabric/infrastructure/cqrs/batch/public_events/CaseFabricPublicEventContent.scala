@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.json.CafienneJson
+import com.casefabric.json.CaseFabricJson
 
-trait CafiennePublicEventContent extends CafienneJson {
+trait CaseFabricPublicEventContent extends CaseFabricJson {
   override def toString: String = getClass.getSimpleName
 
 }

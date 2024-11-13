@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation.definition;
+package com.casefabric.processtask.implementation.calculation.definition;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.json.Value;
-import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.CalculationDefinition;
-import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
-import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
-import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.implementation.calculation.Calculation;
+import com.casefabric.processtask.implementation.calculation.CalculationDefinition;
+import com.casefabric.processtask.implementation.calculation.Result;
+import com.casefabric.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.expression.ConditionDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.source.InputReference;
+import com.casefabric.processtask.implementation.calculation.definition.source.SourceDefinition;
+import com.casefabric.processtask.implementation.calculation.operation.CalculationStep;
+import com.casefabric.util.XMLHelper;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

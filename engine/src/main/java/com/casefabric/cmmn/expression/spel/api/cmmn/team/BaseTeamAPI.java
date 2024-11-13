@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.team;
+package com.casefabric.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
-import org.cafienne.cmmn.expression.spel.api.APIObject;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.team.Team;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamMember;
+import com.casefabric.cmmn.expression.spel.api.APIObject;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.team.Team;
 
 class BaseTeamAPI extends APIObject<Case> {
     protected final Team team;

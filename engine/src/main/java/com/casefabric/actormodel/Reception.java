@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotProtocol;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.*;
-import org.cafienne.infrastructure.serialization.DeserializationFailure;
-import org.cafienne.storage.actormodel.message.StorageEvent;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.actormodel.response.*;
+import com.casefabric.infrastructure.serialization.DeserializationFailure;
+import com.casefabric.storage.actormodel.message.StorageEvent;
 
 /**
  * All actor system incoming traffic (either during recovery or upon receiving incoming messages)

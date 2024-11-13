@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.payload
+package com.casefabric.service.infrastructure.payload
 
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
-import org.cafienne.util.XMLHelper
+import com.casefabric.util.XMLHelper
 import org.w3c.dom.Document
 
 /**

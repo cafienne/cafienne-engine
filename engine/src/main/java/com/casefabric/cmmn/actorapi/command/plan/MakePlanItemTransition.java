@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.plan;
+package com.casefabric.cmmn.actorapi.command.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseNotModifiedResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.CommandException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.actorapi.response.CaseNotModifiedResponse;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.util.ArrayList;

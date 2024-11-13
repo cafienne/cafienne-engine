@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.command.platform;
+package com.casefabric.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.PlatformOwner;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.TenantCommand;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.PlatformOwner;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
+import com.casefabric.tenant.actorapi.command.TenantCommand;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ public abstract class PlatformTenantCommand extends TenantCommand {
 
     @Override
     public void validate(TenantActor modelActor) throws InvalidCommandException {
-        if (! Cafienne.isPlatformOwner(getUser())) {
+        if (! CaseFabric.isPlatformOwner(getUser())) {
             throw new AuthorizationException("Only platform owners can invoke platform commands");
         }
     }

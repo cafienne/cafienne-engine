@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.team;
+package com.casefabric.cmmn.instance.team;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
 
 /**
  * Thrown when an error is found while trying to modify the case team.

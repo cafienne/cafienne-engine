@@ -40,11 +40,11 @@
                 <inputs id="_qgYaQ_18" name="TaskInputParameter"/>
                 <outputs id="_qgYaQ_15" name="TaskOutputParameter" bindingRef="_qgYaQ_5">
                     <extensionElements mustUnderstand="false">
-                        <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                        <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                     </extensionElements>
                 </outputs>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
                         <input id="_ydL3_Owner" name="Owner"/>
                         <input id="_67M8_Content" name="Content"/>
                         <output id="_DtOu_Decision" name="Decision"/>
@@ -64,23 +64,23 @@
                             </transformation>
                         </parameterMapping>
                         <parameterMapping id="_qgYaQ_16" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_15"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
                 <outputs id="_qgYaQ_54" name="Decision">
                     <extensionElements mustUnderstand="false">
-                        <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                        <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                     </extensionElements>
                 </outputs>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask">
                         <input id="_ydL3_Owner" name="Owner"/>
                         <input id="_67M8_Content" name="Content"/>
                         <output id="_DtOu_Decision" name="Decision"/>
                         <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
                         <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>
@@ -88,7 +88,7 @@
                 <inputs id="_qgYaQ_34" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
                 <outputs id="_qgYaQ_30" name="responseCode" bindingRef="_qgYaQ_37">
                     <extensionElements mustUnderstand="false">
-                        <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                        <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                     </extensionElements>
                 </outputs>
                 <parameterMapping id="_qgYaQ_31" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
@@ -116,26 +116,26 @@ HumanTask2 has default validation and a mandatory output parameter]]>
         <output id="_Wddw_responseCode" name="responseCode"/>
         <input id="_FC9h_httpPort" name="httpPort"/>
         <extensionElements>
-            <cafienne:implementation xmlns:cafienne="org.cafienne" async="false" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+            <casefabric:implementation xmlns:casefabric="com.casefabric" async="false" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
                 <url>http://localhost:${httpPort}/ping</url>
                 <method>GET</method>
                 <http-headers>
                     <http-header name="Accept">application/json</http-header>
                 </http-headers>
                 <parameterMapping sourceRef="responseCode" targetRef="responseCode"/>
-            </cafienne:implementation>
+            </casefabric:implementation>
         </extensionElements>
     </process>
     <process name="humantaskvalidator" description="" id="humantaskvalidator.process">
         <extensionElements>
-            <cafienne:implementation xmlns:cafienne="org.cafienne" async="false" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+            <casefabric:implementation xmlns:casefabric="com.casefabric" async="false" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
                 <url>http://localhost:17382/validate</url>
                 <method>POST</method>
                 <http-headers>
                     <http-header name="Accept">application/json</http-header>
                 </http-headers>
                 <post-content/>
-            </cafienne:implementation>
+            </casefabric:implementation>
         </extensionElements>
     </process>
     <CMMNDI>

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
 import org.apache.pekko.actor.ExtendedActorSystem;
 import org.apache.pekko.serialization.SerializerWithStringManifest;
-import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
-import org.cafienne.infrastructure.serialization.serializers.EventSerializers;
-import org.cafienne.infrastructure.serialization.serializers.ResponseSerializers;
-import org.cafienne.infrastructure.serialization.serializers.StorageSerializers;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.ValueMap;
+import com.casefabric.infrastructure.serialization.serializers.CommandSerializers;
+import com.casefabric.infrastructure.serialization.serializers.EventSerializers;
+import com.casefabric.infrastructure.serialization.serializers.ResponseSerializers;
+import com.casefabric.infrastructure.serialization.serializers.StorageSerializers;
+import com.casefabric.json.JSONParseFailure;
+import com.casefabric.json.JSONReader;
+import com.casefabric.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +34,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CafienneSerializer extends SerializerWithStringManifest {
-    private final static Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
+public class CaseFabricSerializer extends SerializerWithStringManifest {
+    private final static Logger logger = LoggerFactory.getLogger(CaseFabricSerializer.class);
 
     /**
-     * The unique identifier for the CafienneSerializer (value is <code>424242</code>)
+     * The unique identifier for the CaseFabricSerializer (value is <code>424242</code>)
      */
     public static final int IDENTIFIER = 52943;
 
@@ -56,7 +56,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         return manifests.get(manifestString);
     }
 
-    public static <CS extends CafienneSerializable>void addManifestWrapper(Class<CS> eventClass, ValueMapDeserializer<CS> deserializer) {
+    public static <CS extends CaseFabricSerializable>void addManifestWrapper(Class<CS> eventClass, ValueMapDeserializer<CS> deserializer) {
         ManifestWrapper manifest = new ManifestWrapper(eventClass, deserializer);
         manifestsByClass.put(manifest.eventClass, manifest);
         // Now register manifest strings of all versions, starting from the current
@@ -70,18 +70,18 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         if (manifest != null) {
             return manifest.toString();
         } else {
-            if (o instanceof CafienneSerializable) {
+            if (o instanceof CaseFabricSerializable) {
                 throw new RuntimeException("A manifest wrapper for class " + o.getClass().getName() + " has not been registered");
             } else {
-                throw new RuntimeException("CafienneSerializer can only serialize objects implementing CafienneSerializable");
+                throw new RuntimeException("CaseFabricSerializer can only serialize objects implementing CaseFabricSerializable");
             }
         }
     }
 
-    public CafienneSerializer() {
+    public CaseFabricSerializer() {
     }
 
-    public CafienneSerializer(ExtendedActorSystem system) {
+    public CaseFabricSerializer(ExtendedActorSystem system) {
     }
 
     @FunctionalInterface // Simplistic interface to avoid an if statement in the deserialize function
@@ -143,11 +143,11 @@ public class CafienneSerializer extends SerializerWithStringManifest {
 
     @Override
     public byte[] toBinary(Object o) {
-        if (o instanceof CafienneSerializable) {
-            CafienneSerializable target = (CafienneSerializable) o;
+        if (o instanceof CaseFabricSerializable) {
+            CaseFabricSerializable target = (CaseFabricSerializable) o;
             return target.toBytes();
         }
-        throw new RuntimeException("CafienneSerializer can only serialize objects implementing CafienneSerializable");
+        throw new RuntimeException("CaseFabricSerializer can only serialize objects implementing CaseFabricSerializable");
     }
 }
 

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.event;
+package com.casefabric.actormodel.event;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.message.UserMessage;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.message.UserMessage;
+import com.casefabric.json.ValueMap;
 
 import java.time.Instant;
 import java.util.Set;
 
 public interface ModelEvent extends UserMessage {
-    String TAG = "cafienne";
+    String TAG = "casefabric";
 
     Set<String> tags = Set.of(ModelEvent.TAG);
 

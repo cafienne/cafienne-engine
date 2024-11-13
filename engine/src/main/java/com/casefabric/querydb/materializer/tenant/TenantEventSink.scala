@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package com.casefabric.querydb.materializer.tenant
 
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
-import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.event.TenantEvent
+import com.casefabric.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.event.TenantEvent
 
 import scala.concurrent.Future
 

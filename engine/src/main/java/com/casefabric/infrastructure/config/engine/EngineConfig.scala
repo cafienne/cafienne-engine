@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.engine
+package com.casefabric.infrastructure.config.engine
 
-import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.infrastructure.config.CafienneConfig
+import com.casefabric.infrastructure.config.util.ChildConfigReader
+import com.casefabric.infrastructure.config.CaseFabricConfig
 
-class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
+class EngineConfig(val parent: CaseFabricConfig) extends ChildConfigReader {
   def path = "engine"
 
   /**

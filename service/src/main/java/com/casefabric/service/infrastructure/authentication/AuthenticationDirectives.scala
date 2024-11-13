@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import org.apache.pekko.http.scaladsl.server.directives.Credentials
 import org.apache.pekko.http.scaladsl.server.{Directive1, Directives}
-import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.actormodel.identity.{IdentityProvider, PlatformUser}
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
 
 import scala.concurrent.{ExecutionContext, Future}
 

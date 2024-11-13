@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent
-import org.cafienne.cmmn.actorapi.event.{CaseAppliedPlatformUpdate, CaseEvent, CaseModified}
-import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent
-import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
-import org.cafienne.querydb.materializer.cases.plan.CasePlanProjection
-import org.cafienne.querydb.materializer.cases.team.CaseTeamProjection
-import org.cafienne.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}
+import com.casefabric.actormodel.event.CommitEvent
+import com.casefabric.cmmn.actorapi.event.file.CaseFileEvent
+import com.casefabric.cmmn.actorapi.event.{CaseAppliedPlatformUpdate, CaseEvent, CaseModified}
+import com.casefabric.cmmn.actorapi.event.plan.CasePlanEvent
+import com.casefabric.cmmn.actorapi.event.team.CaseTeamEvent
+import com.casefabric.infrastructure.cqrs.ModelEventEnvelope
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.querydb.materializer.cases.file.CaseFileProjection
+import com.casefabric.querydb.materializer.cases.plan.CasePlanProjection
+import com.casefabric.querydb.materializer.cases.team.CaseTeamProjection
+import com.casefabric.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}
 
 import scala.concurrent.Future
 

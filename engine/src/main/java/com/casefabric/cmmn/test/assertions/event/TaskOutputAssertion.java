@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions.event;
+package com.casefabric.cmmn.test.assertions.event;
 
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import com.casefabric.json.Value;
 
 /**
  * Assertions around a TaskOutputFilled event

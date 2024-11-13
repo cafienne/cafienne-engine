@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.event;
+package com.casefabric.actormodel.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.file
+package com.casefabric.service.http.cases.file
 
 import io.swagger.v3.oas.annotations.media.Schema
 

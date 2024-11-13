@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.LongValue;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.LongValue;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ import java.io.IOException;
 @Manifest
 public class PingCommand extends TestScriptCommand {
     static {
-        CafienneSerializer.addManifestWrapper(PingCommand.class, PingCommand::new);
+        CaseFabricSerializer.addManifestWrapper(PingCommand.class, PingCommand::new);
     }
 
     private final long waitTime;

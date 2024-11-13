@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.cmmn.instance.State;
+import com.casefabric.cmmn.instance.State;
 
 import java.util.ArrayList;
 import java.util.List;

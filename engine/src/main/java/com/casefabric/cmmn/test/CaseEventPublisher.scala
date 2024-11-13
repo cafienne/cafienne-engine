@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test
+package com.casefabric.cmmn.test
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import org.apache.pekko.{Done, NotUsed}
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.infrastructure.cqrs.ReadJournalProvider
 
 import scala.concurrent.Future
 

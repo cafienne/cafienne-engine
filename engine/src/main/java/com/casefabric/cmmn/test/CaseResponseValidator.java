@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
 @FunctionalInterface
 public interface CaseResponseValidator {

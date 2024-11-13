@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository;
+package com.casefabric.cmmn.repository;
 
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.cmmn.definition.DefinitionsDocument;
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.cmmn.definition.DefinitionsDocument;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
 
 import java.util.List;
 

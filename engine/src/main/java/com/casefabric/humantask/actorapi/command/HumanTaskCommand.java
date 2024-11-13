@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.command;
+package com.casefabric.humantask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.TaskPairingDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
-import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.definition.extension.workflow.FourEyesDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.RendezVousDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.TaskPairingDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.humantask.actorapi.response.HumanTaskResponse;
+import com.casefabric.humantask.instance.TaskState;
+import com.casefabric.humantask.instance.WorkflowTask;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.util.Arrays;

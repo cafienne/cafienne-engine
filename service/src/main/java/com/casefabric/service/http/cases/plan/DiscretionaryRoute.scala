@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.plan
+package com.casefabric.service.http.cases.plan
 
 import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -24,10 +24,10 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.plan.DiscretionaryAPIFormat._
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.plan.DiscretionaryAPIFormat._
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
 

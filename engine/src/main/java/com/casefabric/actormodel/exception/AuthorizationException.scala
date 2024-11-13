@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.exception
+package com.casefabric.actormodel.exception
 
 case class AuthorizationException(message: String) extends RuntimeException(message)

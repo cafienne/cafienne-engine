@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.api
+package com.casefabric.infrastructure.config.api
 
 import com.typesafe.config.{Config, ConfigObject}
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.config.util.{ChildConfigReader, ConfigReader}
+import com.casefabric.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}
+import com.casefabric.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
+import com.casefabric.cmmn.definition.CaseDefinition
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.config.util.{ChildConfigReader, ConfigReader}
 
 class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
   lazy val anonymousUser = new AnonymousUserConfig(readConfig("user"))
   lazy val definitions: Map[String, AnonymousCaseDefinition] = {
     if (!config.hasPath("definitions")) {
-      fail("Cafienne anonymous API requires a set of definitions")
+      fail("CaseFabric anonymous API requires a set of definitions")
     }
     val definitionMap = scala.collection.mutable.Map[String, AnonymousCaseDefinition]()
     config.getObjectList("definitions").forEach(definitionConfig => {
@@ -48,7 +48,7 @@ class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
 }
 
 class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: AnonymousUserConfig) extends ConfigReader {
-  lazy val definition: CaseDefinition = Cafienne.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definitionFile).getFirstCase
+  lazy val definition: CaseDefinition = CaseFabric.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definitionFile).getFirstCase
   lazy val definitionFile: String = {
     val filename = readString("definition")
     if (filename.isBlank) {
@@ -61,7 +61,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   // Validate url, definition and tenant contents; definition and tenant cannot be blank.
   val url: String = readString("url")
   val tenant: String = {
-    val tenant = readString("tenant", Cafienne.config.platform.defaultTenant)
+    val tenant = readString("tenant", CaseFabric.config.platform.defaultTenant)
     if (tenant.isBlank) {
       fail(s"Tenant is missing in anonymous case definition on url '/request/case/$url' --> '$definitionFile'; also default tenant is empty")
     }

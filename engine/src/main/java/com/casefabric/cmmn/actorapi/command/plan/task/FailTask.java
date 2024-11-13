@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.plan.task;
+package com.casefabric.cmmn.actorapi.command.plan.task;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 @Manifest
 public class FailTask extends CompleteTask {

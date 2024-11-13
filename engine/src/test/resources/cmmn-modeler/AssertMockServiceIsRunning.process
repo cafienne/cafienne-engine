@@ -2,13 +2,13 @@
     <output id="_Wddw_responseCode" name="responseCode"/>
     <input id="_FC9h_httpPort" name="httpPort"/>
     <extensionElements>
-        <cafienne:implementation xmlns:cafienne="org.cafienne" async="false" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+        <casefabric:implementation xmlns:casefabric="com.casefabric" async="false" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
             <url>http://localhost:${httpPort}/ping</url>
             <method>GET</method>
             <http-headers>
                 <http-header name="Accept">application/json</http-header>
             </http-headers>
             <parameterMapping sourceRef="responseCode" targetRef="responseCode"/>
-        </cafienne:implementation>
+        </casefabric:implementation>
     </extensionElements>
 </process>

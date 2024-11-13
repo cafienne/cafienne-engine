@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.platform
+package com.casefabric.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.exception.InvalidCommandException
-import org.cafienne.json.{CafienneJson, Value, ValueList}
+import com.casefabric.actormodel.exception.InvalidCommandException
+import com.casefabric.json.{CaseFabricJson, Value, ValueList}
 
-case class PlatformUpdate(info: Seq[NewUserInformation]) extends CafienneJson {
+case class PlatformUpdate(info: Seq[NewUserInformation]) extends CaseFabricJson {
   override def toValue: Value[_] = {
     val list = new ValueList()
     info.map(user => list.add(user.toValue))

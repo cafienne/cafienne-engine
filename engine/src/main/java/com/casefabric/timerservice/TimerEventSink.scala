@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice
+package com.casefabric.timerservice
 
 import org.apache.pekko.Done
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.Offset
 import org.apache.pekko.stream.scaladsl.Sink
-import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
-import org.cafienne.system.CaseSystem
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.cmmn.actorapi.event.plan.eventlistener._
+import com.casefabric.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
+import com.casefabric.system.CaseSystem
+import com.casefabric.system.health.HealthMonitor
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.parameter;
+package com.casefabric.cmmn.instance.parameter;
 
-import org.cafienne.cmmn.definition.parameter.BindingOperation;
-import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.json.StringValue;
+import com.casefabric.cmmn.definition.parameter.BindingOperation;
+import com.casefabric.cmmn.definition.parameter.BindingRefinementDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.json.StringValue;
 
 /**
  * TaskInputParameter is specific from other parameters, in that its value is typically bound to the case file.

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.workflow;
+package com.casefabric.cmmn.expression.spel.api.cmmn.workflow;
 
-import org.cafienne.cmmn.definition.extension.workflow.DueDateDefinition;
-import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.PlanItemRootAPI;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.cmmn.definition.extension.workflow.DueDateDefinition;
+import com.casefabric.cmmn.expression.spel.api.cmmn.constraint.PlanItemRootAPI;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
 
 public class DueDateAPI extends PlanItemRootAPI {
     public DueDateAPI(DueDateDefinition constraintDefinition, HumanTask task) {

@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 class UnhealthyCaseSystem(msg:String) extends Exception(msg)

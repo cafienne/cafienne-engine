@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationStarted;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskCommandRejected;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskImplementationStarted;
 
 public class TaskImplementationActorState {
     private final Task<?> task;
@@ -33,7 +33,7 @@ public class TaskImplementationActorState {
 
     public boolean isStarted() {
         // For backwards compatibility:
-        //  If a task is successfully started in older versions of Cafienne, it will be in state Active;
+        //  If a task is successfully started in older versions of CaseFabric, it will be in state Active;
         //  However, the state of the task interaction is not stored through below handle events.
         //  Therefore, we use the flags in combination with the known task state.
         //  - if (isStated == true), then we have received and stored an event for it.

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.definition;
+package com.casefabric.processtask.definition;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
-import org.cafienne.processtask.implementation.InlineSubProcess;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.instance.task.process.ProcessTask;
+import com.casefabric.processtask.implementation.InlineSubProcess;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 /**

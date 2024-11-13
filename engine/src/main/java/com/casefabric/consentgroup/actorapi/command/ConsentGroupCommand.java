@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.command;
+package com.casefabric.consentgroup.actorapi.command;
 
-import org.cafienne.actormodel.command.BaseModelCommand;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMessage;
-import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BaseModelCommand;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.ConsentGroupUser;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.consentgroup.actorapi.ConsentGroupMessage;
+import com.casefabric.consentgroup.actorapi.exception.ConsentGroupException;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupResponse;
+import com.casefabric.json.ValueMap;
 
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam

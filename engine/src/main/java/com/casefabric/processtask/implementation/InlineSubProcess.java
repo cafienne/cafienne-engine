@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation;
+package com.casefabric.processtask.implementation;
 
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.definition.InlineSubProcessDefinition;
-import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.definition.SubProcessOutputMappingDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.cmmn.instance.task.process.ProcessTask;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.definition.InlineSubProcessDefinition;
+import com.casefabric.processtask.definition.SubProcessDefinition;
+import com.casefabric.processtask.definition.SubProcessOutputMappingDefinition;
 
 import java.util.Collection;
 

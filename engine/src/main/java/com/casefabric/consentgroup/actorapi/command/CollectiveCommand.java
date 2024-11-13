@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.command;
+package com.casefabric.consentgroup.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.ConsentGroup;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
-import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.ConsentGroupUser;
+import com.casefabric.actormodel.identity.TenantUser;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.consentgroup.actorapi.ConsentGroup;
+import com.casefabric.consentgroup.actorapi.ConsentGroupMember;
+import com.casefabric.consentgroup.actorapi.exception.ConsentGroupException;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupResponse;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 import scala.collection.immutable.Seq;
 
 import java.io.IOException;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence.cassandra
+package com.casefabric.timerservice.persistence.cassandra
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
@@ -25,10 +25,10 @@ import com.datastax.oss.driver.api.core.`type`.DataTypes
 import com.datastax.oss.driver.api.core.cql._
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal
 import com.datastax.oss.driver.api.querybuilder.{QueryBuilder, SchemaBuilder}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.timerservice.Timer
-import org.cafienne.timerservice.persistence.TimerStore
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.timerservice.Timer
+import com.casefabric.timerservice.persistence.TimerStore
 
 import java.time.Instant
 import java.util.UUID
@@ -36,9 +36,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore {
-  private val keyspace: String = Cafienne.config.persistence.eventDB.journal.getString("keyspace") // Use configured keyspace of journal to also store timers
-  private val timerTable: String = "cafienne_timer"
-  private val offsetTable: String = "cafienne_timer_offset"
+  private val keyspace: String = CaseFabric.config.persistence.eventDB.journal.getString("keyspace") // Use configured keyspace of journal to also store timers
+  private val timerTable: String = "casefabric_timer"
+  private val offsetTable: String = "casefabric_timer_offset"
   private val cassandraTimeout: Timeout = Timeout(15.seconds)
   override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 

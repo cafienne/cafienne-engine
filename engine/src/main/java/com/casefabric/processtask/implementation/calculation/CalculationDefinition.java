@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation;
+package com.casefabric.processtask.implementation.calculation;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
-import org.cafienne.processtask.definition.InlineSubProcessDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.MapStepDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.MultiStepDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.instance.task.process.ProcessTask;
+import com.casefabric.processtask.definition.InlineSubProcessDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.FilterStepDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.MapStepDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.MultiStepDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.StepDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.w3c.dom.Element;
 
 import java.util.*;

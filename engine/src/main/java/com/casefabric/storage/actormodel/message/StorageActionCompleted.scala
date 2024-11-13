@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package com.casefabric.storage.actormodel.message
 
 trait StorageActionCompleted extends StorageEvent

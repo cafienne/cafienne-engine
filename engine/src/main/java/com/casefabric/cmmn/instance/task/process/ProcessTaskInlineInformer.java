@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.process;
+package com.casefabric.cmmn.instance.task.process;
 
-import org.cafienne.cmmn.definition.ProcessTaskDefinition;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.implementation.InlineSubProcess;
+import com.casefabric.cmmn.definition.ProcessTaskDefinition;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.implementation.InlineSubProcess;
 
 class ProcessTaskInlineInformer extends ProcessInformer {
 

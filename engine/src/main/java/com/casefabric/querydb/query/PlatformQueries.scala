@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
+import com.casefabric.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
 
 import scala.collection.mutable.{Map, Set}
 import scala.concurrent.{ExecutionContext, Future}

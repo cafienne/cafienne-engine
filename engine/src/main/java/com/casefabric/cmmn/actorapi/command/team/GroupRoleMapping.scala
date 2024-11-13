@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import java.util
 import scala.jdk.CollectionConverters.SetHasAsJava
 
-case class GroupRoleMapping(groupRole: String, isOwner: Boolean = false, caseRoles: Set[String], rolesRemoved: Set[String] = Set()) extends CafienneJson {
+case class GroupRoleMapping(groupRole: String, isOwner: Boolean = false, caseRoles: Set[String], rolesRemoved: Set[String] = Set()) extends CaseFabricJson {
   override def toValue: Value[_] = {
     val json = new ValueMap(Fields.groupRole, groupRole, Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
     if (rolesRemoved.nonEmpty) {

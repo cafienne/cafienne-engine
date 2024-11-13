@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.consentgroup.route
+package com.casefabric.service.http.consentgroup.route
 
-import org.cafienne.system.CaseSystem
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.AuthenticatedRoute
+import com.casefabric.service.infrastructure.route.AuthenticatedRoute
 
 @Path("consent-group")
 class ConsentGroupRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {

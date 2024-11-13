@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.exception;
+package com.casefabric.actormodel.exception;
 
-import org.cafienne.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.command.ModelCommand;
 
 /**
  * Every {@link ModelCommand} must have a tenant set.

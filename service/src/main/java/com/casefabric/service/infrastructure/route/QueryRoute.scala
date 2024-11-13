@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.json.{CafienneJson, Value}
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
-import org.cafienne.querydb.query.exception.SearchFailure
+import com.casefabric.actormodel.exception.AuthorizationException
+import com.casefabric.json.{CaseFabricJson, Value}
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.querydb.query.exception.SearchFailure
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -37,22 +37,22 @@ trait QueryRoute extends AuthenticatedRoute {
     readLastModifiedHeader(lastModifiedHeaderName)(subRoute)
   }
 
-  def runQuery[T <: CafienneJson](future: => Future[T]): Route = {
+  def runQuery[T <: CaseFabricJson](future: => Future[T]): Route = {
     readLastModifiedHeader() { lastModified => handleQueryResult(runSyncedQuery(future, lastModified)) }
   }
 
-  def runListQuery[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
+  def runListQuery[T <: CaseFabricJson](future: => Future[Seq[T]]): Route = {
     readLastModifiedHeader() { lastModified => handleQueryResultList(runSyncedQuery(future, lastModified)) }
   }
 
-  def handleQueryResult[T <: CafienneJson](future: => Future[T]): Route = {
+  def handleQueryResult[T <: CaseFabricJson](future: => Future[T]): Route = {
     onComplete(future) {
       case Success(value) => completeJson(value.toValue)
       case Failure(t) => handleFailure(t)
     }
   }
 
-  def handleQueryResultList[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
+  def handleQueryResultList[T <: CaseFabricJson](future: => Future[Seq[T]]): Route = {
     onComplete(future) {
       case Success(value) => completeJson(Value.convert(value.map(v => v.toValue)))
       case Failure(t) => handleFailure(t)

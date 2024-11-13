@@ -15,34 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.event;
+package com.casefabric.consentgroup.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 
 @Manifest
 public class ConsentGroupCreated extends ConsentGroupBaseEvent implements BootstrapMessage {
-    public final CafienneVersion engineVersion;
+    public final CaseFabricVersion engineVersion;
     public final String tenant;
 
     public ConsentGroupCreated(ConsentGroupActor group, String tenant) {
         super(group);
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = CaseFabric.version();
         this.tenant = tenant;
     }
 
     public ConsentGroupCreated(ValueMap json) {
         super(json);
         this.tenant = json.readString(Fields.tenant);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, CaseFabricVersion::new);
     }
 
     @Override

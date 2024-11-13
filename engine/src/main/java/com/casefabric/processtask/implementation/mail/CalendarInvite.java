@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -30,9 +30,9 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.util.RandomUidGenerator;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;

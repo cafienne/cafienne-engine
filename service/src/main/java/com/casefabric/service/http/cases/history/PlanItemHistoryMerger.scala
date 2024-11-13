@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.history
+package com.casefabric.service.http.cases.history
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
-import org.cafienne.cmmn.actorapi.event.plan._
-import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.querydb.record.PlanItemHistoryRecord
+import com.casefabric.cmmn.actorapi.event.migration.PlanItemMigrated
+import com.casefabric.cmmn.actorapi.event.plan._
+import com.casefabric.infrastructure.cqrs.ModelEventEnvelope
+import com.casefabric.querydb.record.PlanItemHistoryRecord
 
 object PlanItemHistoryMerger extends LazyLogging {
   def mapModelEventEnvelope(evt: ModelEventEnvelope): Option[PlanItemHistoryRecord] = {

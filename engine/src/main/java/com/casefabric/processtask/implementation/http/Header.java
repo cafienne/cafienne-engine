@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.http;
+package com.casefabric.processtask.implementation.http;
 
 import java.util.Objects;
 

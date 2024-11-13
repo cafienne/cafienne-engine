@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.event.platform;
+package com.casefabric.tenant.actorapi.event.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.event.TenantBaseEvent;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
+import com.casefabric.tenant.actorapi.event.TenantBaseEvent;
 
 import java.io.IOException;
 

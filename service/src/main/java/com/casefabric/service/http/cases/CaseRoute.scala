@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases
+package com.casefabric.service.http.cases
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
@@ -26,18 +26,18 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam
-import org.cafienne.cmmn.definition.InvalidDefinitionException
-import org.cafienne.cmmn.repository.MissingDefinitionException
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.service.http.cases.CaseAPIFormat._
-import org.cafienne.service.infrastructure.route.CaseTeamValidator
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.StartCase
+import com.casefabric.cmmn.actorapi.command.debug.SwitchDebugMode
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam
+import com.casefabric.cmmn.definition.InvalidDefinitionException
+import com.casefabric.cmmn.repository.MissingDefinitionException
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.querydb.query.filter.CaseFilter
+import com.casefabric.service.http.cases.CaseAPIFormat._
+import com.casefabric.service.infrastructure.route.CaseTeamValidator
+import com.casefabric.system.CaseSystem
 
 import java.util.UUID
 import scala.util.{Failure, Success}
@@ -183,13 +183,13 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
           entity(as[StartCaseFormat]) { payload =>
             caseStarter(user, payload.tenant) { (user, tenant) =>
               try {
-                val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
+                val definitionsDocument = CaseFabric.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
                 val caseDefinition = definitionsDocument.getFirstCase
 
                 val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
                 val inputParameters = payload.inputs
                 val caseTeam: CaseTeam = payload.caseTeam.asTeam
-                val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                val debugMode = payload.debug.getOrElse(CaseFabric.config.actor.debugEnabled)
                 validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, user, newCaseId, caseDefinition, inputParameters, team, debugMode)))
               } catch {
                 case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

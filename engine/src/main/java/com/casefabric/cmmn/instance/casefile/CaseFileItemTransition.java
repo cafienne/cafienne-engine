@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
 public enum CaseFileItemTransition {
     AddChild("addChild"),

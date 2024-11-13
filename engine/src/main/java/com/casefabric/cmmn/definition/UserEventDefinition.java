@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.*;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

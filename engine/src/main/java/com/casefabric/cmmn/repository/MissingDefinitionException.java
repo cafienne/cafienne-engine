@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository;
+package com.casefabric.cmmn.repository;
 
 /**
  * Simple exception class to be used when a DefinitionsDocument cannot be found

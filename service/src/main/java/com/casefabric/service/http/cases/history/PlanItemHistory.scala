@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.history
+package com.casefabric.service.http.cases.history
 
-import org.cafienne.json.{CafienneJson, Value}
-import org.cafienne.querydb.record.PlanItemHistoryRecord
+import com.casefabric.json.{CaseFabricJson, Value}
+import com.casefabric.querydb.record.PlanItemHistoryRecord
 
-final case class PlanItemHistory(records: Seq[PlanItemHistoryRecord]) extends CafienneJson {
+final case class PlanItemHistory(records: Seq[PlanItemHistoryRecord]) extends CaseFabricJson {
   override def toValue: Value[_] = Value.convert(records.map(item => item.toValue))
 }

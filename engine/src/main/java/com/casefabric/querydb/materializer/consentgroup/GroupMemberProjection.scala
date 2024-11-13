@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.consentgroup
+package com.casefabric.querydb.materializer.consentgroup
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.consentgroup.actorapi.event._
-import org.cafienne.querydb.record.ConsentGroupMemberRecord
+import com.casefabric.consentgroup.actorapi.event._
+import com.casefabric.querydb.record.ConsentGroupMemberRecord
 
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.SetHasAsScala

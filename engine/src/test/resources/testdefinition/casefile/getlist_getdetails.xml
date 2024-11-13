@@ -89,7 +89,7 @@
         <output id="o_4" name="detailsIdentifiers"/>
         <output id="o_5" name="headerContentLength"/>
         <extensionElements>
-            <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+            <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
                 <url>http://localhost:${httpPort}/getListWebService</url>
                 <method>GET</method>
                 <http-headers>
@@ -105,7 +105,7 @@
                         <body>responseHeaders.get("Content-Type")</body>
                     </transformation>
                 </parameterMapping>
-            </cafienne:implementation>
+            </casefabric:implementation>
         </extensionElements>
     </process>
     <process name="GetDetailsWebService" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" id="GetDetailsWebService.process">
@@ -113,7 +113,7 @@
         <input id="in2_detailsId" name="detailsId"/>
         <output id="out1_details" name="details"/>
         <extensionElements>
-            <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+            <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.processtask.implementation.http.HTTPCallDefinition">
                 <url>http://localhost:${httpPort}/details/${detailsId}</url>
                 <method>GET</method>
                 <http-headers>
@@ -124,7 +124,7 @@
                         <body>$.._2</body>
                     </transformation>
                 </parameterMapping>
-            </cafienne:implementation>
+            </casefabric:implementation>
         </extensionElements>
     </process>
     <CMMNDI>

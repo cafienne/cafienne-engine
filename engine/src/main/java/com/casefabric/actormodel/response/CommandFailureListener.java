@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.response;
+package com.casefabric.actormodel.response;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.command.ModelCommand;
 
 /**
  * When sending a message to another model instance from within a model,

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.extension.workflow;
+package com.casefabric.cmmn.definition.extension.workflow;
 
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.cmmn.definition.task.TaskImplementationContract;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.WorkflowTask;
+import com.casefabric.cmmn.definition.*;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.definition.parameter.OutputParameterDefinition;
+import com.casefabric.cmmn.definition.task.TaskImplementationContract;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.humantask.instance.WorkflowTask;
 import org.w3c.dom.Element;
 
 import java.util.LinkedHashMap;
@@ -86,7 +86,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     }
 
     public static WorkflowTaskDefinition createEmptyDefinition(HumanTaskDefinition taskDefinition) {
-        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(CAFIENNE_NAMESPACE, "implementation");
+        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(CASEFABRIC_NAMESPACE, "implementation");
         return new WorkflowTaskDefinition(customTag, taskDefinition.getModelDefinition(), taskDefinition);
     }
 

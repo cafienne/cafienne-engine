@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.router
+package com.casefabric.system.router
 
 import org.apache.pekko.actor.{Actor, Terminated}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
-import org.cafienne.infrastructure.serialization.DeserializationFailure
+import com.casefabric.actormodel.command.{ModelCommand, TerminateModelActor}
+import com.casefabric.infrastructure.serialization.DeserializationFailure
 
 /**
   * Base class for routing model commands into the case system

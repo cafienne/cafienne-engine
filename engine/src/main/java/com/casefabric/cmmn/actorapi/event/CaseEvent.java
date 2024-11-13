@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event;
+package com.casefabric.cmmn.actorapi.event;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.CaseMessage;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.cmmn.actorapi.CaseMessage;
 
 import java.util.Set;
 
 public interface CaseEvent extends ModelEvent, CaseMessage {
-    String TAG = "cafienne:case";
+    String TAG = "casefabric:case";
 
     Set<String> tags = Set.of(ModelEvent.TAG, CaseEvent.TAG);
 

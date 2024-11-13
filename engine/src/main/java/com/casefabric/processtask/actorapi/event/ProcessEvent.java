@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.event;
+package com.casefabric.processtask.actorapi.event;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.processtask.actorapi.ProcessActorMessage;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.processtask.actorapi.ProcessActorMessage;
 
 import java.util.Set;
 
 public interface ProcessEvent extends ModelEvent, ProcessActorMessage {
-    String TAG = "cafienne:process";
+    String TAG = "casefabric:process";
 
     Set<String> tags = Set.of(ModelEvent.TAG, ProcessEvent.TAG);
 

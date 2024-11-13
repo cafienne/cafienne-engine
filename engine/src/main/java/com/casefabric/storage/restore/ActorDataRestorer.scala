@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore
+package com.casefabric.storage.restore
 
 import org.apache.pekko.persistence.journal.Tagged
 import org.apache.pekko.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, BaseStorageActor}
-import org.cafienne.storage.archival.{Archive, ModelEventSerializer}
-import org.cafienne.storage.restore.command.RestoreArchive
-import org.cafienne.storage.restore.event.RestoreCompleted
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.{ActorMetadata, BaseStorageActor}
+import com.casefabric.storage.archival.{Archive, ModelEventSerializer}
+import com.casefabric.storage.restore.command.RestoreArchive
+import com.casefabric.storage.restore.event.RestoreCompleted
+import com.casefabric.system.CaseSystem
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.CollectionHasAsScala

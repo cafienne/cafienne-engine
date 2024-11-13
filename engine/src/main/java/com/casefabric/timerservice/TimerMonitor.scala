@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice
+package com.casefabric.timerservice
 
 import org.apache.pekko.Done
 import org.apache.pekko.actor.Scheduler
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.cmmn.actorapi.event.plan.eventlistener.TimerSet
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.system.health.HealthMonitor
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
@@ -41,7 +41,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
     reader.loadNextWindow
 
     // ... and then schedule the reader to repeat itself at the configured interval
-    val interval: FiniteDuration = Cafienne.config.engine.timerService.interval
+    val interval: FiniteDuration = CaseFabric.config.engine.timerService.interval
     scheduler.scheduleWithFixedDelay(interval, interval)(reader)
   }
 

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.state
+package com.casefabric.storage.actormodel.state
 
 import org.apache.pekko.Done
-import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
-import org.cafienne.cmmn.instance.PlanItemType
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.querydb.CaseStorage
+import com.casefabric.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
+import com.casefabric.cmmn.instance.PlanItemType
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.querydb.CaseStorage
 
 import scala.concurrent.Future
 

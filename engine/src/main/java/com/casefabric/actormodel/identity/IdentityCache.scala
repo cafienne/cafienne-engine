@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.querydb.record.TenantRecord
+import com.casefabric.cmmn.repository.file.SimpleLRUCache
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.querydb.query.{TenantQueriesImpl, UserQueries}
+import com.casefabric.querydb.record.TenantRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,8 +31,8 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
-  private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
-  private val tenantCache = new SimpleLRUCache[String, TenantRecord](Cafienne.config.api.security.identityCacheSize)
+  private val cache = new SimpleLRUCache[String, PlatformUser](CaseFabric.config.api.security.identityCacheSize)
+  private val tenantCache = new SimpleLRUCache[String, TenantRecord](CaseFabric.config.api.security.identityCacheSize)
 
   override def getPlatformUser(user: UserIdentity, tenantLastModified: LastModifiedHeader): Future[PlatformUser] = {
     tenantLastModified.available.flatMap(_ => executeUserQuery(user))

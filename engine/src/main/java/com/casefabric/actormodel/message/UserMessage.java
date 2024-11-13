@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.message;
+package com.casefabric.actormodel.message;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.JSONParseFailure;
+import com.casefabric.json.JSONReader;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -38,7 +38,7 @@ import java.io.StringWriter;
  * A UserMessage carries user information
  * Typically used in Commands and resulting Events and Responses from those commands.
  */
-public interface UserMessage extends CafienneSerializable {
+public interface UserMessage extends CaseFabricSerializable {
     UserIdentity getUser();
 
     /**
@@ -71,7 +71,7 @@ public interface UserMessage extends CafienneSerializable {
             writeThisObject(generator);
             generator.close();
             Value<?> json = JSONReader.parse(sw.toString());
-            return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
+            return new ValueMap(Fields.type, CaseFabricSerializer.getManifestString(this), Fields.content, json);
         } catch (IOException | JSONParseFailure e) {
             return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
         }

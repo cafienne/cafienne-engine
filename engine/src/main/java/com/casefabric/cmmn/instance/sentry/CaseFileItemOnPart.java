@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 
 public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItemTransitioned, CaseFileItem> {

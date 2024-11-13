@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.extension.workflow.validation;
+package com.casefabric.cmmn.definition.extension.workflow.validation;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.processtask.implementation.http.HTTPCallDefinition;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.cmmn.instance.task.validation.TaskOutputValidator;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.processtask.implementation.http.HTTPCallDefinition;
 
 public class TaskOutputValidatorDefinition extends CMMNElementDefinition {
     private final ProcessDefinition processDef;

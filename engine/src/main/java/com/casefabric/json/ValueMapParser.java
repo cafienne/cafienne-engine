@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 /**
  * Supports parsing a ValueMap to an instance of type T

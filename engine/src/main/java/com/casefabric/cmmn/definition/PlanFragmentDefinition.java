@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.sentry.SentryDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Transition;
+import com.casefabric.cmmn.definition.sentry.SentryDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.Transition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;

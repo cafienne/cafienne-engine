@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
 import org.apache.pekko.actor.{Actor, ActorRef, Props, Terminated}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.TerminateModelActor
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.command.TerminateModelActor
+import com.casefabric.system.CaseSystem
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,7 +52,7 @@ trait StorageActorSupervisor extends Actor with LazyLogging {
   }
 
   /**
-    * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory.
+    * Tell CaseFabric Gateway to remove the actual ModelActor with the same actor id from memory.
     * Upon successful termination, the followup action will be triggered.
     */
   def terminateModelActor(metadata: ActorMetadata, followUpAction: => Unit = {}): Unit = {

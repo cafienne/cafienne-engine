@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.team.deprecated;
+package com.casefabric.cmmn.actorapi.event.team.deprecated;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.team.CaseTeamEvent;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

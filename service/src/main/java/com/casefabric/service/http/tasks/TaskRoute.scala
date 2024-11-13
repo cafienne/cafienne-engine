@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tasks
+package com.casefabric.service.http.tasks
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
-import org.cafienne.humantask.actorapi.command.HumanTaskCommand
-import org.cafienne.querydb.query._
-import org.cafienne.querydb.query.exception.TaskSearchFailure
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.infrastructure.route.CaseTeamValidator
+import com.casefabric.actormodel.identity.{CaseUserIdentity, UserIdentity}
+import com.casefabric.humantask.actorapi.command.HumanTaskCommand
+import com.casefabric.querydb.query._
+import com.casefabric.querydb.query.exception.TaskSearchFailure
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.infrastructure.route.CaseTeamValidator
 
 import scala.util.{Failure, Success}
 

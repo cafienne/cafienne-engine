@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.persistence.RecoveryCompleted;
 import org.apache.pekko.persistence.SnapshotOffer;
-import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.actormodel.event.EngineVersionChanged;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.infrastructure.serialization.DeserializationFailure;
-import org.cafienne.infrastructure.serialization.Fields;
+import com.casefabric.actormodel.event.DebugEvent;
+import com.casefabric.actormodel.event.EngineVersionChanged;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.infrastructure.serialization.DeserializationFailure;
+import com.casefabric.infrastructure.serialization.Fields;
 
 /**
  * The RecoveryRoom is where the ModelActor is brought back into memory upon reception of new incoming traffic.

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.file
+package com.casefabric.querydb.materializer.cases.file
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.file.{CaseFileItemChildRemoved, CaseFileItemTransitioned}
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.cmmn.actorapi.event.file.{CaseFileItemChildRemoved, CaseFileItemTransitioned}
+import com.casefabric.cmmn.instance.Path
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition
+import com.casefabric.json.{Value, ValueMap}
 
 object CaseFileMerger extends LazyLogging {
 

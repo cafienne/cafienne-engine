@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.instance.PlanItemType;
-import org.cafienne.cmmn.test.CaseTestCommand;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemCreated;
+import com.casefabric.cmmn.instance.PlanItemType;
+import com.casefabric.cmmn.test.CaseTestCommand;
 
 public class TaskAssertion extends PlanItemAssertion {
 

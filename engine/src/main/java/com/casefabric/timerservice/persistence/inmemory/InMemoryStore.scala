@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence.inmemory
+package com.casefabric.timerservice.persistence.inmemory
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.timerservice.Timer
-import org.cafienne.timerservice.persistence.TimerStore
+import com.casefabric.timerservice.Timer
+import com.casefabric.timerservice.persistence.TimerStore
 
 import java.time.Instant
 import scala.collection.mutable

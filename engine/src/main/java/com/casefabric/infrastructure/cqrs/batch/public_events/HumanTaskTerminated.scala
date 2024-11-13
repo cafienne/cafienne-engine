@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.cmmn.instance.Path
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.{Value, ValueMap}
 
 @Manifest
-case class HumanTaskTerminated(taskId: String, path: Path, taskName: String, caseInstanceId: String) extends CafiennePublicEventContent {
+case class HumanTaskTerminated(taskId: String, path: Path, taskName: String, caseInstanceId: String) extends CaseFabricPublicEventContent {
   override def toValue: Value[_] = new ValueMap(Fields.taskId, taskId, Fields.path, path, Fields.taskName, taskName, Fields.caseInstanceId, caseInstanceId)
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
 object HumanTaskTerminated {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
-    .filterMap(classOf[org.cafienne.humantask.actorapi.event.HumanTaskTerminated])
+    .filterMap(classOf[com.casefabric.humantask.actorapi.event.HumanTaskTerminated])
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskTerminated(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): HumanTaskTerminated = HumanTaskTerminated(

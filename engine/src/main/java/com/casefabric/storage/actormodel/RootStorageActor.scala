@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
 import org.apache.pekko.actor.{Actor, ActorRef, Props, Terminated}
 import org.apache.pekko.persistence.journal.Tagged
 import org.apache.pekko.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message._
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.storage.actormodel.event.StorageRequestReceived
+import com.casefabric.storage.actormodel.message._
+import com.casefabric.system.CaseSystem
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

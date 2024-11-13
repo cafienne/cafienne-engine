@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.cmmn;
+package com.casefabric.cmmn.instance.task.cmmn;
 
-import org.cafienne.cmmn.actorapi.command.ReactivateCase;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.migration.MigrateCaseDefinition;
-import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.CaseTaskDefinition;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.ReactivateCase;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.migration.MigrateCaseDefinition;
+import com.casefabric.cmmn.actorapi.command.plan.MakeCaseTransition;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.definition.CaseTaskDefinition;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.instance.*;
+import com.casefabric.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

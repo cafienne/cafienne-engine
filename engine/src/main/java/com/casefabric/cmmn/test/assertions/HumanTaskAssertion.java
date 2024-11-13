@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.humantask.actorapi.event.*;
-import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
-import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.test.CaseTestCommand;
+import com.casefabric.humantask.actorapi.event.*;
+import com.casefabric.humantask.actorapi.response.HumanTaskValidationResponse;
+import com.casefabric.humantask.instance.TaskState;
+import com.casefabric.json.ValueMap;
 
 import java.time.Instant;
 

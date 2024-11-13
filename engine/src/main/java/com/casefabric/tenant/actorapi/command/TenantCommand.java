@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.command;
+package com.casefabric.tenant.actorapi.command;
 
-import org.cafienne.actormodel.command.BaseModelCommand;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.TenantMessage;
-import org.cafienne.tenant.actorapi.exception.TenantException;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
+import com.casefabric.actormodel.command.BaseModelCommand;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.TenantUser;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
+import com.casefabric.tenant.actorapi.TenantMessage;
+import com.casefabric.tenant.actorapi.exception.TenantException;
+import com.casefabric.tenant.actorapi.response.TenantResponse;
 
 import java.util.List;
 import java.util.Map;

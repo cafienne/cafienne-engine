@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package com.casefabric.storage.actormodel.message
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.infrastructure.serialization.JacksonSerializable
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
 
 trait StorageCommand extends JacksonSerializable {
   val metadata: ActorMetadata

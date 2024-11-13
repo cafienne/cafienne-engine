@@ -1,6 +1,6 @@
-package org.cafienne.persistence
+package com.casefabric.persistence
 
-import org.cafienne.querydb.schema.QueryDB
+import com.casefabric.querydb.schema.QueryDB
 
 object Persistence {
   def initializeDatabaseSchemas(): Unit = {

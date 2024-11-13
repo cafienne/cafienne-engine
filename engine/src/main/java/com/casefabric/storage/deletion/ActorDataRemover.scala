@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion
+package com.casefabric.storage.deletion
 
 import org.apache.pekko.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
-import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.RemovalCompleted
-import org.cafienne.storage.deletion.response.RemovalRejected
-import org.cafienne.storage.deletion.state._
-import org.cafienne.system.CaseSystem
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
+import com.casefabric.storage.deletion.command.RemoveActorData
+import com.casefabric.storage.deletion.event.RemovalCompleted
+import com.casefabric.storage.deletion.response.RemovalRejected
+import com.casefabric.storage.deletion.state._
+import com.casefabric.system.CaseSystem
 
 class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) extends QueryDBStorageActor[DeletionState] with LazyLogging {
   printLogMessage(s"\n========== Launching Storage Deletion Service ${metadata.path}")

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.health
+package com.casefabric.system.health
 
-import org.cafienne.json.ValueMap
+import com.casefabric.json.ValueMap
 
 import java.util
 import scala.collection.mutable.Set

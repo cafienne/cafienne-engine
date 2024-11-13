@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
 /**
  * Enum describing possible states plan items and case file items

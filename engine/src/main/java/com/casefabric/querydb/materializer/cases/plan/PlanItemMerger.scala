@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.plan
+package com.casefabric.querydb.materializer.cases.plan
 
-import org.cafienne.cmmn.actorapi.event.CaseModified
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
-import org.cafienne.cmmn.actorapi.event.plan.task.{TaskInputFilled, TaskOutputFilled}
-import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
-import org.cafienne.querydb.record.PlanItemRecord
+import com.casefabric.cmmn.actorapi.event.CaseModified
+import com.casefabric.cmmn.actorapi.event.migration.PlanItemMigrated
+import com.casefabric.cmmn.actorapi.event.plan.task.{TaskInputFilled, TaskOutputFilled}
+import com.casefabric.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
+import com.casefabric.querydb.record.PlanItemRecord
 
 object PlanItemMerger {
 

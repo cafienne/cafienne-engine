@@ -48,7 +48,7 @@
         </casePlanModel>
         <input id="csAQm_inCPs_0" name="inputCaseFile" bindingRef="cfi_csGlQ_0"/>
         <extensionElements mustUnderstand="false">
-            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+            <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
@@ -56,7 +56,7 @@
     }
   }
 }
-                    </cafienne:start-case-model>
+                    </casefabric:start-case-model>
         </extensionElements>
     </case>
     <CMMNDI>

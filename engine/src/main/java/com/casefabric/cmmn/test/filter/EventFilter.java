@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.filter;
+package com.casefabric.cmmn.test.filter;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.test.CaseEventListener;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.cmmn.test.CaseEventListener;
 
 /**
  * An EventFilter can be used to wait until a certain event (or combination of events)

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel;
+package com.casefabric.cmmn.expression.spel;
 
-import org.cafienne.actormodel.ModelActor;
+import com.casefabric.actormodel.ModelActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.AccessException;
@@ -26,7 +26,7 @@ import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 
 /**
- * Hook for Spel through which we can read Cafienne specific API properties in expressions.
+ * Hook for Spel through which we can read CaseFabric specific API properties in expressions.
  */
 public class SpelReadableRecognizer implements PropertyAccessor {
     private final static Logger logger = LoggerFactory.getLogger(SpelReadableRecognizer.class);

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import com.casefabric.cmmn.actorapi.event.CaseEvent;
 
 public interface StandardEvent<T extends Enum<?>, C extends TransitionGenerator<?>> extends CaseEvent {
     T getTransition();

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.plan;
+package com.casefabric.cmmn.expression.spel.api.cmmn.plan;
 
-import org.cafienne.cmmn.instance.TimerEvent;
+import com.casefabric.cmmn.instance.TimerEvent;
 
 /**
  */

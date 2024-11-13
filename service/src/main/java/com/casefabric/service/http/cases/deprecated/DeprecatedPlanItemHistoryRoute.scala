@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.deprecated
+package com.casefabric.service.http.cases.deprecated
 
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.service.http.cases.history.CaseEventsBaseRoute
-import org.cafienne.system.CaseSystem
+import com.casefabric.service.http.cases.history.CaseEventsBaseRoute
+import com.casefabric.system.CaseSystem
 
 import scala.util.{Failure, Success}
 

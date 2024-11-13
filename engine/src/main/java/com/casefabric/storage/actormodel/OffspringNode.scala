@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
 import org.apache.pekko.actor.ActorRef
-import org.cafienne.actormodel.event.ModelEventCollection
-import org.cafienne.storage.actormodel.event.ChildrenReceived
-import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageEvent}
+import com.casefabric.actormodel.event.ModelEventCollection
+import com.casefabric.storage.actormodel.event.ChildrenReceived
+import com.casefabric.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageEvent}
 
 trait OffspringNode extends ModelEventCollection {
   val metadata: ActorMetadata

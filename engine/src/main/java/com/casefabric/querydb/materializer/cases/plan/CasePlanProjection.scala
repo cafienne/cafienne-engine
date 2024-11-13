@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.plan
+package com.casefabric.querydb.materializer.cases.plan
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.CaseModified
-import org.cafienne.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigrated}
-import org.cafienne.cmmn.actorapi.event.plan._
-import org.cafienne.humantask.actorapi.event._
-import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
-import org.cafienne.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
-import org.cafienne.querydb.record.{PlanItemRecord, TaskRecord}
+import com.casefabric.cmmn.actorapi.event.CaseModified
+import com.casefabric.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigrated}
+import com.casefabric.cmmn.actorapi.event.plan._
+import com.casefabric.humantask.actorapi.event._
+import com.casefabric.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
+import com.casefabric.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
+import com.casefabric.querydb.record.{PlanItemRecord, TaskRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 

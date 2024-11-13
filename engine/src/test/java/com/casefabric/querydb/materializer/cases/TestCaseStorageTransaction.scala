@@ -1,11 +1,11 @@
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
 import org.apache.pekko.Done
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.TestQueryDBTransaction
-import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
-import org.cafienne.querydb.record._
+import com.casefabric.cmmn.actorapi.command.platform.NewUserInformation
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.querydb.materializer.TestQueryDBTransaction
+import com.casefabric.querydb.materializer.cases.team.CaseTeamMemberKey
+import com.casefabric.querydb.record._
 
 import java.time.Instant
 import scala.concurrent.Future

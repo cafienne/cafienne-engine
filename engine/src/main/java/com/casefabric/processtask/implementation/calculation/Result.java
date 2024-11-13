@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation;
+package com.casefabric.processtask.implementation.calculation;
 
-import org.cafienne.json.Value;
-import org.cafienne.processtask.implementation.calculation.operation.Source;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.implementation.calculation.operation.Source;
 
 public class Result {
     private final Calculation calculation;

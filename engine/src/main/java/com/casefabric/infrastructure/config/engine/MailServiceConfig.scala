@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.engine
+package com.casefabric.infrastructure.config.engine
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
+import com.casefabric.infrastructure.config.util.MandatoryConfig
 
 import java.util.Properties
 

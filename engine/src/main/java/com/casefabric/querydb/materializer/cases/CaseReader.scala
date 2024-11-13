@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import com.casefabric.querydb.lastmodified.{Headers, LastModifiedRegistration}
 
 object CaseReader {
   val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)

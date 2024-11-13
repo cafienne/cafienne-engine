@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.exception;
+package com.casefabric.actormodel.exception;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ import java.io.IOException;
  * Wrapper class around Exception that can be serialized
  * and used to read the content of the exception across the actor network.
  */
-public class SerializedException implements CafienneSerializable {
+public class SerializedException implements CaseFabricSerializable {
     private final String className;
     private final String message;
     private SerializedException cause;

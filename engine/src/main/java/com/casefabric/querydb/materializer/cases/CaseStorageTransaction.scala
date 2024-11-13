@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
 import org.apache.pekko.Done
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.QueryDBTransaction
-import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
-import org.cafienne.querydb.record._
+import com.casefabric.cmmn.actorapi.command.platform.NewUserInformation
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.querydb.materializer.QueryDBTransaction
+import com.casefabric.querydb.materializer.cases.team.CaseTeamMemberKey
+import com.casefabric.querydb.record._
 
 import scala.concurrent.Future
 

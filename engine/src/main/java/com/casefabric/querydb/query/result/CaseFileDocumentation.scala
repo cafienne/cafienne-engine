@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.result
+package com.casefabric.querydb.query.result
 
-import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.querydb.record.CaseDefinitionRecord
+import com.casefabric.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
+import com.casefabric.json.{CaseFabricJson, Value, ValueList, ValueMap}
+import com.casefabric.querydb.record.CaseDefinitionRecord
 
-final case class CaseFileDocumentation(record: CaseDefinitionRecord) extends CafienneJson {
+final case class CaseFileDocumentation(record: CaseDefinitionRecord) extends CaseFabricJson {
   private def docs = (item: CaseFileItemDefinition) => Documentation(item.documentation.text, item.documentation.textFormat).toValue
 
   def extendList(list: ValueList, collection: CaseFileItemCollectionDefinition): ValueList = {

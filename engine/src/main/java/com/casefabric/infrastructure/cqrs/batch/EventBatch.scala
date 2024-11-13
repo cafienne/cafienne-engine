@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch
+package com.casefabric.infrastructure.cqrs.batch
 
-import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
+import com.casefabric.actormodel.event.CommitEvent
+import com.casefabric.infrastructure.cqrs.ModelEventEnvelope
 
 import scala.collection.mutable.ListBuffer
 

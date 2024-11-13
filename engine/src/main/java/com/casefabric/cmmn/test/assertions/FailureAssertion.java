@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.actormodel.exception.SerializedException;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.cmmn.test.TestScript;
+import com.casefabric.actormodel.exception.SerializedException;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.cmmn.test.CaseTestCommand;
+import com.casefabric.cmmn.test.TestScript;
 
 /**
  * Some assertions for failures coming back from the case.

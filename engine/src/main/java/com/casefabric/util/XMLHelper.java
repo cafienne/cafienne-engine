@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.util;
+package com.casefabric.util;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;

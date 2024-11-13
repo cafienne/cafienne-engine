@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.plan.eventlistener;
+package com.casefabric.cmmn.actorapi.event.plan.eventlistener;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.cmmn.actorapi.event.CaseEvent;
+import com.casefabric.cmmn.actorapi.event.plan.CasePlanEvent;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.TimerEvent;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.util.Set;
@@ -35,7 +35,7 @@ import java.util.Set;
  * These events are tagged so that a projection can handle them and safely set timers.
  */
 public abstract class TimerBaseEvent extends CasePlanEvent {
-    public static final String TAG = "cafienne:timer";
+    public static final String TAG = "casefabric:timer";
 
     private static final Set<String> tags = Set.of(ModelEvent.TAG, CaseEvent.TAG, TimerBaseEvent.TAG);
 

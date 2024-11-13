@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.command;
+package com.casefabric.processtask.actorapi.command;
 
-import org.cafienne.actormodel.command.BaseModelCommand;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.ProcessActorMessage;
-import org.cafienne.processtask.actorapi.response.ProcessResponse;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.actormodel.command.BaseModelCommand;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.ProcessActorMessage;
+import com.casefabric.processtask.actorapi.response.ProcessResponse;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> implements ProcessActorMessage {
     protected ProcessCommand(UserIdentity user, String id) {

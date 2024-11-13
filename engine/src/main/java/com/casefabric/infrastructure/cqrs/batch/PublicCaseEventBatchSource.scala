@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch
+package com.casefabric.infrastructure.cqrs.batch
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
+import com.casefabric.cmmn.actorapi.event.CaseEvent
+import com.casefabric.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
 
 trait PublicCaseEventBatchSource extends EventBatchSource[PublicCaseEventBatch] with LazyLogging {
   // PublicCaseEventBatch works on CaseEvents only

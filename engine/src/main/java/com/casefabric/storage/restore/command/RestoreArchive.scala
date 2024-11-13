@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.command
+package com.casefabric.storage.restore.command
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.archival.Archive
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.ValueMap
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.archival.Archive
 
 @Manifest
 case class RestoreArchive(metadata: ActorMetadata, archive: Archive, override val optionalJson: Option[ValueMap] = None) extends StorageEvent {

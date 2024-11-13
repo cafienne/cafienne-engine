@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.DefinitionElement;
-import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
-import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
-import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.CasePlan;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.DefinitionElement;
+import com.casefabric.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
+import com.casefabric.cmmn.definition.sentry.CriterionDefinition;
+import com.casefabric.cmmn.definition.sentry.OnPartDefinition;
+import com.casefabric.cmmn.definition.sentry.PlanItemOnPartDefinition;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.CasePlan;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

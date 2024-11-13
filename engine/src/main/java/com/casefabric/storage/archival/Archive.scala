@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival
+package com.casefabric.storage.archival
 
-import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.storage.actormodel.ActorMetadata
+import com.casefabric.infrastructure.serialization.{Fields, JacksonSerializable}
+import com.casefabric.json.{CaseFabricJson, Value, ValueList, ValueMap}
+import com.casefabric.storage.actormodel.ActorMetadata
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Archive(metadata: ActorMetadata, events: ValueList, children: Seq[Archive] = Seq()) extends JacksonSerializable with CafienneJson {
+case class Archive(metadata: ActorMetadata, events: ValueList, children: Seq[Archive] = Seq()) extends JacksonSerializable with CaseFabricJson {
   override def toValue: Value[_] = new ValueMap(Fields.metadata, metadata, Fields.events, events, Fields.children, children)
 
   override def toString: String = toValue.toString

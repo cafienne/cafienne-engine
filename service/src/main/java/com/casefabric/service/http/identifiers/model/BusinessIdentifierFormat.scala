@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.identifiers.model
+package com.casefabric.service.http.identifiers.model
 
 case class BusinessIdentifierFormat(caseInstanceId: String, tenant: String, name: String, value: String)

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemTransitioned;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,15 +1,15 @@
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.cmmn.actorapi.event._
-import org.cafienne.cmmn.actorapi.event.file.{CaseFileItemCreated, CaseFileItemTransitioned}
-import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
-import org.cafienne.cmmn.instance.{PlanItemType, State, Transition}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.ValueMap
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.cmmn.actorapi.event._
+import com.casefabric.cmmn.actorapi.event.file.{CaseFileItemCreated, CaseFileItemTransitioned}
+import com.casefabric.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
+import com.casefabric.cmmn.definition.CaseDefinition
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition
+import com.casefabric.cmmn.instance.{PlanItemType, State, Transition}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.ValueMap
 
 import java.time.Instant
 
@@ -25,7 +25,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     val json = new ValueMap(
       Fields.caseName, caseDefinition.getName
       ,Fields.definition, caseDefinition.toJSON
-      ,Fields.engineVersion, Cafienne.version.json
+      ,Fields.engineVersion, CaseFabric.version.json
       ,Fields.parentActorId, ""
       ,Fields.rootActorId, actorId
       ,Fields.createdOn, Instant.now

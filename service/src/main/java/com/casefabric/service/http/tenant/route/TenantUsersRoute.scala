@@ -16,13 +16,13 @@
  */
 
 /*
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.http.tenant.route
+package com.casefabric.service.http.tenant.route
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
@@ -31,10 +31,10 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.querydb.query.exception.UserSearchFailure
-import org.cafienne.service.http.tenant.model.TenantAPI.TenantUserResponseFormat
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.exception.AuthorizationException
+import com.casefabric.querydb.query.exception.UserSearchFailure
+import com.casefabric.service.http.tenant.model.TenantAPI.TenantUserResponseFormat
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
 import scala.util.{Failure, Success}

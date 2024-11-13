@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases
+package com.casefabric.service.http.cases
 
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.cmmn.actorapi.command._
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.exception.CaseSearchFailure
-import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
-import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
-import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.cmmn.actorapi.command._
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.querydb.query.exception.CaseSearchFailure
+import com.casefabric.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
+import com.casefabric.service.infrastructure.authentication.AuthenticatedUser
+import com.casefabric.service.infrastructure.route.{CommandRoute, QueryRoute}
 
 import scala.util.{Failure, Success}
 

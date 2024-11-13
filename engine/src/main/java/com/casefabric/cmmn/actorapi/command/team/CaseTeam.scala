@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
-import org.cafienne.actormodel.identity.CaseUserIdentity
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition
-import org.cafienne.cmmn.instance.team.Team
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.actormodel.identity.CaseUserIdentity
+import com.casefabric.cmmn.definition.team.CaseTeamDefinition
+import com.casefabric.cmmn.instance.team.Team
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import scala.jdk.CollectionConverters._
 
 case class CaseTeam(users: Seq[CaseTeamUser] = Seq(),
                     groups: Seq[CaseTeamGroup] = Seq(),
-                    tenantRoles: Seq[CaseTeamTenantRole] = Seq()) extends CafienneJson {
+                    tenantRoles: Seq[CaseTeamTenantRole] = Seq()) extends CaseFabricJson {
 
   /**
     * Validates whether the case team setup matches the case definition

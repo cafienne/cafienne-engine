@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.persistence
+package com.casefabric.infrastructure.config.persistence
 
 import com.typesafe.config.Config
-import org.cafienne.infrastructure.config.util.ChildConfigReader
+import com.casefabric.infrastructure.config.util.ChildConfigReader
 
 
 class EventDBConfig(val parent: PersistenceConfig, val systemConfig: Config) extends ChildConfigReader {
@@ -52,7 +52,7 @@ class EventDBConfig(val parent: PersistenceConfig, val systemConfig: Config) ext
     import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
     import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
-    logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + journalKey + "\"")
+    logger.warn("Missing conf 'casefabric.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + journalKey + "\"")
     if (isJDBC) {
       return JdbcReadJournal.Identifier
     } else if (isCassandra) {

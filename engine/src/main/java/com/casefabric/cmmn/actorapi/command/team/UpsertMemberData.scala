@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
-import org.cafienne.actormodel.identity.Origin
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition
-import org.cafienne.cmmn.instance.team.{CaseTeamError, Team}
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.actormodel.identity.Origin
+import com.casefabric.cmmn.definition.team.CaseTeamDefinition
+import com.casefabric.cmmn.instance.team.{CaseTeamError, Team}
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class UpsertMemberData(val id: String, val isUser: Boolean, val caseRoles: Set[String] = Set(), val ownership: Option[Boolean] = None, val removeRoles: Set[String] = Set()) extends CafienneJson {
+class UpsertMemberData(val id: String, val isUser: Boolean, val caseRoles: Set[String] = Set(), val ownership: Option[Boolean] = None, val removeRoles: Set[String] = Set()) extends CaseFabricJson {
   override def toValue: Value[_] = {
     val json = new ValueMap(Fields.identifier, id, Fields.isTenantUser, isUser, Fields.caseRoles, caseRoles, Fields.removeRoles, removeRoles)
     ownership.foreach(isOwner => json.plus(Fields.isOwner, isOwner))

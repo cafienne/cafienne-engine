@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi;
+package com.casefabric.processtask.actorapi;
 
-import org.cafienne.actormodel.message.UserMessage;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.actormodel.message.UserMessage;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 public interface ProcessActorMessage extends UserMessage {
     @Override

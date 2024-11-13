@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.event;
+package com.casefabric.consentgroup.actorapi.event;
 
-import org.cafienne.actormodel.event.ActorModified;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.event.ActorModified;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
- * Event that is published after an {@link org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand} has been fully handled by a {@link ConsentGroupActor} instance.
+ * Event that is published after an {@link com.casefabric.consentgroup.actorapi.command.ConsentGroupCommand} has been fully handled by a {@link ConsentGroupActor} instance.
  * Contains information about the last modified moment.
  *
  */

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion
+package com.casefabric.storage.deletion
 
 import org.apache.pekko.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.deletion.event.RemovalRequested
-import org.cafienne.system.CaseSystem
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.storage.deletion.event.RemovalRequested
+import com.casefabric.system.CaseSystem
 
 class RootRemover(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor[RemoveNode](caseSystem, metadata) with LazyLogging {
   override def createInitialEvent: RemovalRequested = RemovalRequested(metadata)

@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.util.Guid;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemCreated;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import com.casefabric.cmmn.definition.*;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
-    private final static boolean usePureCHMMFaultHandling = Cafienne.config().engine().interpreter().usePureCMMNFaultHandling();
+    private final static boolean usePureCHMMFaultHandling = CaseFabric.config().engine().interpreter().usePureCMMNFaultHandling();
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);

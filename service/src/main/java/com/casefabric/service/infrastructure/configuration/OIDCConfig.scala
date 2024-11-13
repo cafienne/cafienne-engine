@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.configuration
+package com.casefabric.service.infrastructure.configuration
 
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata
 import com.typesafe.config.{Config, ConfigValueType}
-import org.cafienne.infrastructure.config.api.SecurityConfig
-import org.cafienne.infrastructure.config.util.MandatoryConfig
-import org.cafienne.service.infrastructure.authentication.OIDCConfiguration
+import com.casefabric.infrastructure.config.api.SecurityConfig
+import com.casefabric.infrastructure.config.util.MandatoryConfig
+import com.casefabric.service.infrastructure.authentication.OIDCConfiguration
 
 import scala.jdk.CollectionConverters.ListHasAsScala
 

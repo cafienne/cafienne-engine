@@ -6,11 +6,11 @@
         <humanTask id="cm_cssni_41" name="TaskRequiredOutput" isBlocking="true">
             <outputs id="_6xePv" name="Result">
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                 </extensionElements>
             </outputs>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_6oZPT" sourceRef="_SkQG_Result" targetRef="_6xePv"/>
                     <assignment id="_p5SZA_22">
                         <condition id="_p5SZA_23">
@@ -19,17 +19,17 @@
                             </body>
                         </condition>
                     </assignment>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="cm_csNY8_47" name="TaskRequiredOutputWithBinding" isBlocking="true">
             <outputs id="_epnJX" name="Result" bindingRef="cfi_csNY8_0">
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                 </extensionElements>
             </outputs>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_9RcDI" sourceRef="_SkQG_Result" targetRef="_epnJX"/>
                     <assignment id="_p5SZA_20">
                         <condition id="_p5SZA_21">
@@ -38,13 +38,13 @@
                             </body>
                         </condition>
                     </assignment>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="cm_csNY8_49" name="TaskWithOutputNotRequired" isBlocking="true">
             <outputs id="_VsVwA" name="Result"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_bW3g9" sourceRef="_SkQG_Result" targetRef="_VsVwA"/>
                     <assignment id="_p5SZA_18">
                         <condition id="_p5SZA_19">
@@ -53,13 +53,13 @@
                             </body>
                         </condition>
                     </assignment>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="cm_csa4I_58" name="TaskWithOutputNotRequiredAndBinding" isBlocking="true">
             <outputs id="_75v4Z" name="Result" bindingRef="cfi_csNY8_0"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_1jW2A" sourceRef="_SkQG_Result" targetRef="_75v4Z">
                         <transformation>
                             <body>
@@ -74,19 +74,19 @@
                             </body>
                         </condition>
                     </assignment>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
     </casePlanModel>
     <caseRoles/>
     <extensionElements mustUnderstand="false">
-        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+        <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
     "properties":{
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
     </extensionElements>
 </case>

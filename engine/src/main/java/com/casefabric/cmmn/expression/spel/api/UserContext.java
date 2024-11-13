@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.identity.UserIdentity;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.identity.UserIdentity;
 
 import java.util.ArrayList;
 

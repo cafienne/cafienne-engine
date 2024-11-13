@@ -1,22 +1,22 @@
-package org.cafienne.cmmn.test.task;
+package com.casefabric.cmmn.test.task;
 
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
-import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
-import org.cafienne.humantask.actorapi.command.ClaimTask;
-import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
-import org.cafienne.humantask.actorapi.command.SaveTaskOutput;
-import org.cafienne.humantask.actorapi.command.ValidateTaskOutput;
-import org.cafienne.humantask.actorapi.event.HumanTaskOutputSaved;
-import org.cafienne.json.*;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.cmmn.test.TestUser;
+import com.casefabric.cmmn.test.assertions.HumanTaskAssertion;
+import com.casefabric.humantask.actorapi.command.ClaimTask;
+import com.casefabric.humantask.actorapi.command.CompleteHumanTask;
+import com.casefabric.humantask.actorapi.command.SaveTaskOutput;
+import com.casefabric.humantask.actorapi.command.ValidateTaskOutput;
+import com.casefabric.humantask.actorapi.event.HumanTaskOutputSaved;
+import com.casefabric.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestTaskOutputValidation {
     private final ValueMap taskOutputFailingValidation = new ValueMap("Decision", "KILLSWITCH");

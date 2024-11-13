@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions.util
+package com.casefabric.querydb.schema.versions.util
 
-import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
-import org.cafienne.querydb.materializer.cases.CaseEventSink
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink
-import org.cafienne.querydb.materializer.tenant.TenantEventSink
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.infrastructure.jdbc.cqrs.OffsetStoreTables
+import com.casefabric.querydb.materializer.cases.CaseEventSink
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupEventSink
+import com.casefabric.querydb.materializer.tenant.TenantEventSink
+import com.casefabric.querydb.schema.QueryDBSchema
 
 /**
   * Helper object to create a script that resets the projection offset, so that it can be rebuild with next db schema version

@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.http;
+package com.casefabric.processtask.implementation.http;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.expression.spel.api.APIRootObject;
-import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
-import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.implementation.http.definition.ContentDefinition;
-import org.cafienne.processtask.implementation.http.definition.HeaderDefinition;
-import org.cafienne.processtask.implementation.http.definition.MethodDefinition;
-import org.cafienne.processtask.implementation.http.definition.URLDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.expression.spel.api.APIRootObject;
+import com.casefabric.cmmn.expression.spel.api.process.InputMappingRoot;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.cmmn.instance.task.validation.TaskOutputValidator;
+import com.casefabric.processtask.definition.SubProcessDefinition;
+import com.casefabric.processtask.implementation.http.definition.ContentDefinition;
+import com.casefabric.processtask.implementation.http.definition.HeaderDefinition;
+import com.casefabric.processtask.implementation.http.definition.MethodDefinition;
+import com.casefabric.processtask.implementation.http.definition.URLDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

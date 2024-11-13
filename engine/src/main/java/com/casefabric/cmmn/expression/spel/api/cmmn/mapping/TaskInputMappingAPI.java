@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.mapping;
+package com.casefabric.cmmn.expression.spel.api.cmmn.mapping;
 
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.parameter.TaskInputParameter;
 
 /**
  * Provides context for input/output transformation of parameters.

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
-import org.cafienne.json.ValueMap;
+import com.casefabric.json.ValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 

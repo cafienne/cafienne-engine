@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.javadsl
+package com.casefabric.infrastructure.cqrs.javadsl
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.Offset
 import org.apache.pekko.stream.javadsl
-import org.cafienne.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
+import com.casefabric.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
 
 import scala.concurrent.Future
 
 class PublicCaseEventBatchSource(system: ActorSystem, offsetStorage: OffsetStorage) {
 
-  private class Wrapper(override val system: ActorSystem, offsetStorage: OffsetStorage) extends org.cafienne.infrastructure.cqrs.batch.PublicCaseEventBatchSource {
+  private class Wrapper(override val system: ActorSystem, offsetStorage: OffsetStorage) extends com.casefabric.infrastructure.cqrs.batch.PublicCaseEventBatchSource {
     override def getOffset: Future[Offset] = offsetStorage.getOffset
   }
 

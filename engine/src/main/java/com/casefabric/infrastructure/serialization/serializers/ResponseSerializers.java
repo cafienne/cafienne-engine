@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization.serializers;
+package com.casefabric.infrastructure.serialization.serializers;
 
-import org.cafienne.actormodel.response.*;
-import org.cafienne.cmmn.actorapi.response.*;
-import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
-import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.processtask.actorapi.response.ProcessResponse;
-import org.cafienne.tenant.actorapi.response.TenantOwnersResponse;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
+import com.casefabric.actormodel.response.*;
+import com.casefabric.cmmn.actorapi.response.*;
+import com.casefabric.cmmn.actorapi.response.migration.MigrationStartedResponse;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupResponse;
+import com.casefabric.humantask.actorapi.response.HumanTaskResponse;
+import com.casefabric.humantask.actorapi.response.HumanTaskValidationResponse;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.processtask.actorapi.response.ProcessResponse;
+import com.casefabric.tenant.actorapi.response.TenantOwnersResponse;
+import com.casefabric.tenant.actorapi.response.TenantResponse;
 
 public class ResponseSerializers {
     public static void register() {
@@ -40,39 +40,39 @@ public class ResponseSerializers {
     }
 
     private static void addCaseResponses() {
-        CafienneSerializer.addManifestWrapper(AddDiscretionaryItemResponse.class, AddDiscretionaryItemResponse::new);
-        CafienneSerializer.addManifestWrapper(GetDiscretionaryItemsResponse.class, GetDiscretionaryItemsResponse::new);
-        CafienneSerializer.addManifestWrapper(CaseStartedResponse.class, CaseStartedResponse::new);
-        CafienneSerializer.addManifestWrapper(MigrationStartedResponse.class, MigrationStartedResponse::new);
-        CafienneSerializer.addManifestWrapper(CaseResponse.class, CaseResponse::new);
-        CafienneSerializer.addManifestWrapper(CaseNotModifiedResponse.class, CaseNotModifiedResponse::new);
+        CaseFabricSerializer.addManifestWrapper(AddDiscretionaryItemResponse.class, AddDiscretionaryItemResponse::new);
+        CaseFabricSerializer.addManifestWrapper(GetDiscretionaryItemsResponse.class, GetDiscretionaryItemsResponse::new);
+        CaseFabricSerializer.addManifestWrapper(CaseStartedResponse.class, CaseStartedResponse::new);
+        CaseFabricSerializer.addManifestWrapper(MigrationStartedResponse.class, MigrationStartedResponse::new);
+        CaseFabricSerializer.addManifestWrapper(CaseResponse.class, CaseResponse::new);
+        CaseFabricSerializer.addManifestWrapper(CaseNotModifiedResponse.class, CaseNotModifiedResponse::new);
     }
 
     private static void addHumanTaskResponses() {
-        CafienneSerializer.addManifestWrapper(HumanTaskResponse.class, HumanTaskResponse::new);
-        CafienneSerializer.addManifestWrapper(HumanTaskValidationResponse.class, HumanTaskValidationResponse::new);
+        CaseFabricSerializer.addManifestWrapper(HumanTaskResponse.class, HumanTaskResponse::new);
+        CaseFabricSerializer.addManifestWrapper(HumanTaskValidationResponse.class, HumanTaskValidationResponse::new);
     }
 
     private static void addProcessResponses() {
-        CafienneSerializer.addManifestWrapper(ProcessResponse.class, ProcessResponse::new);
+        CaseFabricSerializer.addManifestWrapper(ProcessResponse.class, ProcessResponse::new);
     }
 
     private static void addFailureResponses() {
-        CafienneSerializer.addManifestWrapper(CommandFailure.class, CommandFailure::new);
-        CafienneSerializer.addManifestWrapper(SecurityFailure.class, SecurityFailure::new);
-        CafienneSerializer.addManifestWrapper(ActorChokedFailure.class, ActorChokedFailure::new);
-        CafienneSerializer.addManifestWrapper(ActorExistsFailure.class, ActorExistsFailure::new);
-        CafienneSerializer.addManifestWrapper(ActorInStorage.class, ActorInStorage::new);
-        CafienneSerializer.addManifestWrapper(EngineChokedFailure.class, EngineChokedFailure::new);
+        CaseFabricSerializer.addManifestWrapper(CommandFailure.class, CommandFailure::new);
+        CaseFabricSerializer.addManifestWrapper(SecurityFailure.class, SecurityFailure::new);
+        CaseFabricSerializer.addManifestWrapper(ActorChokedFailure.class, ActorChokedFailure::new);
+        CaseFabricSerializer.addManifestWrapper(ActorExistsFailure.class, ActorExistsFailure::new);
+        CaseFabricSerializer.addManifestWrapper(ActorInStorage.class, ActorInStorage::new);
+        CaseFabricSerializer.addManifestWrapper(EngineChokedFailure.class, EngineChokedFailure::new);
     }
 
     private static void addTenantResponses() {
-        CafienneSerializer.addManifestWrapper(TenantOwnersResponse.class, TenantOwnersResponse::new);
-        CafienneSerializer.addManifestWrapper(TenantResponse.class, TenantResponse::new);
+        CaseFabricSerializer.addManifestWrapper(TenantOwnersResponse.class, TenantOwnersResponse::new);
+        CaseFabricSerializer.addManifestWrapper(TenantResponse.class, TenantResponse::new);
     }
 
     private static void addConsentGroupResponses() {
-        CafienneSerializer.addManifestWrapper(ConsentGroupCreatedResponse.class, ConsentGroupCreatedResponse::new);
-        CafienneSerializer.addManifestWrapper(ConsentGroupResponse.class, ConsentGroupResponse::new);
+        CaseFabricSerializer.addManifestWrapper(ConsentGroupCreatedResponse.class, ConsentGroupCreatedResponse::new);
+        CaseFabricSerializer.addManifestWrapper(ConsentGroupResponse.class, ConsentGroupResponse::new);
     }
 }

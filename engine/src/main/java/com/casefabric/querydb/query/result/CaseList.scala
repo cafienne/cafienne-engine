@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.result
+package com.casefabric.querydb.query.result
 
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 final case class CaseList(caseName: String = "",
                           totalInstances: Long = 0,
@@ -27,7 +27,7 @@ final case class CaseList(caseName: String = "",
                           numSuspended:Long = 0,
                           numFailed:Long = 0,
                           numClosed:Long = 0,
-                          numWithFailures: Long = 0) extends CafienneJson {
+                          numWithFailures: Long = 0) extends CaseFabricJson {
 
   override def toValue: Value[_] = {
     val v = new ValueMap

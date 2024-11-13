@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.schema.QueryDBSchema
-import org.cafienne.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
 import slick.migration.api.TableMigration
 
 object QueryDB_1_1_11 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
   with TaskTables
   with TenantTables
-  with CafienneTablesV2 {
+  with CaseFabricTablesV2 {
 
   val version = "1.1.11"
   val migrations = (

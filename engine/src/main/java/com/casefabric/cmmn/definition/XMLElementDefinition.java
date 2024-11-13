@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -36,8 +36,8 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     private static final Logger logger = LoggerFactory.getLogger(XMLElementDefinition.class);
 
     public static final String EXTENSION_ELEMENTS = "extensionElements";
-    public static final String CAFIENNE_NAMESPACE = "org.cafienne";
-    public static final String CAFIENNE_IMPLEMENTATION = "implementation";
+    public static final String CASEFABRIC_NAMESPACE = "com.casefabric";
+    public static final String CASEFABRIC_IMPLEMENTATION = "implementation";
 
     private final String id;
     private String name;
@@ -249,7 +249,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     protected <T> T parseExtension(String childTagName, Class<? extends T> typeClass) {
         Element extensionElement = XMLHelper.getElement(element, EXTENSION_ELEMENTS);
         if (extensionElement != null) {
-            Element grandChild = XMLHelper.getElementNS(extensionElement, CAFIENNE_NAMESPACE, childTagName);
+            Element grandChild = XMLHelper.getElementNS(extensionElement, CASEFABRIC_NAMESPACE, childTagName);
             if (grandChild != null) {
                 return instantiateT(grandChild, typeClass);
             }
@@ -267,7 +267,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     protected <T> void parseExtension(String childTagName, Class<? extends T> typeClass, Collection<T> tCollection) {
         Element extensionElement = XMLHelper.getElement(element, EXTENSION_ELEMENTS);
         if (extensionElement != null) {
-            Collection<Element> namedChildren = XMLHelper.getElementsNS(extensionElement, CAFIENNE_NAMESPACE, childTagName);
+            Collection<Element> namedChildren = XMLHelper.getElementsNS(extensionElement, CASEFABRIC_NAMESPACE, childTagName);
             for (Element child : namedChildren) {
                 T t = instantiateT(child, typeClass);
                 tCollection.add(t);
@@ -313,7 +313,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         String implementationClassName = implementationElement.getAttribute("class");
         if (implementationClassName.isEmpty()) {
             if (presenceRequired) {
-                getModelDefinition().addDefinitionError("A custom " + CAFIENNE_IMPLEMENTATION + " tag does not contain the class attribute in " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("A custom " + CASEFABRIC_IMPLEMENTATION + " tag does not contain the class attribute in " + printElement() + ", but it is required");
                 return null;
             }
             return null;
@@ -327,7 +327,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             T implementationObject = (T) instantiateT(implementationElement, implementationClass);
             return implementationObject;
         } catch (ClassNotFoundException e) {
-            String msg = "Cannot find class to parse the custom " + CAFIENNE_IMPLEMENTATION + " - " + implementationClassName;
+            String msg = "Cannot find class to parse the custom " + CASEFABRIC_IMPLEMENTATION + " - " + implementationClassName;
             getModelDefinition().fatalError(msg, e);
         } catch (SecurityException e) {
             String msg = "The class " + implementationClassName + " cannot be accessed due to a security exception";
@@ -338,7 +338,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
-     * Returns the content of an extension element that has the name "implementation" in the cafienne namespace.
+     * Returns the content of an extension element that has the name "implementation" in the casefabric namespace.
      *
      * @param presenceRequired If presence is required, and the extensionElements tag is not available or the
      *                         implementation element is not found under it, then an error will be added to the definitions document.
@@ -353,9 +353,9 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             return null;
         }
 
-        Element implementationElement = XMLHelper.getElementNS(extensionsElement, CAFIENNE_NAMESPACE, CAFIENNE_IMPLEMENTATION);
+        Element implementationElement = XMLHelper.getElementNS(extensionsElement, CASEFABRIC_NAMESPACE, CASEFABRIC_IMPLEMENTATION);
         if (implementationElement == null && presenceRequired) {
-            getModelDefinition().addDefinitionError("A custom " + CAFIENNE_IMPLEMENTATION + " tag is not found in " + printElement() + "/" + EXTENSION_ELEMENTS + " in " + CAFIENNE_NAMESPACE + " namespace, but it is required");
+            getModelDefinition().addDefinitionError("A custom " + CASEFABRIC_IMPLEMENTATION + " tag is not found in " + printElement() + "/" + EXTENSION_ELEMENTS + " in " + CASEFABRIC_NAMESPACE + " namespace, but it is required");
         }
 
         return implementationElement;
@@ -366,11 +366,11 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * Otherwise, i.e. when the implementation element is not present or the attribute has a different value than true, return false.
      */
     protected boolean getImplementationAttribute(String attributeName) {
-        Element cafienneImplementation = getImplementationElement(false);
-        if (cafienneImplementation == null) {
+        Element casefabricImplementation = getImplementationElement(false);
+        if (casefabricImplementation == null) {
             return false;
         }
-        String value = cafienneImplementation.getAttribute(attributeName);
+        String value = casefabricImplementation.getAttribute(attributeName);
         return value.equalsIgnoreCase("true");
     }
 

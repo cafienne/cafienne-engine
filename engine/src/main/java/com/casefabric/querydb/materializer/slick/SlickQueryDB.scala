@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.slick
+package com.casefabric.querydb.materializer.slick
 
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
-import org.cafienne.querydb.materializer.QueryDBStorage
-import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
-import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.infrastructure.jdbc.cqrs.JDBCOffsetStorage
+import com.casefabric.querydb.materializer.QueryDBStorage
+import com.casefabric.querydb.materializer.cases.CaseStorageTransaction
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
+import com.casefabric.querydb.materializer.tenant.TenantStorageTransaction
+import com.casefabric.querydb.schema.QueryDBSchema
 
 import scala.concurrent.{ExecutionContext, Future}
 

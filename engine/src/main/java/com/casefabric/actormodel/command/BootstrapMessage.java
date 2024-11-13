@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.command;
+package com.casefabric.actormodel.command;
 
-import org.cafienne.actormodel.message.UserMessage;
+import com.casefabric.actormodel.message.UserMessage;
 
 /**
  * The first command that is sent to a ModelActor has to implement this interface such that the actor can

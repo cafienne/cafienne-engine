@@ -15,32 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http
+package com.casefabric.service.http
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.server.Directives.concat
 import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.http.anonymous.AnonymousRequestRoutes
-import org.cafienne.service.http.cases.CasesRoutes
-import org.cafienne.service.http.consentgroup.route.ConsentGroupRoutes
-import org.cafienne.service.http.debug.DebugRoute
-import org.cafienne.service.http.identifiers.route.IdentifierRoutes
-import org.cafienne.service.http.platform.{CaseEngineHealthRoute, PlatformRoutes}
-import org.cafienne.service.http.repository.RepositoryRoute
-import org.cafienne.service.http.storage.StorageRoutes
-import org.cafienne.service.http.swagger.SwaggerHttpServiceRoute
-import org.cafienne.service.http.tasks.TaskRoutes
-import org.cafienne.service.http.tenant.route.TenantRoutes
-import org.cafienne.service.infrastructure.route.CaseServiceRoute
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.service.http.anonymous.AnonymousRequestRoutes
+import com.casefabric.service.http.cases.CasesRoutes
+import com.casefabric.service.http.consentgroup.route.ConsentGroupRoutes
+import com.casefabric.service.http.debug.DebugRoute
+import com.casefabric.service.http.identifiers.route.IdentifierRoutes
+import com.casefabric.service.http.platform.{CaseEngineHealthRoute, PlatformRoutes}
+import com.casefabric.service.http.repository.RepositoryRoute
+import com.casefabric.service.http.storage.StorageRoutes
+import com.casefabric.service.http.swagger.SwaggerHttpServiceRoute
+import com.casefabric.service.http.tasks.TaskRoutes
+import com.casefabric.service.http.tenant.route.TenantRoutes
+import com.casefabric.service.infrastructure.route.CaseServiceRoute
+import com.casefabric.system.CaseSystem
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
-class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
+class CaseFabricHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
 
   val routes: ListBuffer[CaseServiceRoute] = new ListBuffer[CaseServiceRoute]()
 
@@ -55,18 +55,18 @@ class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
   addRoute(new StorageRoutes(caseSystem))
   addRoute(new DebugRoute(caseSystem))
   // Optionally add the anonymous route
-  if (Cafienne.config.api.anonymousConfig.enabled) {
+  if (CaseFabric.config.api.anonymousConfig.enabled) {
     addRoute(new AnonymousRequestRoutes(caseSystem))
   }
 
   /**
-    * Method to extend the default routes that Cafienne exposes
+    * Method to extend the default routes that CaseFabric exposes
     * @param caseServiceRoute The additional Route must extend CaseServiceRoute
     */
   def addRoute(caseServiceRoute: CaseServiceRoute): Unit = routes += caseServiceRoute
 
   def start(): Future[Http.ServerBinding] = {
-    logger.info("Starting Cafienne HTTP Server - loading swagger documentation of the routes")
+    logger.info("Starting CaseFabric HTTP Server - loading swagger documentation of the routes")
 
     // Create the route tree
     val apiRoutes = {
@@ -78,9 +78,9 @@ class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
       mainRoute
     }
 
-    val apiHost = Cafienne.config.api.bindHost
-    val apiPort = Cafienne.config.api.bindPort
-    logger.info(s"Starting Cafienne HTTP Server - starting on $apiHost:$apiPort")
+    val apiHost = CaseFabric.config.api.bindHost
+    val apiPort = CaseFabric.config.api.bindPort
+    logger.info(s"Starting CaseFabric HTTP Server - starting on $apiHost:$apiPort")
     implicit val system: ActorSystem = caseSystem.system
 
     val httpServer = Http().newServerAt(apiHost, apiPort)

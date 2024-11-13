@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.persistence.journal.Tagged;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.CommitEvent;
-import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.actormodel.event.EngineVersionChanged;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.EngineChokedFailure;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.json.Value;
-import org.cafienne.system.health.HealthMonitor;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.event.CommitEvent;
+import com.casefabric.actormodel.event.DebugEvent;
+import com.casefabric.actormodel.event.EngineVersionChanged;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.actormodel.response.EngineChokedFailure;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import com.casefabric.json.Value;
+import com.casefabric.system.health.HealthMonitor;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -61,8 +61,8 @@ public class StagingArea {
 
     private void checkEngineVersion() {
         // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
-        CafienneVersion currentEngineVersion = Cafienne.version();
-        CafienneVersion actorVersion = actor.getEngineVersion();
+        CaseFabricVersion currentEngineVersion = CaseFabric.version();
+        CaseFabricVersion actorVersion = actor.getEngineVersion();
         if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
             actor.getLogger().info(actor + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
             addEvent(new EngineVersionChanged(actor, currentEngineVersion));

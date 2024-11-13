@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test
+package com.casefabric.cmmn.test
 
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser
+import com.casefabric.actormodel.identity.{CaseUserIdentity, Origin}
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamUser
 
 class TestUser(userId: String, userRoles: Array[String]) extends CaseUserIdentity {
   override val id: String = userId

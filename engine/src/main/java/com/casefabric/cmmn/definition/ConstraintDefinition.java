@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.expression.DefaultValueEvaluator;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.Path;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.expression.DefaultValueEvaluator;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.instance.Path;
 import org.w3c.dom.Element;
 
 public class ConstraintDefinition extends CMMNElementDefinition {

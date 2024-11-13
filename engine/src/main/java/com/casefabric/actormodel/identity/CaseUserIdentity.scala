@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{Value, ValueMap}
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 

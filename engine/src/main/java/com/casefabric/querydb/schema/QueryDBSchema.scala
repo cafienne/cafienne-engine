@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema
+package com.casefabric.querydb.schema
 
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
 import QueryDBSchema._db
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
@@ -42,11 +42,11 @@ import slick.jdbc.JdbcProfile
    DROP table offset_storage CASCADE;
   */
 
-trait QueryDBSchema extends CafienneJDBCConfig {
+trait QueryDBSchema extends CaseFabricJDBCConfig {
 
   override lazy val dbConfig: DatabaseConfig[JdbcProfile] = _db
 }
 
 object QueryDBSchema extends QueryDBSchema {
-   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config)
+   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseFabric.config.persistence.queryDB.config)
 }

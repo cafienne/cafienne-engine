@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.response;
+package com.casefabric.actormodel.response;
 
-import org.cafienne.cmmn.actorapi.response.InvalidCaseLastModifiedException;
+import com.casefabric.cmmn.actorapi.response.InvalidCaseLastModifiedException;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;

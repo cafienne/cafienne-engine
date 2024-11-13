@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation.definition.expression;
+package com.casefabric.processtask.implementation.calculation.definition.expression;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.json.BooleanValue;
-import org.cafienne.json.Value;
-import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
-import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.json.BooleanValue;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.implementation.calculation.Calculation;
+import com.casefabric.processtask.implementation.calculation.definition.source.InputReference;
+import com.casefabric.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
 
 import java.util.Map;

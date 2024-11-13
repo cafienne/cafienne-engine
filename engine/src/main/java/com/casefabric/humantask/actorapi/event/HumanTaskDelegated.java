@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.event;
+package com.casefabric.humantask.actorapi.event;
 
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.TaskAction;
-import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.humantask.instance.TaskAction;
+import com.casefabric.humantask.instance.TaskState;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 @Manifest
 public class HumanTaskDelegated extends HumanTaskAssigned {

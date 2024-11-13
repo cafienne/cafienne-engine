@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
 import org.apache.pekko.actor.ActorSystem;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.DefinitionsDocument;
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.repository.MissingDefinitionException;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.json.ValueMap;
-import org.cafienne.system.CaseSystem;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamUser;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.definition.DefinitionsDocument;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.cmmn.repository.MissingDefinitionException;
+import com.casefabric.cmmn.test.assertions.CaseAssertion;
+import com.casefabric.cmmn.test.assertions.FailureAssertion;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.json.ValueMap;
+import com.casefabric.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Await;
@@ -90,7 +90,7 @@ public class TestScript {
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
-            return Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
+            return CaseFabric.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException | InvalidDefinitionException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +109,7 @@ public class TestScript {
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
-            Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
+            CaseFabric.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException e) {
             throw new AssertionError(e);
         }
@@ -199,7 +199,7 @@ public class TestScript {
     }
 
     public static StartCase createCaseCommand(String tenant, TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
-        return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
+        return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, CaseFabric.config().actor().debugEnabled());
     }
 
     public static PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {

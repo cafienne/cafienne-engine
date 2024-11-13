@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.team.user;
+package com.casefabric.cmmn.actorapi.event.team.user;
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamUser;
+import com.casefabric.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Event caused when a consent group access to the case is removed.

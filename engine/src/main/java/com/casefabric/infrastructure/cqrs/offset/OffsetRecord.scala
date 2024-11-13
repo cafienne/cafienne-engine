@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.offset
+package com.casefabric.infrastructure.cqrs.offset
 
 import org.apache.pekko.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
 

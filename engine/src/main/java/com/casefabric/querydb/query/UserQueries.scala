@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity._
-import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.querydb.query.exception._
-import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
-import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
+import com.casefabric.actormodel.identity._
+import com.casefabric.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
+import com.casefabric.querydb.query.exception._
+import com.casefabric.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
+import com.casefabric.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

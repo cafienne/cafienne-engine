@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
-import org.cafienne.processtask.implementation.mail.definition.AttachmentDefinition;
-import org.cafienne.processtask.implementation.mail.definition.BodyDefinition;
-import org.cafienne.processtask.implementation.mail.definition.SubjectDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.processtask.definition.SubProcessDefinition;
+import com.casefabric.processtask.implementation.mail.definition.AddressDefinition;
+import com.casefabric.processtask.implementation.mail.definition.AttachmentDefinition;
+import com.casefabric.processtask.implementation.mail.definition.BodyDefinition;
+import com.casefabric.processtask.implementation.mail.definition.SubjectDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class MailDefinition extends SubProcessDefinition {
     }
 
     public Properties getMailProperties() {
-        return Cafienne.config().engine().mailService().asProperties();
+        return CaseFabric.config().engine().mailService().asProperties();
     }
 
     @Override

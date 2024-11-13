@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.slf4j.Logger;
 
 /**

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<definitions xmlns:cafienne="org.cafienne">
+<definitions xmlns:casefabric="com.casefabric">
 	<caseFileItemDefinition id="unspecified"/>
 	
 	<case name="roles" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
@@ -43,12 +43,12 @@
 		<caseRoles>
 			<role name="Admin">
 				<extensionElements>
-					<cafienne:mutex>Manager</cafienne:mutex>
+					<casefabric:mutex>Manager</casefabric:mutex>
 				</extensionElements>
 			</role>
 			<role name="Manager">
 				<extensionElements>
-					<cafienne:singleton>true</cafienne:singleton>
+					<casefabric:singleton>true</casefabric:singleton>
 				</extensionElements>
 			</role>
 			<role name="Employee" />

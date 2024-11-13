@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.instance.sentry.CaseFileItemOnPart;
+import com.casefabric.cmmn.instance.sentry.TransitionPublisher;
 
 public class CaseFileTransitionPublisher extends TransitionPublisher<CaseFileItemTransitioned, CaseFileItem, CaseFileItemOnPart> {
     CaseFileTransitionPublisher(CaseFileItem item) {

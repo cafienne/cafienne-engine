@@ -8,10 +8,10 @@
             <inputs id="_nvtez_9" name="CaseInput" bindingRef="_nvtez_5"/>
             <outputs id="_nvtez_10" name="CaseOutput" bindingRef="_nvtez_6"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_nvtez_1" sourceRef="_nvtez_9" targetRef="_Hun3_Input"/>
                     <parameterMapping id="_nvtez_3" sourceRef="_SkQG_Result" targetRef="_nvtez_10"/>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
     </casePlanModel>

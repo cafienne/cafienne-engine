@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.command.ModelCommand
-import org.cafienne.actormodel.response._
-import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
-import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.exception._
-import org.cafienne.storage.actormodel.ActorType
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
+import com.casefabric.actormodel.command.ModelCommand
+import com.casefabric.actormodel.response._
+import com.casefabric.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
+import com.casefabric.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
+import com.casefabric.humantask.actorapi.response.HumanTaskResponse
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.querydb.query.exception._
+import com.casefabric.storage.actormodel.ActorType
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
 import scala.util.{Failure, Success}
 

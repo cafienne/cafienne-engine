@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.humantask;
+package com.casefabric.cmmn.instance.task.humantask;
 
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.definition.HumanTaskDefinition;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.PlanningTableDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
-import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.humantask.actorapi.event.HumanTaskResumed;
-import org.cafienne.humantask.actorapi.event.HumanTaskSuspended;
-import org.cafienne.humantask.actorapi.event.HumanTaskTerminated;
-import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
-import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import com.casefabric.cmmn.definition.HumanTaskDefinition;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.PlanningTableDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.instance.*;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.task.validation.TaskOutputValidator;
+import com.casefabric.cmmn.instance.task.validation.ValidationResponse;
+import com.casefabric.humantask.actorapi.event.HumanTaskResumed;
+import com.casefabric.humantask.actorapi.event.HumanTaskSuspended;
+import com.casefabric.humantask.actorapi.event.HumanTaskTerminated;
+import com.casefabric.humantask.actorapi.event.migration.HumanTaskDropped;
+import com.casefabric.humantask.instance.WorkflowTask;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.Collection;

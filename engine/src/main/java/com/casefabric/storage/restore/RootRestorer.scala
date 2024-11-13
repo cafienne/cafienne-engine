@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore
+package com.casefabric.storage.restore
 
 import org.apache.pekko.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.archival.Archive
-import org.cafienne.storage.archive.Storage
-import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.storage.restore.event.{ArchiveRetrieved, RestoreRequested, RestoreStarted}
-import org.cafienne.storage.restore.response.ArchiveNotFound
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.storage.archival.Archive
+import com.casefabric.storage.archive.Storage
+import com.casefabric.storage.restore.command.RestoreActorData
+import com.casefabric.storage.restore.event.{ArchiveRetrieved, RestoreRequested, RestoreStarted}
+import com.casefabric.storage.restore.response.ArchiveNotFound
+import com.casefabric.system.CaseSystem
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -43,7 +43,7 @@ class RootRestorer(caseSystem: CaseSystem, metadata: ActorMetadata) extends Root
     //  Use the system dispatcher for handling the export success
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-    val storage: Storage = Cafienne.config.engine.storage.archive.plugin
+    val storage: Storage = CaseFabric.config.engine.storage.archive.plugin
     val senderRef = sender()
 
     def raiseFailure(throwable: Throwable): Unit = {

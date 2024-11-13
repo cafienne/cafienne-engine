@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.util
+package com.casefabric.infrastructure.config.util
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
@@ -37,7 +37,7 @@ trait ChildConfigReader extends ConfigReader with LazyLogging {
     }
   }
 
-  override def toString: String = s"cafienne.$fullPath"
+  override def toString: String = s"casefabric.$fullPath"
 
   lazy val fullPath: String = parent match {
     case reader: ChildConfigReader => reader.path + "." + path

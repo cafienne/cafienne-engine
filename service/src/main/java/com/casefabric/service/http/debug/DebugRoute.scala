@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.debug
+package com.casefabric.service.http.debug
 
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
@@ -24,12 +24,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.command.TerminateModelActor
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.command.TerminateModelActor
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs.{GET, PATCH, Path, Produces}
-import org.cafienne.service.infrastructure.route.CommandRoute
+import com.casefabric.service.infrastructure.route.CommandRoute
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
@@ -95,7 +95,7 @@ class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
   def forceRecovery: Route = patch {
     path("force-recovery" / Segment) { modelId =>
       validUser { user =>
-        if (!Cafienne.config.developerRouteOpen) {
+        if (!CaseFabric.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
           onComplete(caseSystem.gateway.request(TerminateModelActor(modelId))) {

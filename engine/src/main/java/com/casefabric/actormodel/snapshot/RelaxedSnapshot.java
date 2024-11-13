@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.snapshot;
+package com.casefabric.actormodel.snapshot;
 
-import org.cafienne.actormodel.ModelActor;
+import com.casefabric.actormodel.ModelActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.FiniteDuration;

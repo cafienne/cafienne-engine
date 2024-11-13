@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.file
+package com.casefabric.service.http.cases.file
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -25,15 +25,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
-import org.cafienne.cmmn.instance
-import org.cafienne.service.infrastructure.payload.HttpJsonReader._
-import org.cafienne.json.Value
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.file.CaseFileAPIFormat.CaseFileJsonExampleFormat
-import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
+import com.casefabric.cmmn.instance
+import com.casefabric.service.infrastructure.payload.HttpJsonReader._
+import com.casefabric.json.Value
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.file.CaseFileAPIFormat.CaseFileJsonExampleFormat
+import com.casefabric.service.infrastructure.authentication.AuthenticatedUser
+import com.casefabric.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
@@ -175,20 +175,20 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   }
 
   /**
-    * Checks if the path ends or has more elements left, and returns any remains into a Cafienne Path object.
+    * Checks if the path ends or has more elements left, and returns any remains into a CaseFabric Path object.
     * Empty path (either with or without slash results in an empty path object, referring to top level CaseFile)
     * @param subRoute
     * @return
     */
   private def withCaseFilePath(subRoute: instance.Path => Route): Route = {
-    // Creating a "cafienne-path" will validate the syntax
-    import org.cafienne.cmmn.instance.Path
+    // Creating a "casefabric-path" will validate the syntax
+    import com.casefabric.cmmn.instance.Path
     pathEndOrSingleSlash {
       subRoute(new Path(""))
     } ~ path(Remaining) { rawPath =>
-      // Take the "raw" remaining string, and decode it, and make it a Cafienne CaseFile Path
+      // Take the "raw" remaining string, and decode it, and make it a CaseFabric CaseFile Path
       // Note: taking "Segment" or "Segments" instead of "Remaining" fails and returns 405 on paths like "abc[0 ",
-      //  when parsing it to a Cafienne path the error message is more clear.
+      //  when parsing it to a CaseFabric path the error message is more clear.
       import java.nio.charset.StandardCharsets
       val decodedRawPath = java.net.URLDecoder.decode(rawPath, StandardCharsets.UTF_8.name)
       subRoute(new Path(decodedRawPath))

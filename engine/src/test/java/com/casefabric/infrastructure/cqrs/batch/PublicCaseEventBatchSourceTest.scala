@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.cqrs.batch
+package com.casefabric.infrastructure.cqrs.batch
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.ActorSystem
@@ -6,16 +6,16 @@ import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import org.apache.pekko.testkit.TestKit
-import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.instance.Transition
-import org.cafienne.cmmn.test.TestScript
-import org.cafienne.cmmn.test.TestScript.{loadCaseDefinition, testUser}
-import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
-import org.cafienne.json.ValueMap
-import org.cafienne.util.Guid
+import com.casefabric.cmmn.actorapi.command.StartCase
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition
+import com.casefabric.cmmn.definition.CaseDefinition
+import com.casefabric.cmmn.instance.Transition
+import com.casefabric.cmmn.test.TestScript
+import com.casefabric.cmmn.test.TestScript.{loadCaseDefinition, testUser}
+import com.casefabric.infrastructure.config.TestConfig
+import com.casefabric.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
+import com.casefabric.json.ValueMap
+import com.casefabric.util.Guid
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.matchers.should.Matchers

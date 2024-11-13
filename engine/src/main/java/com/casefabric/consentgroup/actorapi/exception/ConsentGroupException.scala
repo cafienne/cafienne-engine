@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.exception
+package com.casefabric.consentgroup.actorapi.exception
 
-import org.cafienne.actormodel.exception.InvalidCommandException
+import com.casefabric.actormodel.exception.InvalidCommandException
 
 case class ConsentGroupException(msg: String) extends InvalidCommandException(msg)

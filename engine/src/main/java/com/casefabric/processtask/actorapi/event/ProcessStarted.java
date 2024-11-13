@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.event;
+package com.casefabric.processtask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.command.StartProcess;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.command.StartProcess;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class ProcessStarted extends BaseProcessEvent implements BootstrapMessage
     public final ValueMap inputParameters;
     public transient ProcessDefinition definition;
     public final boolean debugMode;
-    public final CafienneVersion engineVersion;
+    public final CaseFabricVersion engineVersion;
 
     public ProcessStarted(ProcessTaskActor actor, StartProcess command) {
         super(actor);
@@ -48,12 +48,12 @@ public class ProcessStarted extends BaseProcessEvent implements BootstrapMessage
         this.parentActorId = command.getParentActorId();
         this.rootActorId = command.getRootActorId();
         this.inputParameters = command.getInputParameters();
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = CaseFabric.version();
     }
 
     public ProcessStarted(ValueMap json) {
         super(json);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, CaseFabricVersion::new);
         this.name = json.readString(Fields.name);
         this.parentActorId = json.readString(Fields.parentActorId);
         this.rootActorId = json.readString(Fields.rootActorId);

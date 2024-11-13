@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.process;
+package com.casefabric.cmmn.instance.task.process;
 
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.ProcessTaskDefinition;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.ProcessTaskDefinition;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.json.ValueMap;
 
 public class ProcessTask extends Task<ProcessTaskDefinition> {
     private final ProcessInformer informer;

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.team.deprecated.member;
+package com.casefabric.cmmn.actorapi.event.team.deprecated.member;
 
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Event caused when a role is removed from a case team member

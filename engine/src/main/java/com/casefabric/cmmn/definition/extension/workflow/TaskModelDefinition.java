@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.extension.workflow;
+package com.casefabric.cmmn.definition.extension.workflow;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ConstraintDefinition;
-import org.cafienne.cmmn.definition.HumanTaskDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.expression.ResolverDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.expression.spel.api.cmmn.mapping.TaskInputRoot;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ConstraintDefinition;
+import com.casefabric.cmmn.definition.HumanTaskDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.expression.ResolverDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.expression.spel.api.cmmn.mapping.TaskInputRoot;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.json.JSONParseFailure;
+import com.casefabric.json.JSONReader;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.Value;
 import org.w3c.dom.Element;
 
 import java.io.IOException;

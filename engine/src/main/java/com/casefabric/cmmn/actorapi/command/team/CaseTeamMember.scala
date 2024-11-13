@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition
-import org.cafienne.cmmn.instance.team.{CaseTeamError, MemberType, Team}
-import org.cafienne.json._
+import com.casefabric.cmmn.definition.team.CaseTeamDefinition
+import com.casefabric.cmmn.instance.team.{CaseTeamError, MemberType, Team}
+import com.casefabric.json._
 
 import java.util
 import scala.jdk.CollectionConverters._
 
-trait CaseTeamMember extends CafienneJson {
+trait CaseTeamMember extends CaseFabricJson {
   val caseRoles: Set[String] = Set()
   val rolesRemoved: Set[String] = Set()
   val isOwner: Boolean = false

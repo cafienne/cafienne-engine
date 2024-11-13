@@ -1,21 +1,21 @@
-package org.cafienne.cmmn.test.casefile;
+package com.casefabric.cmmn.test.casefile;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
-import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.Guid;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.casefile.CreateCaseFileItem;
+import com.casefabric.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
+import com.casefabric.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.cmmn.test.assertions.file.CaseFileAssertion;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
+import com.casefabric.util.Guid;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestNewCaseFile {
     private final String caseName = "NewCaseFileTest";

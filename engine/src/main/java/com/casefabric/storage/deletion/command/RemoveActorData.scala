@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.command
+package com.casefabric.storage.deletion.command
 
-import org.cafienne.storage.actormodel.message.StorageCommand
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.deletion.RootRemover
+import com.casefabric.storage.actormodel.message.StorageCommand
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.storage.deletion.RootRemover
 
 /** @param user User initiating the removal process
   * @param tenant Tenant to which the ModelActor belongs

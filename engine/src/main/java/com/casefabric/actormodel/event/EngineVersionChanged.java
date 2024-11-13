@@ -15,30 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.event;
+package com.casefabric.actormodel.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 
 @Manifest
 public class EngineVersionChanged extends BaseModelEvent<ModelActor> {
 
-    private final CafienneVersion version;
+    private final CaseFabricVersion version;
 
-    public EngineVersionChanged(ModelActor actor, CafienneVersion version) {
+    public EngineVersionChanged(ModelActor actor, CaseFabricVersion version) {
         super(actor);
         this.version = version;
     }
 
     public EngineVersionChanged(ValueMap json) {
         super(json);
-        this.version = json.readObject(Fields.version, CafienneVersion::new);
+        this.version = json.readObject(Fields.version, CaseFabricVersion::new);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class EngineVersionChanged extends BaseModelEvent<ModelActor> {
      * Returns the version of the engine that is currently applied in the case
      * @return
      */
-    public CafienneVersion version() {
+    public CaseFabricVersion version() {
         return version;
     }
 

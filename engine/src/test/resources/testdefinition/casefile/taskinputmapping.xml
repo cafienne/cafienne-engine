@@ -50,7 +50,7 @@
                 <inputs id="_ilffQ_6" name="Container" bindingRef="cfi_casefile/testcontext.case_3"/>
                 <outputs id="_3X9aF" name="Child" bindingRef="cfi_casefile/testcontext.case_4"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
                         <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
@@ -63,14 +63,14 @@
                         </assignment>
                         <parameterMapping id="_kHJ0j" sourceRef="_SkQG_Result" targetRef="_3X9aF"/>
                         <parameterMapping id="_ilffQ_4" sourceRef="_ilffQ_6" targetRef="_Hun3_Input"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_casefile/testcontext.case_144" name="TaskWithContainer" isBlocking="true">
                 <inputs id="_v9FEK" name="inputChildren" bindingRef="cfi_casefile/testcontext.case_3"/>
                 <outputs id="_NXDUT" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
                         <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
@@ -82,20 +82,20 @@
                             </transformation>
                         </parameterMapping>
                         <parameterMapping id="_RkBj2" sourceRef="_SkQG_Result" targetRef="_NXDUT"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_casefile/testcontext.case_148" name="TaskWithChild" isBlocking="true">
                 <inputs id="_axaLd" name="inputChild" bindingRef="cfi_casefile/testcontext.case_4"/>
                 <outputs id="_dDqEH" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
                         <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
                         <parameterMapping id="_B4VdN" sourceRef="_axaLd" targetRef="_Hun3_Input"/>
                         <parameterMapping id="_RMhmR" sourceRef="_SkQG_Result" targetRef="_dDqEH"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <userEvent id="pid_cm_casefile/testcontext.case_143" name="Trigger.TaskWithContainer"/>
@@ -103,14 +103,14 @@
         </casePlanModel>
         <input id="_dJPax_inCPs_0" name="Container" bindingRef="cfi_casefile/testcontext.case_3"/>
         <extensionElements mustUnderstand="false">
-            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+            <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
     "properties":{
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
         </extensionElements>
     </case>
     <CMMNDI>

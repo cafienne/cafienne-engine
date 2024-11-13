@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion
+package com.casefabric.storage.deletion
 
-import org.cafienne.storage.actormodel.{ActorMetadata, OffspringNode}
-import org.cafienne.storage.deletion.command.RemoveActorData
+import com.casefabric.storage.actormodel.{ActorMetadata, OffspringNode}
+import com.casefabric.storage.deletion.command.RemoveActorData
 
 class RemoveNode(val metadata: ActorMetadata, val actor: RootRemover) extends OffspringNode {
   override def createStorageCommand: Any = RemoveActorData(metadata)

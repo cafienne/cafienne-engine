@@ -1,15 +1,15 @@
-package org.cafienne.cmmn.test.expression;
+package com.casefabric.cmmn.test.expression;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.json.ValueMap;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestTimerExpression {
 

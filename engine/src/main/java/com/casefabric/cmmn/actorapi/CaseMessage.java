@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi;
+package com.casefabric.cmmn.actorapi;
 
-import org.cafienne.actormodel.message.UserMessage;
-import org.cafienne.cmmn.instance.Case;
+import com.casefabric.actormodel.message.UserMessage;
+import com.casefabric.cmmn.instance.Case;
 
 public interface CaseMessage extends UserMessage {
     @Override

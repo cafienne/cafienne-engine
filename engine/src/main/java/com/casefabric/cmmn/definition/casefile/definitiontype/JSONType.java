@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.casefile.definitiontype;
+package com.casefabric.cmmn.definition.casefile.definitiontype;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.definition.casefile.DefinitionType;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.definition.casefile.DefinitionType;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.util.Map;
 

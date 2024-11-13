@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.command;
+package com.casefabric.humantask.actorapi.command;
 
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.humantask.instance.WorkflowTask;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.command;
+package com.casefabric.consentgroup.actorapi.command;
 
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.ConsentGroup;
-import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.ConsentGroupUser;
+import com.casefabric.consentgroup.ConsentGroupActor;
+import com.casefabric.consentgroup.actorapi.ConsentGroup;
+import com.casefabric.consentgroup.actorapi.exception.ConsentGroupException;
+import com.casefabric.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 @Manifest
 public class CreateConsentGroup extends CollectiveCommand implements BootstrapMessage {

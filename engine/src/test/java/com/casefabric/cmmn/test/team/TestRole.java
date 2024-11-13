@@ -1,25 +1,25 @@
 /*
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.test.team;
+package com.casefabric.cmmn.test.team;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.plan.MakeCaseTransition;
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.instance.TransitionDeniedException;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.cmmn.test.TestUser;
+import com.casefabric.cmmn.test.assertions.CaseAssertion;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestRole {
 

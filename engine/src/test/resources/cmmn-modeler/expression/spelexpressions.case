@@ -32,7 +32,7 @@
             <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
             <outputs id="outTP_cm_cstko_4_3" name="MultiOutput" bindingRef="cfi_cstko_4"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="expression/spelexpressionstask.humantask">
                     <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                     <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
                     <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4">
@@ -70,7 +70,7 @@
                             </body>
                         </condition>
                     </duedate>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <milestone id="cm_csd7G_38" name="Milestone">
@@ -148,7 +148,7 @@ The Milestone has various entry criteria with ifPart expressions, it responds to
         </text>
     </textAnnotation>
     <extensionElements mustUnderstand="false">
-        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+        <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
@@ -156,6 +156,6 @@ The Milestone has various entry criteria with ifPart expressions, it responds to
     }
   }
 }
-            </cafienne:start-case-model>
+            </casefabric:start-case-model>
     </extensionElements>
 </case>

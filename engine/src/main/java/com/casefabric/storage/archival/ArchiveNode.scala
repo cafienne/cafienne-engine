@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival
+package com.casefabric.storage.archival
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, OffspringNode}
-import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.archival.event.{ArchiveCreated, ArchiveReceived}
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.{ActorMetadata, OffspringNode}
+import com.casefabric.storage.archival.command.ArchiveActorData
+import com.casefabric.storage.archival.event.{ArchiveCreated, ArchiveReceived}
 
 class ArchiveNode(val metadata: ActorMetadata, val actor: RootArchiver) extends OffspringNode with LazyLogging {
   override def createStorageCommand: Any = ArchiveActorData(metadata)

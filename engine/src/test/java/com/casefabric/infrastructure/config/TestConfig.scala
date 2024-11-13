@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import com.typesafe.config.ConfigFactory
 
@@ -22,10 +22,10 @@ object TestConfig {
       |          serialize-messages = off
       |
       |          serializers {
-      |            cafienne_serializer = "org.cafienne.infrastructure.serialization.CafienneSerializer"
+      |            casefabric_serializer = "com.casefabric.infrastructure.serialization.CaseFabricSerializer"
       |          }
       |          serialization-bindings {
-      |            "org.cafienne.infrastructure.serialization.CafienneSerializable" = cafienne_serializer
+      |            "com.casefabric.infrastructure.serialization.CaseFabricSerializable" = casefabric_serializer
       |          }
       |        }
       |

@@ -1,17 +1,17 @@
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
 import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.testkit.{TestKit, TestProbe}
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.test.TestScript.loadCaseDefinition
-import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.querydb.materializer.{EventFactory, TestQueryDB}
-import org.cafienne.system.CaseSystem
-import org.cafienne.util.Guid
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.cmmn.actorapi.event.CaseEvent
+import com.casefabric.cmmn.definition.CaseDefinition
+import com.casefabric.cmmn.test.TestScript.loadCaseDefinition
+import com.casefabric.identity.TestIdentityFactory
+import com.casefabric.infrastructure.config.TestConfig
+import com.casefabric.querydb.materializer.{EventFactory, TestQueryDB}
+import com.casefabric.system.CaseSystem
+import com.casefabric.util.Guid
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers

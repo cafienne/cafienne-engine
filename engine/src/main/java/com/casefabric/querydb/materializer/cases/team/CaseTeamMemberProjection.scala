@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.team
+package com.casefabric.querydb.materializer.cases.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.actorapi.event.team.group.{CaseTeamGroupAdded, CaseTeamGroupChanged}
-import org.cafienne.cmmn.actorapi.event.team.{CaseTeamMemberEvent, CaseTeamMemberRemoved}
-import org.cafienne.cmmn.instance.team.MemberType
-import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
-import org.cafienne.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
+import com.casefabric.cmmn.actorapi.command.team._
+import com.casefabric.cmmn.actorapi.event.team.group.{CaseTeamGroupAdded, CaseTeamGroupChanged}
+import com.casefabric.cmmn.actorapi.event.team.{CaseTeamMemberEvent, CaseTeamMemberRemoved}
+import com.casefabric.cmmn.instance.team.MemberType
+import com.casefabric.querydb.materializer.cases.CaseStorageTransaction
+import com.casefabric.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

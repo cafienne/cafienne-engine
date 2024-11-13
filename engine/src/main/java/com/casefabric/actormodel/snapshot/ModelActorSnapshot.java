@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.snapshot;
+package com.casefabric.actormodel.snapshot;
 
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable;
 
 /**
  * Interface to implement if the ModelActor uses snapshot storage
  */
-public interface ModelActorSnapshot extends CafienneSerializable {
+public interface ModelActorSnapshot extends CaseFabricSerializable {
 }

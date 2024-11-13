@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package com.casefabric.querydb.materializer.tenant
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}
-import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
-import org.cafienne.tenant.actorapi.event.platform.PlatformEvent
-import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
-import org.cafienne.tenant.actorapi.event.{TenantAppliedPlatformUpdate, TenantModified}
+import com.casefabric.actormodel.event.CommitEvent
+import com.casefabric.infrastructure.cqrs.ModelEventEnvelope
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}
+import com.casefabric.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
+import com.casefabric.tenant.actorapi.event.platform.PlatformEvent
+import com.casefabric.tenant.actorapi.event.user.TenantMemberEvent
+import com.casefabric.tenant.actorapi.event.{TenantAppliedPlatformUpdate, TenantModified}
 
 import scala.concurrent.Future
 

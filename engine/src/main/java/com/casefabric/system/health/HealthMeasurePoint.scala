@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.health
+package com.casefabric.system.health
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.json.ValueMap
+import com.casefabric.json.ValueMap
 
 import java.time.Instant
 

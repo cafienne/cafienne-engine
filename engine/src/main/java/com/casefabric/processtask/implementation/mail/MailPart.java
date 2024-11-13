@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 /**
  * Small custom class to print with toString() the body content (for adding the debug information in Mail class)

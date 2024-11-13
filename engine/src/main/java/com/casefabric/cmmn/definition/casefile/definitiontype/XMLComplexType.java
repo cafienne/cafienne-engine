@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.casefile.definitiontype;
+package com.casefabric.cmmn.definition.casefile.definitiontype;
 
-import org.cafienne.cmmn.definition.casefile.DefinitionType;
+import com.casefabric.cmmn.definition.casefile.DefinitionType;
 
 public class XMLComplexType extends DefinitionType {
 

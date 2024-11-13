@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.exception;
+package com.casefabric.actormodel.exception;
 
 /**
  * Exception that can be raised to avoid having to set final fields in a deprecated event,

@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.consentgroup.route
+package com.casefabric.service.http.consentgroup.route
 
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.ConsentGroupUser
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.querydb.query.UserQueries
-import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
-import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
+import com.casefabric.actormodel.identity.ConsentGroupUser
+import com.casefabric.consentgroup.actorapi.command.ConsentGroupCommand
+import com.casefabric.querydb.lastmodified.{Headers, LastModifiedHeader}
+import com.casefabric.querydb.query.UserQueries
+import com.casefabric.service.infrastructure.authentication.AuthenticatedUser
+import com.casefabric.service.infrastructure.route.{CommandRoute, QueryRoute}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

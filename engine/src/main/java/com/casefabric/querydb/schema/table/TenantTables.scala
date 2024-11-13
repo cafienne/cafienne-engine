@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.table
+package com.casefabric.querydb.schema.table
 
-import org.cafienne.querydb.record.{TenantRecord, UserRoleRecord}
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.record.{TenantRecord, UserRoleRecord}
+import com.casefabric.querydb.schema.QueryDBSchema
 
 trait TenantTables extends QueryDBSchema {
 
   import dbConfig.profile.api._
 
   // Schema for the "tenant" table:
-  final class TenantTable(tag: Tag) extends CafienneTable[TenantRecord](tag, "tenant") {
+  final class TenantTable(tag: Tag) extends CaseFabricTable[TenantRecord](tag, "tenant") {
 
     // Columsn
     lazy val name = idColumn[String]("name", O.PrimaryKey)
@@ -36,7 +36,7 @@ trait TenantTables extends QueryDBSchema {
     lazy val * = (name, enabled).mapTo[TenantRecord]
   }
 
-  class UserRoleTable(tag: Tag) extends CafienneTenantTable[UserRoleRecord](tag, "user_role") {
+  class UserRoleTable(tag: Tag) extends CaseFabricTenantTable[UserRoleRecord](tag, "user_role") {
     lazy val pk = primaryKey("pk_userrole", (userId, tenant, role_name)) // Note: cannot use pkName becauase pk_userrole deviates from the actual table name :(
 
     lazy val * = (userId, tenant, role_name, name, email, isOwner, enabled).mapTo[UserRoleRecord]

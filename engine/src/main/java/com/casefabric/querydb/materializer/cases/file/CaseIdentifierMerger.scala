@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.file
+package com.casefabric.querydb.materializer.cases.file
 
-import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
-import org.cafienne.querydb.record.CaseBusinessIdentifierRecord
+import com.casefabric.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
+import com.casefabric.querydb.record.CaseBusinessIdentifierRecord
 
 object CaseIdentifierMerger {
 

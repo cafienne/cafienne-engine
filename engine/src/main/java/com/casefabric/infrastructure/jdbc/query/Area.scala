@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.query
+package com.casefabric.infrastructure.jdbc.query
 
 case class Area(offset: Int, numOfResults: Int)
 

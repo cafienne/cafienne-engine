@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
-import org.cafienne.cmmn.instance.sentry.CriteriaListener;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.ReactivatingCriterion;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.sentry.ReactivateCriterionDefinition;
+import com.casefabric.cmmn.instance.sentry.CriteriaListener;
+import com.casefabric.cmmn.instance.sentry.Criterion;
+import com.casefabric.cmmn.instance.sentry.ReactivatingCriterion;
 import org.w3c.dom.Element;
 
 public class PlanItemReactivation extends CriteriaListener<ReactivateCriterionDefinition, ReactivatingCriterion> {

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.state
+package com.casefabric.storage.deletion.state
 
-import org.cafienne.storage.actormodel.state.CaseState
-import org.cafienne.storage.deletion.ActorDataRemover
+import com.casefabric.storage.actormodel.state.CaseState
+import com.casefabric.storage.deletion.ActorDataRemover
 
 class CaseDeletionState(override val actor: ActorDataRemover) extends DeletionState with CaseState

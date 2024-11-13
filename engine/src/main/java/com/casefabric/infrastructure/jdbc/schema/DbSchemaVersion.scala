@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.schema
+package com.casefabric.infrastructure.jdbc.schema
 
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
 import slick.migration.api.Migration
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
 
-trait DbSchemaVersion extends CafienneJDBCConfig {
+trait DbSchemaVersion extends CaseFabricJDBCConfig {
   val version: String
   val migrations: Migration
   def getScript(implicit infoProvider: MigrationInfo.Provider[Migration]): Seq[VersionedMigration[String]] = {

@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
-import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.expression.spel.SpelReadable;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.ValueMapJacksonDeserializer;
+import com.casefabric.infrastructure.serialization.ValueMapJacksonSerializer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

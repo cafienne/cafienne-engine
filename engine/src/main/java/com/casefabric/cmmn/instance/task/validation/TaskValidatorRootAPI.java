@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.validation;
+package com.casefabric.cmmn.instance.task.validation;
 
-import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.expression.spel.api.CaseRootObject;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.json.ValueMap;
 
 public class TaskValidatorRootAPI extends CaseRootObject {
     public TaskValidatorRootAPI(HumanTask task, ValueMap requestPayloadJson) {

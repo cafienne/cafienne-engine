@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.plan.task;
+package com.casefabric.cmmn.actorapi.event.plan.task;
 
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 @Manifest
 public class TaskImplementationStarted extends TaskEvent<Task<?>> {

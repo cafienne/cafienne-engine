@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases
+package com.casefabric.service.http.cases
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.service.http.cases.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
-import org.cafienne.service.http.cases.documentation.CaseDocumentationRoute
-import org.cafienne.service.http.cases.file.CaseFileRoute
-import org.cafienne.service.http.cases.history.CaseHistoryRoute
-import org.cafienne.service.http.cases.migration.CaseMigrationRoute
-import org.cafienne.service.http.cases.plan.{DiscretionaryRoute, PlanItemRoute}
-import org.cafienne.service.http.cases.team.CaseTeamRoute
-import org.cafienne.system.CaseSystem
+import com.casefabric.service.http.cases.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
+import com.casefabric.service.http.cases.documentation.CaseDocumentationRoute
+import com.casefabric.service.http.cases.file.CaseFileRoute
+import com.casefabric.service.http.cases.history.CaseHistoryRoute
+import com.casefabric.service.http.cases.migration.CaseMigrationRoute
+import com.casefabric.service.http.cases.plan.{DiscretionaryRoute, PlanItemRoute}
+import com.casefabric.service.http.cases.team.CaseTeamRoute
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.AuthenticatedRoute
+import com.casefabric.service.infrastructure.route.AuthenticatedRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")

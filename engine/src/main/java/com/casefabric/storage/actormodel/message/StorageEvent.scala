@@ -15,23 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package com.casefabric.storage.actormodel.message
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.actormodel.ModelActor
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
-import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.ActorMetadata
+import com.casefabric.actormodel.ModelActor
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
+import com.casefabric.storage.StorageUser
+import com.casefabric.storage.actormodel.ActorMetadata
 
 import java.time.Instant
 
 /** Provide a scala base class that can be used as alternative for ModelEvent,
-  * in order to generate events from ModelActor Data Removal pattern and have those events end up also in Cafienne Debugger.
+  * in order to generate events from ModelActor Data Removal pattern and have those events end up also in CaseFabric Debugger.
   */
-trait StorageEvent extends CafienneJson with ModelEvent {
+trait StorageEvent extends CaseFabricJson with ModelEvent {
   val metadata: ActorMetadata
   val user: StorageUser = metadata.user
   val tenant: String = user.tenant
@@ -78,5 +78,5 @@ trait StorageEvent extends CafienneJson with ModelEvent {
 }
 
 object StorageEvent {
-  val TAG: String = "cafienne:storage"
+  val TAG: String = "casefabric:storage"
 }

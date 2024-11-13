@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.process.smtp;
+package com.casefabric.cmmn.instance.process.smtp;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
-public class SMTPCallDefinition extends org.cafienne.processtask.implementation.smtp.SMTPCallDefinition {
+public class SMTPCallDefinition extends com.casefabric.processtask.implementation.smtp.SMTPCallDefinition {
     public SMTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }

@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.instance;
+package com.casefabric.processtask.instance;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
-import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.command.*;
-import org.cafienne.processtask.actorapi.event.*;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.system.CaseSystem;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.cmmn.actorapi.command.plan.task.CompleteTask;
+import com.casefabric.cmmn.actorapi.command.plan.task.FailTask;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.command.*;
+import com.casefabric.processtask.actorapi.event.*;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

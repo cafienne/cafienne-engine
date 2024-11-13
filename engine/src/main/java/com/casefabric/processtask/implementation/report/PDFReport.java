@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.report;
+package com.casefabric.processtask.implementation.report;
 
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.definition.SubProcessDefinition;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;

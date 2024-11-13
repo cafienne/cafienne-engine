@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.record
+package com.casefabric.querydb.record
 
-import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
-import org.cafienne.json._
+import com.casefabric.cmmn.definition.{CaseDefinition, DefinitionsDocument}
+import com.casefabric.json._
 
 import java.time.Instant
 
@@ -34,7 +34,7 @@ final case class CaseRecord(id: String,
                             createdOn: Instant,
                             createdBy: String = "",
                             caseInput: String = "",
-                            caseOutput: String = "") extends CafienneJson {
+                            caseOutput: String = "") extends CaseFabricJson {
 
   override def toValue: Value[_] = {
     val v = new ValueMap
@@ -67,11 +67,11 @@ final case class CaseDefinitionRecord(caseInstanceId: String, name: String, desc
   lazy val caseDefinition: CaseDefinition = definitions.getCaseDefinition(elementId)
 }
 
-final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: String) extends CafienneJson {
+final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: String) extends CaseFabricJson {
   override def toValue: ValueMap = JSONReader.parse(data)
 }
 
-final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: String, name: String, value: Option[String], active: Boolean, path: String) extends CafienneJson {
+final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: String, name: String, value: Option[String], active: Boolean, path: String) extends CaseFabricJson {
   override def toValue: Value[_] = new ValueMap("name", name, "value", value.orNull)
 }
 
@@ -103,7 +103,7 @@ final case class PlanItemRecord(id: String,
                                 taskInput: String = "",
                                 taskOutput: String = "",
                                 mappedInput: String = "",
-                                rawOutput: String = "") extends CafienneJson {
+                                rawOutput: String = "") extends CaseFabricJson {
 
   def toValue: ValueMap = {
     val v = new ValueMap
@@ -147,7 +147,7 @@ final case class PlanItemHistoryRecord(id: String = "",
                                        taskInput: String = "",
                                        taskOutput: String = "",
                                        mappedInput: String = "",
-                                       rawOutput: String = "") extends CafienneJson {
+                                       rawOutput: String = "") extends CaseFabricJson {
 
   override def toValue: ValueMap = {
     val v = new ValueMap

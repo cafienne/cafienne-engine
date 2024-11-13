@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.DiscretionaryItemDefinition;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.util.Collection;
 import java.util.Set;

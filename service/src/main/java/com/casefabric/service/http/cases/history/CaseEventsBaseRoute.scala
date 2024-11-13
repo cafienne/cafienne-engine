@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.history
+package com.casefabric.service.http.cases.history
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.stream.scaladsl.Sink
-import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
-import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
-import org.cafienne.querydb.query.exception.PlanItemSearchFailure
-import org.cafienne.querydb.record.PlanItemHistoryRecord
-import org.cafienne.service.http.cases.CasesRoute
+import com.casefabric.cmmn.actorapi.event.plan.CasePlanEvent
+import com.casefabric.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
+import com.casefabric.querydb.query.exception.PlanItemSearchFailure
+import com.casefabric.querydb.record.PlanItemHistoryRecord
+import com.casefabric.service.http.cases.CasesRoute
 
 import scala.concurrent.Future
 

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.consentgroup
+package com.casefabric.querydb.materializer.consentgroup
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import com.casefabric.querydb.lastmodified.{Headers, LastModifiedRegistration}
 
 object ConsentGroupReader {
   val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CONSENT_GROUP_LAST_MODIFIED)

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.response
+package com.casefabric.storage.restore.response
 
-import org.cafienne.querydb.query.exception.SearchFailure
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageFailure
+import com.casefabric.querydb.query.exception.SearchFailure
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.actormodel.message.StorageFailure
 
 case class ArchiveNotFound(metadata: ActorMetadata) extends SearchFailure(s"Cannot find archive for ${metadata.path}") with StorageFailure

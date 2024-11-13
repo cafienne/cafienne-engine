@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
-import org.cafienne.cmmn.definition.ConstraintDefinition;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
-import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
-import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import com.casefabric.cmmn.actorapi.event.migration.PlanItemDropped;
+import com.casefabric.cmmn.actorapi.event.migration.PlanItemMigrated;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import com.casefabric.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
+import com.casefabric.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import com.casefabric.cmmn.definition.ConstraintDefinition;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.PlanItemDefinitionDefinition;
+import com.casefabric.cmmn.instance.sentry.PlanItemOnPart;
+import com.casefabric.cmmn.instance.sentry.TransitionGenerator;
 import org.w3c.dom.Element;
 
 import java.util.Collection;

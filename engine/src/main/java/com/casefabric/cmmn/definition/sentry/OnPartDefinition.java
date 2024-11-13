@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.sentry;
+package com.casefabric.cmmn.definition.sentry;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.OnPart;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.instance.sentry.Criterion;
+import com.casefabric.cmmn.instance.sentry.OnPart;
 import org.w3c.dom.Element;
 
 public abstract class OnPartDefinition extends CMMNElementDefinition {

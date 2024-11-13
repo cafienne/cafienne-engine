@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.event
+package com.casefabric.storage.deletion.event
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.ValueMap
+import com.casefabric.storage.actormodel.ActorMetadata
 
 import scala.jdk.CollectionConverters.SeqHasAsJava
 

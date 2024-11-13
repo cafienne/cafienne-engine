@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.migration
+package com.casefabric.service.http.cases.migration
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -25,12 +25,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.migration.CaseMigrationAPI._
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.migration.MigrateDefinition
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.migration.CaseMigrationAPI._
+import com.casefabric.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
@@ -60,7 +60,7 @@ class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("migrate-definition") {
         entity(as[MigrationDefinitionFormat]) { migrateDefinition =>
-          val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
+          val definitionsDocument = CaseFabric.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
           val newDefinition = definitionsDocument.getFirstCase
           val newCaseTeam = migrateDefinition.newTeam.map(_.asTeam).orNull
           askCase(user, caseInstanceId, caseMember => new MigrateDefinition(caseMember, caseInstanceId, newDefinition, newCaseTeam))

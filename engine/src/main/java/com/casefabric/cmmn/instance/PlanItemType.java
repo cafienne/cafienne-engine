@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
 public enum PlanItemType {
-    CasePlan(org.cafienne.cmmn.instance.CasePlan.class),
-    Stage(String.valueOf(org.cafienne.cmmn.instance.Stage.class)),
-    HumanTask(org.cafienne.cmmn.instance.task.humantask.HumanTask.class),
-    CaseTask(org.cafienne.cmmn.instance.task.cmmn.CaseTask.class),
-    ProcessTask(org.cafienne.cmmn.instance.task.process.ProcessTask.class),
-    UserEvent(org.cafienne.cmmn.instance.UserEvent.class),
-    TimerEvent(org.cafienne.cmmn.instance.TimerEvent.class),
-    Milestone(org.cafienne.cmmn.instance.Milestone.class);
+    CasePlan(com.casefabric.cmmn.instance.CasePlan.class),
+    Stage(String.valueOf(com.casefabric.cmmn.instance.Stage.class)),
+    HumanTask(com.casefabric.cmmn.instance.task.humantask.HumanTask.class),
+    CaseTask(com.casefabric.cmmn.instance.task.cmmn.CaseTask.class),
+    ProcessTask(com.casefabric.cmmn.instance.task.process.ProcessTask.class),
+    UserEvent(com.casefabric.cmmn.instance.UserEvent.class),
+    TimerEvent(com.casefabric.cmmn.instance.TimerEvent.class),
+    Milestone(com.casefabric.cmmn.instance.Milestone.class);
 
     PlanItemType(String value) {
     }

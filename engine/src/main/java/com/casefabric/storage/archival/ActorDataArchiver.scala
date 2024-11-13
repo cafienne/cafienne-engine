@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival
+package com.casefabric.storage.archival
 
 import org.apache.pekko.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
-import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.archival.event._
-import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
-import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
-import org.cafienne.storage.archival.state.{ArchivalState, CaseArchivalState, ProcessArchivalState}
-import org.cafienne.system.CaseSystem
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
+import com.casefabric.storage.archival.command.ArchiveActorData
+import com.casefabric.storage.archival.event._
+import com.casefabric.storage.archival.event.cmmn.ModelActorArchived
+import com.casefabric.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
+import com.casefabric.storage.archival.state.{ArchivalState, CaseArchivalState, ProcessArchivalState}
+import com.casefabric.system.CaseSystem
 
 class ActorDataArchiver(override val caseSystem: CaseSystem, override val metadata: ActorMetadata) extends QueryDBStorageActor[ArchivalState] with LazyLogging {
 

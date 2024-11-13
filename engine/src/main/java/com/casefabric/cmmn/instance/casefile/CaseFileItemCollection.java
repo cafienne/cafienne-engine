@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;

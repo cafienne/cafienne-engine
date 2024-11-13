@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.json.{CafienneJson, StringValue, Value}
-import org.cafienne.querydb.query.filter.IdentifierFilter
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.json.{CaseFabricJson, StringValue, Value}
+import com.casefabric.querydb.query.filter.IdentifierFilter
 
 import scala.concurrent.Future
 
@@ -66,6 +66,6 @@ class IdentifierQueriesImpl
   }
 }
 
-case class IdentifierName(name: String) extends CafienneJson {
+case class IdentifierName(name: String) extends CaseFabricJson {
   override def toValue: Value[_] = new StringValue(name)
 }

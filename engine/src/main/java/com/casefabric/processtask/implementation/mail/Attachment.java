@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -23,10 +23,10 @@ import jakarta.mail.BodyPart;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.util.ByteArrayDataSource;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.implementation.mail.definition.AttachmentDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.implementation.mail.definition.AttachmentDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.util.Base64;
 

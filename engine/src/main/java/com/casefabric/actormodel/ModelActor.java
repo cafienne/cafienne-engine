@@ -15,30 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.actor.PoisonPill;
 import org.apache.pekko.persistence.AbstractPersistentActor;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotOffer;
 import org.apache.pekko.persistence.SnapshotProtocol;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.ActorModified;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.CommandFailureListener;
-import org.cafienne.actormodel.response.CommandResponseListener;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.system.CaseSystem;
-import org.cafienne.system.health.HealthMonitor;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.event.ActorModified;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.exception.CommandException;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.actormodel.response.CommandFailureListener;
+import com.casefabric.actormodel.response.CommandResponseListener;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import com.casefabric.system.CaseSystem;
+import com.casefabric.system.health.HealthMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    private boolean debugMode = Cafienne.config().actor().debugEnabled();
+    private boolean debugMode = CaseFabric.config().actor().debugEnabled();
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -94,12 +94,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
-     * If a ModelActor is recovered by the actor system, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
+     * If a ModelActor is recovered by the actor system, then the version will be overwritten in {@link ModelActor#setEngineVersion(CaseFabricVersion)}.
      * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
      * the actor will insert a new event EngineVersionChanged.
      * For new Cases, the CaseDefinitionApplied event will generate the current version
      */
-    private CafienneVersion engineVersion;
+    private CaseFabricVersion engineVersion;
 
     /**
      * The CaseSystem in which this ModelActor runs
@@ -120,11 +120,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return true;
     }
 
-    public CafienneVersion getEngineVersion() {
+    public CaseFabricVersion getEngineVersion() {
         return this.engineVersion;
     }
 
-    public void setEngineVersion(CafienneVersion version) {
+    public void setEngineVersion(CaseFabricVersion version) {
         this.engineVersion = version;
     }
 
@@ -236,7 +236,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     }
 
     void takeABreak() {
-        takeABreak("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (Cafienne.config().actor().idlePeriod() / 1000) + " seconds");
+        takeABreak("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (CaseFabric.config().actor().idlePeriod() / 1000) + " seconds");
     }
 
     void takeABreak(String msg) {
@@ -457,7 +457,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * This method is invoked when handling of the source message completed and
      * resulting state changes are to be persisted in the event journal.
-     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
+     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link com.casefabric.actormodel.event.ActorModified} event.
      */
     protected void completeMessageHandling(IncomingActorMessage source, StagingArea stagingArea) {
         if (stagingArea.needsCommitEvent()) {
@@ -470,7 +470,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * This method is invoked when handling of the source message completed and
      * resulting state changes are to be persisted in the event journal.
-     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
+     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link com.casefabric.actormodel.event.ActorModified} event.
      */
     protected void addCommitEvent(IncomingActorMessage message) {
     }

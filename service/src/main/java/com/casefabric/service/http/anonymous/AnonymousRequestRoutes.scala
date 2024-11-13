@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.anonymous
+package com.casefabric.service.http.anonymous
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.CaseServiceRoute
+import com.casefabric.service.infrastructure.route.CaseServiceRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/request")

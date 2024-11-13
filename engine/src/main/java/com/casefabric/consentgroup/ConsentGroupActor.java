@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup;
+package com.casefabric.consentgroup;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand;
-import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
-import org.cafienne.consentgroup.actorapi.command.ReplaceConsentGroup;
-import org.cafienne.consentgroup.actorapi.event.*;
-import org.cafienne.system.CaseSystem;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.identity.ConsentGroupUser;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.consentgroup.actorapi.ConsentGroupMember;
+import com.casefabric.consentgroup.actorapi.command.ConsentGroupCommand;
+import com.casefabric.consentgroup.actorapi.command.CreateConsentGroup;
+import com.casefabric.consentgroup.actorapi.command.ReplaceConsentGroup;
+import com.casefabric.consentgroup.actorapi.event.*;
+import com.casefabric.system.CaseSystem;
 
 import java.util.*;
 import java.util.stream.Collectors;

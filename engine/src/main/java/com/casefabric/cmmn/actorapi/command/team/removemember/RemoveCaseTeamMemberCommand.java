@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team.removemember;
+package com.casefabric.cmmn.actorapi.command.team.removemember;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamCommand;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
-import org.cafienne.cmmn.instance.team.CaseTeamError;
-import org.cafienne.cmmn.instance.team.MemberType;
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamCommand;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamMember;
+import com.casefabric.cmmn.instance.team.CaseTeamError;
+import com.casefabric.cmmn.instance.team.MemberType;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

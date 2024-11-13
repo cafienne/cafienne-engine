@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.exception;
+package com.casefabric.actormodel.exception;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.Case;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.instance.Case;
 
 /**
  * This exception is typically raised during the {@link CaseCommand#process(Case)} method.

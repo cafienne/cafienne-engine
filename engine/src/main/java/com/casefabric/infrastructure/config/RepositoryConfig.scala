@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.repository.DefinitionProvider
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.config.util.MandatoryConfig
+import com.casefabric.cmmn.repository.DefinitionProvider
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.config.util.MandatoryConfig
 
-class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class RepositoryConfig(val parent: CaseFabricConfig) extends MandatoryConfig {
   def path = "definitions"
   private var _location = config.getString("location")
-  override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"
+  override val msg = "CaseFabric Repository is not configured. Check for 'casefabric.definitions' settings"
 
   /**
     * DefinitionProvider provides an interface for loading Case Definitions
@@ -50,7 +50,7 @@ class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
 
 /** Small runtime test */
 object RepositoryConfig extends App with LazyLogging {
-  println("Current location: " + Cafienne.config.repository.location)
-  Cafienne.config.repository.setLocation("./NewLocation")
-  println("New location: " + Cafienne.config.repository.location)
+  println("Current location: " + CaseFabric.config.repository.location)
+  CaseFabric.config.repository.setLocation("./NewLocation")
+  println("New location: " + CaseFabric.config.repository.location)
 }

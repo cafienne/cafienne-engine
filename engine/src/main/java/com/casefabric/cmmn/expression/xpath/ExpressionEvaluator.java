@@ -15,23 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.xpath;
+package com.casefabric.cmmn.expression.xpath;
 
-import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
-import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.json.BooleanValue;
-import org.cafienne.json.Value;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.actormodel.exception.CommandException;
+import com.casefabric.cmmn.definition.*;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.definition.sentry.IfPartDefinition;
+import com.casefabric.cmmn.expression.CMMNExpressionEvaluator;
+import com.casefabric.cmmn.expression.InvalidExpressionException;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.TimerEvent;
+import com.casefabric.cmmn.instance.parameter.TaskInputParameter;
+import com.casefabric.cmmn.instance.sentry.Criterion;
+import com.casefabric.json.BooleanValue;
+import com.casefabric.json.Value;
+import com.casefabric.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;

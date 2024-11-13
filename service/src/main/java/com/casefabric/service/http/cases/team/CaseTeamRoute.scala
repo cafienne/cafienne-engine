@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.team
+package com.casefabric.service.http.cases.team
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -26,14 +26,14 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.actorapi.command.team.removemember._
-import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.cases.team.CaseTeamAPI._
-import org.cafienne.service.infrastructure.route.CaseTeamValidator
-import org.cafienne.system.CaseSystem
+import com.casefabric.cmmn.actorapi.command.team._
+import com.casefabric.cmmn.actorapi.command.team.removemember._
+import com.casefabric.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.cases.team.CaseTeamAPI._
+import com.casefabric.service.infrastructure.route.CaseTeamValidator
+import com.casefabric.system.CaseSystem
 
 import scala.util.{Failure, Success}
 

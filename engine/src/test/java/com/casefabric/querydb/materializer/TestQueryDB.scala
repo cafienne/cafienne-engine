@@ -1,9 +1,9 @@
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.querydb.materializer.cases.TestCaseStorageTransaction
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
-import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
+import com.casefabric.querydb.materializer.cases.TestCaseStorageTransaction
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
+import com.casefabric.querydb.materializer.tenant.TenantStorageTransaction
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.file;
+package com.casefabric.cmmn.actorapi.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

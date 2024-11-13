@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
 import org.apache.pekko.persistence.PersistentActor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.system.CaseSystem
+import com.casefabric.system.CaseSystem
 
 trait BaseStorageActor
   extends PersistentActor

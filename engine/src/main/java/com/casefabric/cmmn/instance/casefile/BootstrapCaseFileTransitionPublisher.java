@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 
 import java.util.ArrayList;
 import java.util.List;

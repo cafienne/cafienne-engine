@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.definition.task.TaskImplementationContract;
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.definition.task.TaskImplementationContract;
+import com.casefabric.cmmn.definition.team.CaseTeamDefinition;
 import org.w3c.dom.Element;
 
 import java.util.Collection;

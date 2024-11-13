@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.consentgroup
+package com.casefabric.querydb.materializer.consentgroup
 
-import org.cafienne.querydb.materializer.QueryDBTransaction
-import org.cafienne.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
+import com.casefabric.querydb.materializer.QueryDBTransaction
+import com.casefabric.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
 
 trait ConsentGroupStorageTransaction extends QueryDBTransaction {
   def upsert(record: ConsentGroupRecord): Unit

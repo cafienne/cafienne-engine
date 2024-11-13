@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization
+package com.casefabric.infrastructure.serialization
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.databind.{DeserializationContext, SerializerProvider}
-import org.cafienne.json.{JSONReader, ValueMap}
+import com.casefabric.json.{JSONReader, ValueMap}
 
 class ValueMapJacksonSerializer(c: Class[ValueMap]) extends StdSerializer[ValueMap](c) {
 

@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.plan.eventlistener;
+package com.casefabric.cmmn.actorapi.command.plan.eventlistener;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * A command to have a plan item make a certain transition. E.g. complete a task in a case, or suspend a subprocess.

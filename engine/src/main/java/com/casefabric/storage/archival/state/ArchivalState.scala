@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.state
+package com.casefabric.storage.archival.state
 
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.json.{ValueList, ValueMap}
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.QueryDBState
-import org.cafienne.storage.archival.event._
-import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
-import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.json.{ValueList, ValueMap}
+import com.casefabric.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.state.QueryDBState
+import com.casefabric.storage.archival.event._
+import com.casefabric.storage.archival.event.cmmn.ModelActorArchived
+import com.casefabric.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
 trait ArchivalState extends QueryDBState {
   override val actor: ActorDataArchiver

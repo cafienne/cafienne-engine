@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.command;
+package com.casefabric.humantask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamUser;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.humantask.instance.TaskState;
+import com.casefabric.humantask.instance.WorkflowTask;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

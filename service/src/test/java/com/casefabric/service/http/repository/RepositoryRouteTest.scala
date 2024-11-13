@@ -1,12 +1,12 @@
-package org.cafienne.service.http.repository
+package com.casefabric.service.http.repository
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
-import org.cafienne.service.infrastructure.payload.HttpXmlReader
-import org.cafienne.system.CaseSystem
+import com.casefabric.service.infrastructure.payload.HttpXmlReader
+import com.casefabric.system.CaseSystem
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 

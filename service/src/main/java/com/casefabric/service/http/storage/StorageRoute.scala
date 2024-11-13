@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.storage
+package com.casefabric.service.http.storage
 
 import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.http.scaladsl.model.StatusCodes
@@ -23,17 +23,17 @@ import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.infrastructure.route.AuthenticatedRoute
-import org.cafienne.storage.StorageCoordinator
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageCommand, StorageFailure}
-import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.RemovalCompleted
-import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.service.infrastructure.route.AuthenticatedRoute
+import com.casefabric.storage.StorageCoordinator
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.actormodel.event.StorageRequestReceived
+import com.casefabric.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageCommand, StorageFailure}
+import com.casefabric.storage.archival.command.ArchiveActorData
+import com.casefabric.storage.deletion.command.RemoveActorData
+import com.casefabric.storage.deletion.event.RemovalCompleted
+import com.casefabric.storage.restore.command.RestoreActorData
+import com.casefabric.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
@@ -68,7 +68,7 @@ object StorageRoute extends LazyLogging {
 
   def askStorageCoordinator(command: StorageCommand): Route = {
     import org.apache.pekko.pattern.ask
-    implicit val timeout: Timeout = Cafienne.config.actor.askTimout
+    implicit val timeout: Timeout = CaseFabric.config.actor.askTimout
 
     onComplete(storageCoordinator.ask(command)) {
       case Success(value) =>

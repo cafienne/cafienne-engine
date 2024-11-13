@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.result
+package com.casefabric.querydb.query.result
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value}
+import com.casefabric.cmmn.actorapi.command.team.CaseTeam
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value}
 
 final case class CaseTeamResponse(team: CaseTeam, caseRoles: Seq[String] = Seq(),
-                                  unassignedRoles: Seq[String] = Seq()) extends CafienneJson {
+                                  unassignedRoles: Seq[String] = Seq()) extends CaseFabricJson {
   override def toValue: Value[_] = team.toValue.asMap.plus(Fields.caseRoles, caseRoles, Fields.unassignedRoles, unassignedRoles)
 }

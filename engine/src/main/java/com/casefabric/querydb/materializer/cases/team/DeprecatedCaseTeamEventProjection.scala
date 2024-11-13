@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.team
+package com.casefabric.querydb.materializer.cases.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.Origin
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.cmmn.actorapi.event.team.deprecated.member._
-import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeamUserEvent, TeamMemberAdded}
-import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
-import org.cafienne.querydb.record.{CaseTeamTenantRoleRecord, CaseTeamUserRecord}
+import com.casefabric.actormodel.identity.Origin
+import com.casefabric.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
+import com.casefabric.cmmn.actorapi.event.team.deprecated.member._
+import com.casefabric.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeamUserEvent, TeamMemberAdded}
+import com.casefabric.querydb.materializer.cases.CaseStorageTransaction
+import com.casefabric.querydb.record.{CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.concurrent.ExecutionContext
 

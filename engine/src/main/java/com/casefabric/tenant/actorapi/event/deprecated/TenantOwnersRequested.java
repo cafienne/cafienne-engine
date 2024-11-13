@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.event.deprecated;
+package com.casefabric.tenant.actorapi.event.deprecated;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.event.TenantBaseEvent;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.TenantActor;
+import com.casefabric.tenant.actorapi.event.TenantBaseEvent;
 
 import java.io.IOException;
 

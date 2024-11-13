@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events.migration
+package com.casefabric.infrastructure.cqrs.batch.public_events.migration
 
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.infrastructure.cqrs.batch.public_events.{CafiennePublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.ValueMap
+import com.casefabric.cmmn.instance.Path
+import com.casefabric.infrastructure.cqrs.batch.public_events.{CaseFabricPublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.ValueMap
 
 @Manifest
-case class HumanTaskDropped(taskId: String, path: Path, taskName: String, caseInstanceId: String, parentStage: String) extends CafiennePublicEventContent {
+case class HumanTaskDropped(taskId: String, path: Path, taskName: String, caseInstanceId: String, parentStage: String) extends CaseFabricPublicEventContent {
   override def toValue: ValueMap = new ValueMap(
     Fields.taskId, taskId,
     Fields.path, path,
@@ -38,7 +38,7 @@ object HumanTaskDropped {
   def deserialize(json: ValueMap): HumanTaskDropped = HumanTaskDropped(taskId = json.readString(Fields.taskId), path = json.readPath(Fields.path), taskName = json.readString(Fields.taskName), caseInstanceId = json.readString(Fields.caseInstanceId), parentStage = json.readString(Fields.parentStage))
 
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
-    .filterMap(classOf[org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped])
+    .filterMap(classOf[com.casefabric.humantask.actorapi.event.migration.HumanTaskDropped])
     .map(event => {
       val taskId = event.getTaskId
       val path = event.path

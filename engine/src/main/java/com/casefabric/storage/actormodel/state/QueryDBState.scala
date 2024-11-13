@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.state
+package com.casefabric.storage.actormodel.state
 
 import org.apache.pekko.Done
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.querydb.QueryDBStorage
+import com.casefabric.storage.actormodel.ActorMetadata
+import com.casefabric.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
+import com.casefabric.storage.querydb.QueryDBStorage
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -1,6 +1,6 @@
-package org.cafienne.querydb.lastmodified
+package com.casefabric.querydb.lastmodified
 
-import org.cafienne.actormodel.response.ActorLastModified
+import com.casefabric.actormodel.response.ActorLastModified
 
 import scala.concurrent.Future
 

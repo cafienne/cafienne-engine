@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
-import org.cafienne.json.ValueMap;
+import com.casefabric.json.ValueMap;
 
 /**
  * Deserializes a {@link ValueMap} based json AST into an object
  */
 @FunctionalInterface
-public interface ValueMapDeserializer<T extends CafienneSerializable> {
+public interface ValueMapDeserializer<T extends CaseFabricSerializable> {
     T deserialize(ValueMap json);
 }

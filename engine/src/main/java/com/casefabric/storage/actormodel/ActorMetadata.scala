@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
-import org.cafienne.cmmn.instance.{Case, Path}
-import org.cafienne.consentgroup.ConsentGroupActor
-import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.processtask.instance.ProcessTaskActor
-import org.cafienne.storage.StorageUser
-import org.cafienne.tenant.TenantActor
+import com.casefabric.cmmn.instance.{Case, Path}
+import com.casefabric.consentgroup.ConsentGroupActor
+import com.casefabric.infrastructure.serialization.{Fields, JacksonSerializable}
+import com.casefabric.json.{CaseFabricJson, Value, ValueList, ValueMap}
+import com.casefabric.processtask.instance.ProcessTaskActor
+import com.casefabric.storage.StorageUser
+import com.casefabric.tenant.TenantActor
 
-case class ActorMetadata(user: StorageUser, actorType: String, actorId: String, parent: ActorMetadata = null) extends JacksonSerializable with CafienneJson {
+case class ActorMetadata(user: StorageUser, actorType: String, actorId: String, parent: ActorMetadata = null) extends JacksonSerializable with CaseFabricJson {
   override def toValue: Value[_] = new ValueMap(Fields.actor, toString(), Fields.path, path)
 
   def path: String = {

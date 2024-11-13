@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
-import org.cafienne.actormodel.identity.{Origin, UserIdentity}
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.definition.CMMNElementDefinition
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
-import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
-import org.cafienne.querydb.record._
+import com.casefabric.actormodel.identity.{Origin, UserIdentity}
+import com.casefabric.cmmn.actorapi.command.team._
+import com.casefabric.cmmn.definition.CMMNElementDefinition
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
+import com.casefabric.querydb.query.filter.CaseFilter
+import com.casefabric.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
+import com.casefabric.querydb.record._
 
 import scala.concurrent.Future
 

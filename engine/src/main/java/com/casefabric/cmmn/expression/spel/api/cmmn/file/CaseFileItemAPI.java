@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.file;
+package com.casefabric.cmmn.expression.spel.api.cmmn.file;
 
-import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.cmmn.expression.spel.api.APIObject;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemArray;
+import com.casefabric.cmmn.expression.InvalidExpressionException;
+import com.casefabric.cmmn.expression.spel.api.APIObject;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemArray;
 
 /**
  */

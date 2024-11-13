@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi.response;
+package com.casefabric.consentgroup.actorapi.response;
 
-import org.cafienne.actormodel.response.BaseModelResponse;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMessage;
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.response.BaseModelResponse;
+import com.casefabric.consentgroup.actorapi.ConsentGroupMessage;
+import com.casefabric.consentgroup.actorapi.command.ConsentGroupCommand;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 @Manifest
 public class ConsentGroupResponse extends BaseModelResponse implements ConsentGroupMessage {

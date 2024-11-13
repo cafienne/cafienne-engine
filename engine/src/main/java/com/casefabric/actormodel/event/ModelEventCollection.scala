@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.event
+package com.casefabric.actormodel.event
 
 import scala.collection.mutable.ListBuffer
 

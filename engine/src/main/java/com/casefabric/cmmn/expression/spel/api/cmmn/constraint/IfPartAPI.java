@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.constraint;
+package com.casefabric.cmmn.expression.spel.api.cmmn.constraint;
 
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
+import com.casefabric.cmmn.definition.sentry.IfPartDefinition;
+import com.casefabric.cmmn.instance.sentry.Criterion;
 
 /**
  * Context for evaluation of an if part in a criterion.

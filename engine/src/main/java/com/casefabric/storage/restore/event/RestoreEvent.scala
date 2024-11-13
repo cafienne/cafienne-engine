@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.event
+package com.casefabric.storage.restore.event
 
-import org.cafienne.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.message.StorageEvent
 
 trait RestoreEvent extends StorageEvent

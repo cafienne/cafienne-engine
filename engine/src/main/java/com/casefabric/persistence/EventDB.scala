@@ -1,13 +1,13 @@
-package org.cafienne.persistence
+package com.casefabric.persistence
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
+import com.casefabric.infrastructure.CaseFabric
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.output.MigrateResult
 
 object EventDB extends LazyLogging {
   def initializeDatabaseSchema(): MigrateResult = {
-    val eventDB = Cafienne.config.persistence.eventDB
+    val eventDB = CaseFabric.config.persistence.eventDB
     if (!eventDB.isJDBC) {
       return null
     }

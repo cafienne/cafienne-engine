@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.state
+package com.casefabric.storage.deletion.state
 
 import org.apache.pekko.Done
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.QueryDBState
-import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
+import com.casefabric.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.state.QueryDBState
+import com.casefabric.storage.deletion.ActorDataRemover
+import com.casefabric.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
 
 import scala.concurrent.Future
 

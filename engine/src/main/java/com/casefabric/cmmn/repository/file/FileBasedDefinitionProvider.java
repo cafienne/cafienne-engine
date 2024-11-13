@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository.file;
+package com.casefabric.cmmn.repository.file;
 
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.cmmn.definition.DefinitionsDocument;
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.repository.DefinitionProvider;
-import org.cafienne.cmmn.repository.MissingDefinitionException;
-import org.cafienne.cmmn.repository.WriteDefinitionException;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.cmmn.definition.DefinitionsDocument;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.cmmn.repository.DefinitionProvider;
+import com.casefabric.cmmn.repository.MissingDefinitionException;
+import com.casefabric.cmmn.repository.WriteDefinitionException;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -36,7 +36,7 @@ import java.util.*;
 
 public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
-    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
+    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(CaseFabric.config().repository().cacheSize());
     private String deployDirectory = null;
     private final String EXTENSION = ".xml";
 
@@ -125,7 +125,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     /**
      * Returns the directory in which DefinitionDocuments can be found or written to
      * Writes warnings if the directory does not exist.
-     * The directory can be configured through the Typesafe config setting 'cafienne.definitions.location'
+     * The directory can be configured through the Typesafe config setting 'casefabric.definitions.location'
      * If this setting is not defined, it will take as default value './definitions', i.e. a subfolder
      * under the directory in which the JVM is started.
      *
@@ -133,7 +133,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      */
     public String getDeployDirectory() {
         if (deployDirectory == null) {
-            deployDirectory = Cafienne.config().repository().location();
+            deployDirectory = CaseFabric.config().repository().location();
             File file = new File(deployDirectory);
             if (!file.exists()) {
                 logger.warn("The deploy directory '" + file.getAbsolutePath() + "' does not exist (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path until the deploy directory is created.");

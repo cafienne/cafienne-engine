@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity;
+package com.casefabric.actormodel.identity;
 
 public enum Origin {
     Tenant("Tenant"),

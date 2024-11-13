@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.api
+package com.casefabric.infrastructure.config.api
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
-import org.cafienne.infrastructure.config.CafienneConfig
+import com.casefabric.infrastructure.config.util.MandatoryConfig
+import com.casefabric.infrastructure.config.CaseFabricConfig
 
-class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class ApiConfig(val parent: CaseFabricConfig) extends MandatoryConfig {
   def path = "api"
 
   lazy val bindHost: String = {

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.command
+package com.casefabric.storage.restore.command
 
-import org.cafienne.storage.actormodel.message.StorageCommand
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.restore.RootRestorer
+import com.casefabric.storage.actormodel.message.StorageCommand
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.storage.restore.RootRestorer
 
 case class RestoreActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"Restore command for $metadata"

@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema
+package com.casefabric.querydb.schema
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.schema.CafienneDatabaseDefinition
-import org.cafienne.querydb.materializer.cases.CaseEventSink
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink
-import org.cafienne.querydb.materializer.slick.SlickQueryDB
-import org.cafienne.querydb.materializer.tenant.TenantEventSink
-import org.cafienne.querydb.schema.versions._
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.jdbc.schema.CaseFabricDatabaseDefinition
+import com.casefabric.querydb.materializer.cases.CaseEventSink
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupEventSink
+import com.casefabric.querydb.materializer.slick.SlickQueryDB
+import com.casefabric.querydb.materializer.tenant.TenantEventSink
+import com.casefabric.querydb.schema.versions._
+import com.casefabric.system.CaseSystem
 import org.flywaydb.core.api.output.MigrateResult
 
-object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLogging {
+object QueryDB extends CaseFabricDatabaseDefinition with QueryDBSchema with LazyLogging {
   def initializeDatabaseSchema(): MigrateResult = {
     useSchema(Seq(QueryDB_1_0_0, QueryDB_1_1_5, QueryDB_1_1_6, QueryDB_1_1_10, QueryDB_1_1_11, QueryDB_1_1_16, QueryDB_1_1_18, QueryDB_1_1_22))
   }
@@ -45,7 +45,7 @@ object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLo
   private def checkH2InDebugMode(): Unit = {
     import org.h2.tools.Server
 
-    if (Cafienne.config.persistence.queryDB.debug) {
+    if (CaseFabric.config.persistence.queryDB.debug) {
       val port = "8082"
       logger.warn("Starting H2 Web Client on port " + port)
       Server.createWebServer("-web", "-webAllowOthers", "-webPort", port).start()

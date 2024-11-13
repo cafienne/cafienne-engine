@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.actor.Cancellable;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.*;
-import org.cafienne.infrastructure.Cafienne;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.CommandException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.actormodel.response.*;
+import com.casefabric.infrastructure.CaseFabric;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -117,7 +117,7 @@ class BackOffice {
     private void enableSelfCleaner() {
         if (actor.hasAutoShutdown()) {
             // Now set the new selfCleaner
-            long idlePeriod = Cafienne.config().actor().idlePeriod();
+            long idlePeriod = CaseFabric.config().actor().idlePeriod();
             FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
             selfCleaner = actor.getScheduler().schedule(duration, actor::takeABreak);
         }

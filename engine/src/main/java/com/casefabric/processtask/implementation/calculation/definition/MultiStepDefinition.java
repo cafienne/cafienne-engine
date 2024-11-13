@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation.definition;
+package com.casefabric.processtask.implementation.calculation.definition;
 
-import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.CalculationDefinition;
-import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
-import org.cafienne.processtask.implementation.calculation.operation.MultiStep;
+import com.casefabric.processtask.implementation.calculation.Calculation;
+import com.casefabric.processtask.implementation.calculation.CalculationDefinition;
+import com.casefabric.processtask.implementation.calculation.operation.CalculationStep;
+import com.casefabric.processtask.implementation.calculation.operation.MultiStep;
 
 import java.util.List;
 

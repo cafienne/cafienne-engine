@@ -1,16 +1,16 @@
 /*
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.test.casefile;
+package com.casefabric.cmmn.test.casefile;
 
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.repository.MissingDefinitionException;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.infrastructure.Cafienne;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.cmmn.repository.MissingDefinitionException;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.infrastructure.CaseFabric;
 import org.junit.Test;
 
 public class TestInvalidCaseFileDefinition {
@@ -40,7 +40,7 @@ public class TestInvalidCaseFileDefinition {
     public void testMissingDefinition() {
         // First, test with an invalid Definitions document
         try {
-            Cafienne.config().repository().DefinitionProvider().read(null, null, "a file that does not exist");
+            CaseFabric.config().repository().DefinitionProvider().read(null, null, "a file that does not exist");
             // Did not go to the catch block
             throw new AssertionError("Test failed, as the case definition is not invalid");
         } catch (MissingDefinitionException e) {

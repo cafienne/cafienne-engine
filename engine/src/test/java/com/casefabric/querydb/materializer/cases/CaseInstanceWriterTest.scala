@@ -1,7 +1,7 @@
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
-import org.cafienne.json.ValueMap
-import org.cafienne.querydb.materializer.TestQueryDB
+import com.casefabric.json.ValueMap
+import com.casefabric.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 
@@ -14,8 +14,8 @@ class CaseInstanceWriterTest extends CaseEventSinkTest {
       sendEvent(eventFactory.createCaseDefinitionApplied())
       sendEvent(eventFactory.createCaseModified(Instant.now()))
 
-      import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-      import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
+      import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+      import com.casefabric.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 
       eventually {
         assert(TestQueryDB.hasTransaction(caseInstanceId))

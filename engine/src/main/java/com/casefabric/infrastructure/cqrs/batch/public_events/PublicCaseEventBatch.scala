@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.infrastructure.cqrs.batch.EventBatch
-import org.cafienne.infrastructure.cqrs.batch.public_events.migration.{CaseMigrated, HumanTaskDropped, HumanTaskMigrated, MilestoneDropped, MilestoneMigrated, StageDropped, StageMigrated}
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.infrastructure.cqrs.batch.EventBatch
+import com.casefabric.infrastructure.cqrs.batch.public_events.migration.{CaseMigrated, HumanTaskDropped, HumanTaskMigrated, MilestoneDropped, MilestoneMigrated, StageDropped, StageMigrated}
 
 import java.time.Instant
 
@@ -55,7 +55,7 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
   // Simple mechanism to filter out all events that have or extend a certain class of ModelEvent
   def filterMap[ME <: ModelEvent](clazz: Class[ME]): Seq[ME] = events.map(_.event).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[ME]).toSeq
 
-  def publicEvents[PE <: CafiennePublicEventContent](clazz: Class[PE]): Seq[PE] = publicEvents.map(_.content).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[PE])
+  def publicEvents[PE <: CaseFabricPublicEventContent](clazz: Class[PE]): Seq[PE] = publicEvents.map(_.content).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[PE])
 
   def createPublicEvents: PublicCaseEventBatch = {
     logger.whenDebugEnabled(logger.debug(s"Batch on case [$persistenceId] at offset [$offset] has ${publicEvents.size} public events: ${publicEvents.map(_.manifest).mkString(", ")}"))

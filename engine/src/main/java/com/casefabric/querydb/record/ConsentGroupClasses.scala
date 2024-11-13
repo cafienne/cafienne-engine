@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.record
+package com.casefabric.querydb.record
 
 final case class ConsentGroupRecord(id: String, tenant: String)
 

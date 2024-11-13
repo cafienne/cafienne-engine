@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.payload
+package com.casefabric.service.infrastructure.payload
 
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
-import org.cafienne.json.{JSONReader, Value, ValueList, ValueMap}
+import com.casefabric.json.{JSONReader, Value, ValueList, ValueMap}
 
 /**
   * This file contains unmarshallers for various types of Value[_] objects

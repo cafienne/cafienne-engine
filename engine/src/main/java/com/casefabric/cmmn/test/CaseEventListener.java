@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Props;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.event.CaseModified;
-import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
-import org.cafienne.cmmn.test.filter.EventFilter;
-import org.cafienne.system.router.CafienneGateway;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.cmmn.actorapi.event.CaseModified;
+import com.casefabric.cmmn.actorapi.event.plan.CasePlanEvent;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemCreated;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskEvent;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskInputFilled;
+import com.casefabric.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.test.assertions.PublishedEventsAssertion;
+import com.casefabric.cmmn.test.filter.EventFilter;
+import com.casefabric.system.router.CaseFabricGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class CaseEventListener {
     private final List<ModelEvent> publishedEvents = new ArrayList<>();
     private List<ModelEvent> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
-    private final CafienneGateway caseMessageRouter; // proxy to the case system
+    private final CaseFabricGateway caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
     private final TestScript testScript;
     private final CaseEventPublisher readJournal;

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.message;
+package com.casefabric.actormodel.message;
 
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.response.ModelResponse;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.response.ModelResponse;
 
 /**
  * An IncomingActorMessage is received by a ModelActor. Typically a ModelCommand or a ModelResponse.

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events.migration
+package com.casefabric.infrastructure.cqrs.batch.public_events.migration
 
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.infrastructure.cqrs.batch.public_events.{CafiennePublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.cmmn.actorapi.event.migration.PlanItemMigrated
+import com.casefabric.cmmn.instance.Path
+import com.casefabric.infrastructure.cqrs.batch.public_events.{CaseFabricPublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
+import com.casefabric.infrastructure.serialization.{Fields, Manifest}
+import com.casefabric.json.{Value, ValueMap}
 
 @Manifest
-case class StageMigrated(stageId: String, parentStage: String, path: Path, name: String, caseInstanceId: String) extends CafiennePublicEventContent {
+case class StageMigrated(stageId: String, parentStage: String, path: Path, name: String, caseInstanceId: String) extends CaseFabricPublicEventContent {
   override def toValue: Value[_] = new ValueMap(Fields.stageId, stageId, Fields.parentStage, parentStage, Fields.path, path, Fields.name, name, Fields.caseInstanceId, caseInstanceId)
 
   override def toString: String = getClass.getSimpleName + "[" + path + "]"

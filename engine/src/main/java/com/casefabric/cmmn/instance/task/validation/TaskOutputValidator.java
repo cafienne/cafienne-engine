@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.validation;
+package com.casefabric.cmmn.instance.task.validation;
 
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.json.*;
-import org.cafienne.processtask.implementation.http.HTTPCallDefinition;
-import org.cafienne.processtask.implementation.http.Header;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.json.*;
+import com.casefabric.processtask.implementation.http.HTTPCallDefinition;
+import com.casefabric.processtask.implementation.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

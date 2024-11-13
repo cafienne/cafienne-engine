@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.table
+package com.casefabric.querydb.schema.table
 
-import org.cafienne.querydb.record._
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.record._
+import com.casefabric.querydb.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
 import slick.relational.RelationalProfile.ColumnOption.Length
 
@@ -30,7 +30,7 @@ trait CaseTables extends QueryDBSchema {
 
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
-  class CaseInstanceTable(tag: Tag) extends CafienneTenantTable[CaseRecord](tag, "case_instance") {
+  class CaseInstanceTable(tag: Tag) extends CaseFabricTenantTable[CaseRecord](tag, "case_instance") {
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "id" => id
       case "definition" => caseName // Backwards compatibility; column name before was "definition"
@@ -84,7 +84,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput).mapTo[CaseRecord]
   }
 
-  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTenantTable[CaseDefinitionRecord](tag, "case_instance_definition") {
+  final class CaseInstanceDefinitionTable(tag: Tag) extends CaseFabricTenantTable[CaseDefinitionRecord](tag, "case_instance_definition") {
 
     lazy val caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
 
@@ -103,7 +103,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy).mapTo[CaseDefinitionRecord]
   }
 
-  class PlanItemTable(tag: Tag) extends CafienneTenantTable[PlanItemRecord](tag, "plan_item") {
+  class PlanItemTable(tag: Tag) extends CaseFabricTenantTable[PlanItemRecord](tag, "plan_item") {
 
     lazy val id = idColumn[String]("id", O.PrimaryKey)
 
@@ -152,7 +152,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexModifiedBy = oldStyleIndex(modifiedBy)
   }
 
-  class CaseFileTable(tag: Tag) extends CafienneTenantTable[CaseFileRecord](tag, "case_file") {
+  class CaseFileTable(tag: Tag) extends CaseFabricTenantTable[CaseFileRecord](tag, "case_file") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
 
@@ -163,7 +163,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
-  final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTenantTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
+  final class CaseBusinessIdentifierTable(tag: Tag) extends CaseFabricTenantTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "name" => name
       case "tenant" => tenant
@@ -192,7 +192,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexName = oldStyleIndex(name)
   }
 
-  class CaseInstanceRoleTable(tag: Tag) extends CafienneTenantTable[CaseRoleRecord](tag, "case_instance_role") {
+  class CaseInstanceRoleTable(tag: Tag) extends CaseFabricTenantTable[CaseRoleRecord](tag, "case_instance_role") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -207,7 +207,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
-  class CaseInstanceTeamUserTable(tag: Tag) extends CafienneTenantTable[CaseTeamUserRecord](tag, "case_instance_team_user") {
+  class CaseInstanceTeamUserTable(tag: Tag) extends CaseFabricTenantTable[CaseTeamUserRecord](tag, "case_instance_team_user") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -227,7 +227,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexUserId = index(userId)
   }
 
-  class CaseInstanceTeamTenantRoleTable(tag: Tag) extends CafienneTenantTable[CaseTeamTenantRoleRecord](tag, "case_instance_team_tenant_role") {
+  class CaseInstanceTeamTenantRoleTable(tag: Tag) extends CaseFabricTenantTable[CaseTeamTenantRoleRecord](tag, "case_instance_team_tenant_role") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -245,7 +245,7 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexTenantRoles = index(ixName(tenantRole), (tenant, tenantRole))
   }
 
-  class CaseInstanceTeamGroupTable(tag: Tag) extends CafienneTenantTable[CaseTeamGroupRecord](tag, "case_instance_team_group") {
+  class CaseInstanceTeamGroupTable(tag: Tag) extends CaseFabricTenantTable[CaseTeamGroupRecord](tag, "case_instance_team_group") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 

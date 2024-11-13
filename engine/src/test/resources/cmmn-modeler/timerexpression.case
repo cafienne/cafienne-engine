@@ -28,9 +28,9 @@
         <humanTask id="pi_ht__AqPiG_2" name="simplehumantask" isBlocking="true">
             <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="pi_ht__AqPiG_1" name="HumanTask_0" isBlocking="true">

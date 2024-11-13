@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.parameter;
+package com.casefabric.cmmn.instance.parameter;
 
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.instance.Parameter;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.json.Value;
 
 /**
  * TaskParameter is specific to {@link Task} input and output

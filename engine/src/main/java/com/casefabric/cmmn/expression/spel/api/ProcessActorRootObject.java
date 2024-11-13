@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
-import org.cafienne.cmmn.expression.spel.api.process.ProcessTaskAPI;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.expression.spel.api.process.ProcessTaskAPI;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 /**
  * Base class for giving object context to ProcessTask expressions

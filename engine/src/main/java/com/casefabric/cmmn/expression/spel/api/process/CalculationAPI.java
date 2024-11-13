@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.process;
+package com.casefabric.cmmn.expression.spel.api.process;
 
-import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
-import org.cafienne.json.Value;
-import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
-import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
+import com.casefabric.cmmn.expression.spel.api.CaseRootObject;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.implementation.calculation.Calculation;
+import com.casefabric.processtask.implementation.calculation.definition.source.InputReference;
+import com.casefabric.processtask.implementation.calculation.operation.CalculationStep;
 
 import java.util.Map;
 import java.util.stream.Collectors;

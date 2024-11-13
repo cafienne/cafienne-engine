@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.exception
+package com.casefabric.querydb.query.exception
 
 class SearchFailure(msg: String) extends RuntimeException(msg)
 

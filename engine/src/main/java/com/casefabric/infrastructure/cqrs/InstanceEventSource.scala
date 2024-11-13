@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package com.casefabric.infrastructure.cqrs
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.persistence.query.EventEnvelope

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.slick
+package com.casefabric.querydb.materializer.slick
 
 import org.apache.pekko.Done
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
-import org.cafienne.querydb.record.{TenantRecord, UserRoleKey, UserRoleRecord}
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.cmmn.actorapi.command.platform.NewUserInformation
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.querydb.materializer.tenant.TenantStorageTransaction
+import com.casefabric.querydb.record.{TenantRecord, UserRoleKey, UserRoleRecord}
 
 import scala.concurrent.Future
 

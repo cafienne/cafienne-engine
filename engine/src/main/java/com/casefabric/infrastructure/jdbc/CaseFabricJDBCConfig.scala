@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc
+package com.casefabric.infrastructure.jdbc
 
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
 import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.lifted.{ColumnOrdered, Index}
-import slick.migration.api.org.cafienne.infrastructure.jdbc.sqlserver.SQLServerDialect
+import slick.migration.api.SQLServerDialect
 import slick.migration.api.{Dialect, GenericDialect, MigrationSeq, SqlMigration}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlAction
@@ -34,7 +34,7 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
   *
   * Includes some helpers for queries and MS SQL Server support
   */
-trait CafienneJDBCConfig {
+trait CaseFabricJDBCConfig {
   lazy val dbConfig: DatabaseConfig[JdbcProfile] = ???
 
   lazy val db = dbConfig.db
@@ -42,7 +42,7 @@ trait CafienneJDBCConfig {
   import dbConfig.profile.api._
   lazy val isSQLServer = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
 
-  abstract class CafienneTable[T](tag: Tag, tableName: String) extends Table[T](tag, tableName) {
+  abstract class CaseFabricTable[T](tag: Tag, tableName: String) extends Table[T](tag, tableName) {
 
     /**
       * If queries on the table use the Sort case class, then the table must implement this method
@@ -206,11 +206,11 @@ trait CafienneJDBCConfig {
     * @param tableName
     * @tparam T
     */
-  abstract class CafienneTenantTable[T](tag: Tag, tableName: String) extends CafienneTable[T](tag, tableName) {
+  abstract class CaseFabricTenantTable[T](tag: Tag, tableName: String) extends CaseFabricTable[T](tag, tableName) {
     def tenant = idColumn[String]("tenant")
   }
 
-  implicit class QueryHelper[CT <: CafienneTable[_], E](query: Query[CT, E, Seq]) {
+  implicit class QueryHelper[CT <: CaseFabricTable[_], E](query: Query[CT, E, Seq]) {
     /**
       * Orders the results as given in the Sort object.
       * Note that if the Sort.on field is empty (None), the query will not be affected.
@@ -235,7 +235,7 @@ trait CafienneJDBCConfig {
     }
   }
 
-  implicit class TenantQueryHelper[CTT <: CafienneTenantTable[_], E](query: Query[CTT, E, Seq]) {
+  implicit class TenantQueryHelper[CTT <: CaseFabricTenantTable[_], E](query: Query[CTT, E, Seq]) {
     /**
       * Add tenant selector to the query. If no tenants specified, it will not add a filter on tenant
       * and search across tenants

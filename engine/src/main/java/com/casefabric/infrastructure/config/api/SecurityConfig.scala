@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.api
+package com.casefabric.infrastructure.config.api
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
+import com.casefabric.infrastructure.config.util.MandatoryConfig
 
 class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
   def path = "security"

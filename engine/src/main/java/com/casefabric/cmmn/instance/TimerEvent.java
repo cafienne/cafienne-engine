@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.TimerEventDefinition;
-import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
+import com.casefabric.cmmn.actorapi.event.plan.eventlistener.*;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.TimerEventDefinition;
+import com.casefabric.humantask.actorapi.event.migration.HumanTaskDropped;
 
 import java.time.Instant;
 

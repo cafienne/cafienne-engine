@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package com.casefabric.infrastructure.cqrs
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.PersistenceQuery
 import org.apache.pekko.persistence.query.scaladsl._
-import org.cafienne.infrastructure.Cafienne
+import com.casefabric.infrastructure.CaseFabric
 
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
@@ -44,7 +44,7 @@ trait ReadJournalProvider extends LazyLogging {
 
   private def findReadJournalSetting(): String = {
 
-    val explicitReadJournal = Cafienne.config.persistence.readJournal
+    val explicitReadJournal = CaseFabric.config.persistence.readJournal
     if (explicitReadJournal.nonEmpty) {
       return explicitReadJournal
     }
@@ -54,7 +54,7 @@ trait ReadJournalProvider extends LazyLogging {
     import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
     import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
-    logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
+    logger.warn("Missing conf 'casefabric.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
     if (configuredJournal.contains("jdbc")) {
       return JdbcReadJournal.Identifier
     } else if (configuredJournal.contains("cassandra")) {

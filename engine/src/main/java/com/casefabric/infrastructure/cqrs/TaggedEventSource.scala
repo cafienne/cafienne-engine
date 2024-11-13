@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package com.casefabric.infrastructure.cqrs
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.apache.pekko.stream.scaladsl.{RestartSource, Source}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.system.health.HealthMonitor
 
 import scala.concurrent.Future
 
@@ -62,7 +62,7 @@ trait TaggedEventSource extends ReadJournalProvider with ModelEventFilter with L
       .map(ModelEventEnvelope) // Construct a simple wrapper that understands we're dealing with ModelEvents
 
   def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
-    RestartSource.withBackoff(Cafienne.config.persistence.queryDB.restartSettings) { () =>
+    RestartSource.withBackoff(CaseFabric.config.persistence.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding

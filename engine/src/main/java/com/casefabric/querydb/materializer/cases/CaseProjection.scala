@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package com.casefabric.querydb.materializer.cases
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent
-import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated
-import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
-import org.cafienne.cmmn.instance.State
-import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
-import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord}
+import com.casefabric.cmmn.actorapi.event.definition.CaseDefinitionEvent
+import com.casefabric.cmmn.actorapi.event.migration.CaseDefinitionMigrated
+import com.casefabric.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
+import com.casefabric.cmmn.instance.State
+import com.casefabric.querydb.materializer.cases.file.CaseFileProjection
+import com.casefabric.querydb.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 

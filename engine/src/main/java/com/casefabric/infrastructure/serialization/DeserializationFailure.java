@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
 import java.io.Serializable;
 
 /**
- * Wrapper for events with outdated or too new manifests (i.e. {@link CafienneSerializer} does not recognize them.
+ * Wrapper for events with outdated or too new manifests (i.e. {@link CaseFabricSerializer} does not recognize them.
  */
 public class DeserializationFailure implements Serializable {
     public final String manifest;

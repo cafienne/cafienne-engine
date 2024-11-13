@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.schema
+package com.casefabric.infrastructure.jdbc.schema
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
 import org.flywaydb.core.api.output.MigrateResult
 import slick.migration.api.Migration
 import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
@@ -28,7 +28,7 @@ import scala.concurrent.Await
 /**
   * Simple flyway abstraction that can be used to define and validate a JDBC database schema
   */
-trait CafienneDatabaseDefinition extends CafienneJDBCConfig with LazyLogging {
+trait CaseFabricDatabaseDefinition extends CaseFabricJDBCConfig with LazyLogging {
   import dbConfig.profile.api._
 
   import scala.concurrent.ExecutionContext.Implicits.global

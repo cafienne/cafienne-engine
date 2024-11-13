@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.persistence
+package com.casefabric.infrastructure.config.persistence
 
 import com.typesafe.config.Config
-import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.infrastructure.config.{CafienneConfig, QueryDBConfig}
+import com.casefabric.infrastructure.config.util.ChildConfigReader
+import com.casefabric.infrastructure.config.{CaseFabricConfig, QueryDBConfig}
 
 
-class PersistenceConfig(val parent: CafienneConfig, val systemConfig: Config) extends ChildConfigReader {
+class PersistenceConfig(val parent: CaseFabricConfig, val systemConfig: Config) extends ChildConfigReader {
   def path = ""
 
   lazy val journalKey: String = systemConfig.getString("pekko.persistence.journal.plugin")
@@ -42,7 +42,7 @@ class PersistenceConfig(val parent: CafienneConfig, val systemConfig: Config) ex
     import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
     import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
-    logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + journalKey + "\"")
+    logger.warn("Missing conf 'casefabric.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + journalKey + "\"")
     if (eventDB.isJDBC) {
       return JdbcReadJournal.Identifier
     } else if (eventDB.isCassandra) {

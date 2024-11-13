@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.repository
+package com.casefabric.service.http.repository
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -26,17 +26,17 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server._
-import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
-import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
-import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.json.ValueMap
-import org.cafienne.service.http.cases.CaseAPIFormat.CaseDefinitionFormat
-import org.cafienne.service.http.repository.RepositoryAPIFormat.ModelListResponseFormat
-import org.cafienne.service.infrastructure.payload.HttpXmlReader._
-import org.cafienne.service.infrastructure.route.{AuthenticatedRoute, TenantValidator}
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.exception.{AuthorizationException, MissingTenantException}
+import com.casefabric.actormodel.identity.PlatformUser
+import com.casefabric.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
+import com.casefabric.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.json.ValueMap
+import com.casefabric.service.http.cases.CaseAPIFormat.CaseDefinitionFormat
+import com.casefabric.service.http.repository.RepositoryAPIFormat.ModelListResponseFormat
+import com.casefabric.service.infrastructure.payload.HttpXmlReader._
+import com.casefabric.service.infrastructure.route.{AuthenticatedRoute, TenantValidator}
+import com.casefabric.system.CaseSystem
 import org.w3c.dom.Document
 
 import scala.concurrent.ExecutionContext
@@ -71,7 +71,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
       userWithTenant { (platformUser, tenant) => {
         try {
           logger.debug(s"Loading definitions '$modelName' from tenant '$tenant'")
-          val model = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
+          val model = CaseFabric.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
           completeXML(model.getDocument)
         }
         catch {
@@ -110,10 +110,10 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
 
         val models = new ValueMap()
         models.withArray("models") // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
-        for (file <- Cafienne.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
+        for (file <- CaseFabric.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
           var description = "Description"
           try {
-            val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, file)
+            val definitionsDocument = CaseFabric.config.repository.DefinitionProvider.read(platformUser, tenant, file)
             description = definitionsDocument.getFirstCase.documentation.text
           } catch {
             case i: InvalidDefinitionException => description = i.toString
@@ -188,7 +188,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
 
             val tenantUser = platformUser.getTenantUser(tenant)
             if (tenantUser.isOwner) {
-              Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
+              CaseFabric.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
               complete(StatusCodes.NoContent)
             } else {
               complete(StatusCodes.Unauthorized, "User '" + platformUser.id + "' does not have the privileges to deploy a definition")

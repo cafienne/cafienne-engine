@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tenant.route
+package com.casefabric.service.http.tenant.route
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
-import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
-import org.cafienne.tenant.actorapi.command.TenantCommand
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.querydb.lastmodified.{Headers, LastModifiedHeader}
+import com.casefabric.querydb.query.{TenantQueriesImpl, UserQueries}
+import com.casefabric.service.infrastructure.authentication.AuthenticatedUser
+import com.casefabric.service.infrastructure.route.{CommandRoute, QueryRoute}
+import com.casefabric.tenant.actorapi.command.TenantCommand
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

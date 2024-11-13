@@ -8,7 +8,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.cafienne" level="debug" additivity="false">
+  <logger name="com.casefabric" level="debug" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
 

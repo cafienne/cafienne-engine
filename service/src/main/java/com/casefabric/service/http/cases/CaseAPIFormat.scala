@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases
+package com.casefabric.service.http.cases
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
-import org.cafienne.json.ValueMap
-import org.cafienne.service.http.cases.plan.PlanItemAPIFormat.PlanItemResponseFormat
-import org.cafienne.service.http.cases.team.CaseTeamAPI
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.json.ValueMap
+import com.casefabric.service.http.cases.plan.PlanItemAPIFormat.PlanItemResponseFormat
+import com.casefabric.service.http.cases.team.CaseTeamAPI
 
 import java.time.Instant
 import scala.annotation.meta.field
@@ -234,6 +234,6 @@ object CaseAPIFormat {
                                 file: Object,
                                )
 
-  @Schema(description = "Response when getting case instance documentation", example = "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\" xmlns:cafienne=\"org.cafienne\"><case id=\"caseDefinitionId\">The definitions tag is CMMN XSD compliant</case></definitions>")
+  @Schema(description = "Response when getting case instance documentation", example = "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\" xmlns:casefabric=\"com.casefabric\"><case id=\"caseDefinitionId\">The definitions tag is CMMN XSD compliant</case></definitions>")
   class CaseDefinitionFormat()
 }

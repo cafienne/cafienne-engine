@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.expression.spel.SpelReadable;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.cmmn.expression.spel.SpelReadable;
 
 import java.io.IOException;
 import java.util.Collection;

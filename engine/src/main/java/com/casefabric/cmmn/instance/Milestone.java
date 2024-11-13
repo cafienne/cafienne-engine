@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.MilestoneDefinition;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.MilestoneDefinition;
 
 public class Milestone extends PlanItem<MilestoneDefinition> {
     public Milestone(String id, int index, ItemDefinition itemDefinition, MilestoneDefinition definition, Stage<?> stage) {

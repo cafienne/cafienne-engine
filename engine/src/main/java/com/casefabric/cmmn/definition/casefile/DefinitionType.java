@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.casefile;
+package com.casefabric.cmmn.definition.casefile;
 
-import org.cafienne.cmmn.definition.casefile.definitiontype.*;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.casefile.definitiontype.*;
+import com.casefabric.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

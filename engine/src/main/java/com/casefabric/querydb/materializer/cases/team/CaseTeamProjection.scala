@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.team
+package com.casefabric.querydb.materializer.cases.team
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.team._
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
+import com.casefabric.cmmn.actorapi.event.team._
+import com.casefabric.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
+import com.casefabric.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
 
 import scala.concurrent.{ExecutionContext, Future}
 

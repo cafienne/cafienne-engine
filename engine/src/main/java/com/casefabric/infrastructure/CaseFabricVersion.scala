@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure
+package com.casefabric.infrastructure
 
-import org.cafienne.BuildInfo
-import org.cafienne.json.{JSONReader, Value, ValueMap}
+import com.casefabric.BuildInfo
+import com.casefabric.json.{JSONReader, Value, ValueMap}
 
 // Note: json creation is somewhat cumbersome, but it is required in order to have the comparison mechanism work properly.
-class CafienneVersion(val json: ValueMap = JSONReader.parse(Value.convert(BuildInfo.toMap).asMap.toString).asInstanceOf[ValueMap]) {
+class CaseFabricVersion(val json: ValueMap = JSONReader.parse(Value.convert(BuildInfo.toMap).asMap.toString).asInstanceOf[ValueMap]) {
   /**
     * Returns true if the two versions differ, false if they are the same.
     *
     * @param otherVersionInstance
     * @return
     */
-  def differs(otherVersionInstance: CafienneVersion): Boolean = {
+  def differs(otherVersionInstance: CaseFabricVersion): Boolean = {
     !json.equals(otherVersionInstance.json)
   }
 

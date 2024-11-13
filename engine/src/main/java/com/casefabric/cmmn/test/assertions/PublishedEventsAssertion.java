@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.event.CaseModified;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.filter.EventFilter;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.cmmn.actorapi.event.CaseModified;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.CaseTestCommand;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.cmmn.test.filter.EventFilter;
 
 import java.time.Instant;
 import java.util.ArrayList;

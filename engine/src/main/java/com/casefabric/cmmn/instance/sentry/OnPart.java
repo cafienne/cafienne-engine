@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.definition.sentry.OnPartDefinition;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

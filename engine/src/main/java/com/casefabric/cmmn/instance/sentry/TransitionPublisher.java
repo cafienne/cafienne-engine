@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
 
 import java.util.ArrayList;
 import java.util.List;

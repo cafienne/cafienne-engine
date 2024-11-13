@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.storage
+package com.casefabric.service.http.storage
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.{Directive, Route}
@@ -24,13 +24,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.CaseOwnership
-import org.cafienne.querydb.query.exception.CaseSearchFailure
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.tenant.route.TenantRoute
-import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
-import org.cafienne.system.CaseSystem
+import com.casefabric.querydb.query.CaseOwnership
+import com.casefabric.querydb.query.exception.CaseSearchFailure
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.tenant.route.TenantRoute
+import com.casefabric.storage.StorageUser
+import com.casefabric.storage.actormodel.{ActorMetadata, ActorType}
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs.{DELETE, PUT, Path, Produces}
 import scala.util.{Failure, Success}

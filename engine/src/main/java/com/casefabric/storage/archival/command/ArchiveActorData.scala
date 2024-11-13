@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.command
+package com.casefabric.storage.archival.command
 
-import org.cafienne.storage.actormodel.message.StorageCommand
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.archival.RootArchiver
+import com.casefabric.storage.actormodel.message.StorageCommand
+import com.casefabric.storage.actormodel.{ActorMetadata, RootStorageActor}
+import com.casefabric.storage.archival.RootArchiver
 
 case class ArchiveActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"Archive command for $metadata"

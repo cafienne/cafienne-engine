@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.enginedeveloper
+package com.casefabric.infrastructure.enginedeveloper
 
 /**
   * Special logger for engine developers to print indented logging for SentryNetwork executions

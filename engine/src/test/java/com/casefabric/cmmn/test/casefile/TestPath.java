@@ -1,15 +1,15 @@
-package org.cafienne.cmmn.test.casefile;
+package com.casefabric.cmmn.test.casefile;
 
-import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.casefile.InvalidPathException;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.Guid;
+import com.casefabric.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.casefile.InvalidPathException;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.json.ValueMap;
+import com.casefabric.util.Guid;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestPath {
     private final String caseName = "CaseFileTest";

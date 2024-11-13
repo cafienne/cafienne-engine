@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.definition.EventListenerDefinition;
-import org.cafienne.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.EventListenerDefinition;
+import com.casefabric.cmmn.definition.ItemDefinition;
 
 public abstract class EventListener<D extends EventListenerDefinition> extends PlanItem<D> {
     protected EventListener(String id, int index, ItemDefinition itemDefinition, D definition, Stage<?> stage) {

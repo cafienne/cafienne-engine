@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
-import org.cafienne.actormodel.identity.UserIdentity
+import com.casefabric.actormodel.identity.UserIdentity
 
 case class CaseOwnership(override val id: String, val caseInstanceId: String, val tenant: String, val isOwner: Boolean) extends UserIdentity

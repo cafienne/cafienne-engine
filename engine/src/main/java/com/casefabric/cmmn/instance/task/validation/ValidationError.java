@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.task.validation;
+package com.casefabric.cmmn.instance.task.validation;
 
-import org.cafienne.json.ValueMap;
+import com.casefabric.json.ValueMap;
 
 /**
  * Validation errors can occur if the TaskOutputValidator ran into some networking error and the like.

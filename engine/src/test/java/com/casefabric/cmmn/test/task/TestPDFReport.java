@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.test.task;
+package com.casefabric.cmmn.test.task;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,20 +6,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.event.ProcessCompleted;
-import org.cafienne.processtask.actorapi.event.ProcessStarted;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.actorapi.event.ProcessCompleted;
+import com.casefabric.processtask.actorapi.event.ProcessStarted;
 import org.junit.Test;
 
 import java.io.*;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestPDFReport {
     private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/pdfreport.xml");

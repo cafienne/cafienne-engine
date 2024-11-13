@@ -15,23 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.event.plan.task.*;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.ParameterMappingDefinition;
-import org.cafienne.cmmn.definition.TaskDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.cmmn.instance.parameter.TaskOutputParameter;
-import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.response.CommandFailure;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.event.plan.task.*;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.definition.ParameterMappingDefinition;
+import com.casefabric.cmmn.definition.TaskDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.definition.parameter.TaskOutputParameterDefinition;
+import com.casefabric.cmmn.instance.parameter.TaskInputParameter;
+import com.casefabric.cmmn.instance.parameter.TaskOutputParameter;
+import com.casefabric.cmmn.instance.task.validation.ValidationResponse;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 

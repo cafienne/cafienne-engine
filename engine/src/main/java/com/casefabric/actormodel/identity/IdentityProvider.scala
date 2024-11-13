@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
-import org.cafienne.querydb.record.TenantRecord
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.querydb.record.TenantRecord
 
 import scala.concurrent.Future
 

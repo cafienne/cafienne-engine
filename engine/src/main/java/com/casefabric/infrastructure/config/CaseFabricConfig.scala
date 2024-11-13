@@ -15,28 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.config.api.ApiConfig
-import org.cafienne.infrastructure.config.engine.EngineConfig
-import org.cafienne.infrastructure.config.persistence.PersistenceConfig
-import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
+import com.casefabric.infrastructure.config.api.ApiConfig
+import com.casefabric.infrastructure.config.engine.EngineConfig
+import com.casefabric.infrastructure.config.persistence.PersistenceConfig
+import com.casefabric.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
-  * Configuration settings of this Cafienne Case System Platform
+  * Configuration settings of this CaseFabric Case System Platform
   *
   * @param systemConfig
   */
-class CafienneConfig extends ConfigReader with LazyLogging {
+class CaseFabricConfig extends ConfigReader with LazyLogging {
   val systemConfig: Config = SystemConfig.load().getConfig
-  val path = "cafienne"
+  val path = "casefabric"
   override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {
       systemConfig.getConfig(path)
     } else {
-      fail("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
+      fail("CaseFabric System is not configured. Check local.conf for 'casefabric' settings")
     }
   }
 

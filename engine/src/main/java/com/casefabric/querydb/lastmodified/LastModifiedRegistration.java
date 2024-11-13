@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.lastmodified;
+package com.casefabric.querydb.lastmodified;
 
 import org.apache.pekko.dispatch.Futures;
-import org.cafienne.actormodel.event.ActorModified;
-import org.cafienne.actormodel.response.ActorLastModified;
+import com.casefabric.actormodel.event.ActorModified;
+import com.casefabric.actormodel.response.ActorLastModified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Promise;

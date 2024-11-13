@@ -15,27 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure
+package com.casefabric.infrastructure
 
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.config.CafienneConfig
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.config.CaseFabricConfig
 
 /**
   * JVM wide configurations and settings
   */
-object Cafienne {
+object CaseFabric {
 
   /**
-    * Configuration settings of this Cafienne Platform
+    * Configuration settings of this CaseFabric Platform
     */
-  lazy val config = new CafienneConfig
+  lazy val config = new CaseFabricConfig
 
   /**
     * Returns the BuildInfo as a string (containing JSON)
     *
     * @return
     */
-  lazy val version = new CafienneVersion
+  lazy val version = new CaseFabricVersion
 
   def isPlatformOwner(user: UserIdentity): Boolean = isPlatformOwner(user.id)
 

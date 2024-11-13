@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.schema.QueryDBSchema
 import slick.migration.api.{Migration, SqlMigration}
 
 object QueryDB_1_1_5 extends DbSchemaVersion with QueryDBSchema {

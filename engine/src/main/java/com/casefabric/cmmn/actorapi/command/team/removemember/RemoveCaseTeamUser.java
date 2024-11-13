@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team.removemember;
+package com.casefabric.cmmn.actorapi.command.team.removemember;
 
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
-import org.cafienne.cmmn.instance.team.MemberType;
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.team.CaseTeamUser;
+import com.casefabric.cmmn.instance.team.MemberType;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Command to remove a user from the case team

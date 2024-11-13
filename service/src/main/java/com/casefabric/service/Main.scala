@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service
+package com.casefabric.service
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.Persistence
-import org.cafienne.querydb.schema.QueryDB
-import org.cafienne.service.http.CafienneHttpServer
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.persistence.Persistence
+import com.casefabric.querydb.schema.QueryDB
+import com.casefabric.service.http.CaseFabricHttpServer
+import com.casefabric.system.CaseSystem
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
@@ -41,12 +41,12 @@ object Main extends App with LazyLogging {
 
     implicit val ec: ExecutionContextExecutor = caseSystem.system.dispatcher
     // Create and start the http server
-    new CafienneHttpServer(caseSystem).start().onComplete {
+    new CaseFabricHttpServer(caseSystem).start().onComplete {
       case Success(answer) =>
-        logger.warn(s"Running Cafienne version: ${Cafienne.version}")
-        logger.warn(s"Cafienne HTTP Server available at $answer")
+        logger.warn(s"Running CaseFabric version: ${CaseFabric.version}")
+        logger.warn(s"CaseFabric HTTP Server available at $answer")
       case Failure(msg) =>
-        logger.error(s"Starting Cafienne HTTP Server failed: $msg")
+        logger.error(s"Starting CaseFabric HTTP Server failed: $msg")
         System.exit(-1) // Also exit the JVM; what use do we have to keep running when there is no http available...
     }
 

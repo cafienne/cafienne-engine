@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.response.CommandFailureListener;
-import org.cafienne.actormodel.response.CommandResponseListener;
+import com.casefabric.actormodel.command.ModelCommand;
+import com.casefabric.actormodel.response.CommandFailureListener;
+import com.casefabric.actormodel.response.CommandResponseListener;
 
 public class Responder {
     public final ModelCommand command;

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage
+package com.casefabric.storage
 
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
-import org.cafienne.json.ValueMap
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.serialization.{Fields, JacksonSerializable}
+import com.casefabric.json.ValueMap
 
 case class StorageUser(id: String, tenant: String) extends UserIdentity with JacksonSerializable
 

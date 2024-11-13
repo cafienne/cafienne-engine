@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.process.http;
+package com.casefabric.cmmn.instance.process.http;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
-public class HTTPCallDefinition extends org.cafienne.processtask.implementation.http.HTTPCallDefinition {
+public class HTTPCallDefinition extends com.casefabric.processtask.implementation.http.HTTPCallDefinition {
     public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }

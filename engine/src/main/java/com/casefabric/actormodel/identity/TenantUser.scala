@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
-import org.cafienne.tenant.actorapi.event.deprecated._
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{Value, ValueMap}
+import com.casefabric.tenant.actorapi.event.deprecated._
 
 import java.util
 

@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.event.migration;
+package com.casefabric.humantask.actorapi.event.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.actorapi.event.HumanTaskEvent;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.humantask.actorapi.event.HumanTaskEvent;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;

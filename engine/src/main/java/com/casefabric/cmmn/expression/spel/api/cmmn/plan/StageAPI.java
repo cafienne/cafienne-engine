@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.plan;
+package com.casefabric.cmmn.expression.spel.api.cmmn.plan;
 
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.Task;
+import com.casefabric.cmmn.definition.ItemDefinition;
+import com.casefabric.cmmn.instance.*;
+import com.casefabric.cmmn.instance.Task;
 
 import java.util.*;
 

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json
+package com.casefabric.json
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.CafienneSerializable
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable
 
 /**
   * Simple trait that case classes can implement if they can convert themselves into Value[_] objects.
   * This can be used to make a case class json serializable (for now - better is to use default json serializers of http libraries).
   */
-trait CafienneJson extends CafienneSerializable {
+trait CaseFabricJson extends CaseFabricSerializable {
   def toValue: Value[_]
 
   override def toString: String = toValue.toString

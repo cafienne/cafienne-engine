@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.team
+package com.casefabric.service.http.cases.team
 
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Schema}
-import org.cafienne.actormodel.identity.Origin
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
-import org.cafienne.service.infrastructure.payload.PayloadValidator
+import com.casefabric.actormodel.identity.Origin
+import com.casefabric.cmmn.actorapi.command.team._
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.infrastructure.payload.PayloadValidator
 
 import scala.annotation.meta.field
 

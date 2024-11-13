@@ -1,4 +1,4 @@
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.source.{ImmutableJWKSet, JWKSource}
@@ -10,8 +10,8 @@ import net.minidev.json.JSONArray
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
-import org.cafienne.actormodel.identity.IdentityProvider
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.actormodel.identity.IdentityProvider
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike

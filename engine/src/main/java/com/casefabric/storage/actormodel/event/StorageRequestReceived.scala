@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.event
+package com.casefabric.storage.actormodel.event
 
-import org.cafienne.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.message.StorageEvent
 
 trait StorageRequestReceived extends StorageEvent

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.oauth2.sdk.id.Issuer
@@ -23,10 +23,10 @@ import com.nimbusds.openid.connect.sdk.SubjectType
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.config.util.ConfigReader
-import org.cafienne.json.JSONReader
-import org.cafienne.service.infrastructure.configuration.OIDCConfig
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.config.util.ConfigReader
+import com.casefabric.json.JSONReader
+import com.casefabric.service.infrastructure.configuration.OIDCConfig
 
 import java.net.URI
 import java.util
@@ -84,12 +84,12 @@ class OIDCConfiguration(override val config: Config) extends ConfigReader {
 }
 
 object OIDCConfiguration extends LazyLogging {
-  val config = new OIDCConfig(Cafienne.config.api.security)
+  val config = new OIDCConfig(CaseFabric.config.api.security)
 
   def readConfigurations(configs: Seq[Config]): Seq[OIDCProviderMetadata] = {
     val issuers = configs.map(new OIDCConfiguration(_)).filter(_.metadata.nonEmpty).map(_.metadata.get)
     // Check that we have actual values in the list
-    logger.warn(s"Cafienne HTTP Server is configured with ${issuers.size} identity providers: ${issuers.map(_.getIssuer.toString).mkString("\n- ", "\n- ", "")}")
+    logger.warn(s"CaseFabric HTTP Server is configured with ${issuers.size} identity providers: ${issuers.map(_.getIssuer.toString).mkString("\n- ", "\n- ", "")}")
     issuers
   }
 }

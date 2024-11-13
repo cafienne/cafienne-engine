@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.cmmn.instance.Path;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.cmmn.instance.Path;
 
 /**
  * Thrown if a {@link Path} is not valid according to the CaseDefinition

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team;
+package com.casefabric.cmmn.actorapi.command.team;
 
-import org.cafienne.json.ValueMap;
+import com.casefabric.json.ValueMap;
 
 /**
  * Simple functional interface to read a typed CaseTeamMember from a ValueMap

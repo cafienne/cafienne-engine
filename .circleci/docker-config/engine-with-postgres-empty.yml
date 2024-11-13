@@ -1,6 +1,6 @@
 services:
   cafienne:
-    image: cafienne/engine:latest
+    image:  casefabric/engine:latest
     labels:
       component: cafienne-engine
     network_mode: host
@@ -25,8 +25,8 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
-      - /home/circleci/cafienne-engine/.circleci/run/cafienne/archive:/opt/cafienne/archive
-      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
-      - /home/circleci/cafienne-engine/.circleci/src/jdbc-conf:/opt/cafienne/conf
-      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/cafienne/bootstrap
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/casefabric/journal
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/archive:/opt/casefabric/archive
+      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/casefabric/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/jdbc-conf:/opt/casefabric/conf
+      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/casefabric/bootstrap

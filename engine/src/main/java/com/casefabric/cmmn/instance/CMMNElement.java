@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.definition.DefinitionElement;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
+import com.casefabric.cmmn.actorapi.event.CaseEvent;
+import com.casefabric.cmmn.definition.DefinitionElement;
+import com.casefabric.cmmn.instance.debug.DebugInfoAppender;
 
 public class CMMNElement<T extends DefinitionElement> {
     private final Case caseInstance;

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.actorapi.event;
+package com.casefabric.processtask.actorapi.event;
 
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 @Manifest
 public class ProcessTerminated extends ProcessEnded {

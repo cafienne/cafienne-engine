@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import org.apache.pekko.stream.RestartSettings
-import org.cafienne.infrastructure.config.persistence.PersistenceConfig
-import org.cafienne.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
+import com.casefabric.infrastructure.config.persistence.PersistenceConfig
+import com.casefabric.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
@@ -27,13 +27,13 @@ import scala.concurrent.duration.FiniteDuration
 
 class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
   def path = "query-db"
-  override val msg = "Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings"
+  override val msg = "CaseFabric Query Database is not configured. Check local.conf for 'casefabric.query-db' settings"
 
   lazy val restartSettings: RestartSettings = new RestartConfig(this).settings
   lazy val debug: Boolean = readBoolean("debug", default = false)
   lazy val readJournal: String = {
     val foundJournal = readString("read-journal")
-    logger.warn(s"Obtaining read-journal settings from 'cafienne.querydb.read-journal' = $foundJournal is deprecated; please place these settings in 'cafienne.read-journal' instead")
+    logger.warn(s"Obtaining read-journal settings from 'casefabric.querydb.read-journal' = $foundJournal is deprecated; please place these settings in 'casefabric.read-journal' instead")
     foundJournal
   }
 

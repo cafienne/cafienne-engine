@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
 /**
  * Simple functional interface to return a value upon invocation of the getter

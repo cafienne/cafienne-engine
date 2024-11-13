@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
-import org.cafienne.cmmn.instance.PlanItemType;
+import com.casefabric.cmmn.definition.extension.workflow.FourEyesDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.RendezVousDefinition;
+import com.casefabric.cmmn.definition.sentry.EntryCriterionDefinition;
+import com.casefabric.cmmn.definition.sentry.ExitCriterionDefinition;
+import com.casefabric.cmmn.definition.sentry.ReactivateCriterionDefinition;
+import com.casefabric.cmmn.instance.PlanItemType;
 
 import java.util.ArrayList;
 import java.util.Collection;

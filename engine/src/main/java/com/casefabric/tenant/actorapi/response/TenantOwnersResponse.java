@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.response;
+package com.casefabric.tenant.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.actorapi.command.GetTenantOwners;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.actorapi.command.GetTenantOwners;
 
 import java.io.IOException;
 import java.util.List;

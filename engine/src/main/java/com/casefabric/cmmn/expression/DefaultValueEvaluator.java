@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression;
+package com.casefabric.cmmn.expression;
 
-import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
-import org.cafienne.cmmn.definition.ConstraintDefinition;
-import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.ApplicabilityRuleDefinition;
+import com.casefabric.cmmn.definition.ConstraintDefinition;
+import com.casefabric.cmmn.definition.DiscretionaryItemDefinition;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.definition.sentry.IfPartDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.parameter.TaskInputParameter;
+import com.casefabric.cmmn.instance.sentry.Criterion;
+import com.casefabric.json.Value;
 
 /**
  * Simplest implementation of the CMMNExpressionEvaluator. Intended to return default values

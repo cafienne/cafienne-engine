@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package com.casefabric.querydb.materializer.tenant
 
 import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.querydb.record.{UserRoleKey, UserRoleRecord}
-import org.cafienne.tenant.actorapi.event.deprecated._
-import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.querydb.record.{UserRoleKey, UserRoleRecord}
+import com.casefabric.tenant.actorapi.event.deprecated._
+import com.casefabric.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
 
 import scala.concurrent.{ExecutionContext, Future}
 

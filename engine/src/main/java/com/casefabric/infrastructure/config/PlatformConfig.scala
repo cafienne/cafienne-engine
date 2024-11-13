@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import com.typesafe.config.{ConfigValue, ConfigValueFactory, ConfigValueType}
-import org.cafienne.actormodel.identity.PlatformOwner
-import org.cafienne.infrastructure.config.util.MandatoryConfig
+import com.casefabric.actormodel.identity.PlatformOwner
+import com.casefabric.infrastructure.config.util.MandatoryConfig
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class PlatformConfig(val parent: CaseFabricConfig) extends MandatoryConfig {
   def path = "platform"
 
   val platformOwners: Seq[PlatformOwner] = config.getStringList("owners").asScala.map(PlatformOwner(_)).toSeq
   if (platformOwners.isEmpty) {
-    fail("Platform owners cannot be an empty list. Check configuration property cafienne.platform.owners")
+    fail("Platform owners cannot be an empty list. Check configuration property casefabric.platform.owners")
   }
 
   lazy val defaultTenant: String = {

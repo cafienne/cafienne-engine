@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.exception.MissingTenantException
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.query.exception.SearchFailure
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import com.casefabric.actormodel.exception.MissingTenantException
+import com.casefabric.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
+import com.casefabric.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.querydb.query.exception.SearchFailure
+import com.casefabric.querydb.query.{TenantQueriesImpl, UserQueries}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -35,8 +35,8 @@ trait CaseTeamValidator extends TenantValidator {
 
   def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
     val tenant = optionalTenant match {
-      case Some(value) => if (value.isBlank) Cafienne.config.platform.defaultTenant else value
-      case None => Cafienne.config.platform.defaultTenant
+      case Some(value) => if (value.isBlank) CaseFabric.config.platform.defaultTenant else value
+      case None => CaseFabric.config.platform.defaultTenant
     }
     if (tenant.isBlank) {
       throw new MissingTenantException("Tenant field is empty or missing and a default tenant is not configured")

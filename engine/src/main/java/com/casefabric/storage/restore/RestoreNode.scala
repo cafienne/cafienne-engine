@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore
+package com.casefabric.storage.restore
 
-import org.cafienne.storage.actormodel.{ActorMetadata, OffspringNode}
-import org.cafienne.storage.archival.Archive
-import org.cafienne.storage.restore.command.RestoreArchive
+import com.casefabric.storage.actormodel.{ActorMetadata, OffspringNode}
+import com.casefabric.storage.archival.Archive
+import com.casefabric.storage.restore.command.RestoreArchive
 
 class RestoreNode(val metadata: ActorMetadata, val actor: RootRestorer) extends OffspringNode {
   override def createStorageCommand: Any = RestoreArchive(metadata, archive)

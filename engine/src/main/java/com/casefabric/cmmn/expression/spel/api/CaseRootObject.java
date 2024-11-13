@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
-import org.cafienne.cmmn.expression.spel.api.cmmn.plan.CaseAPI;
-import org.cafienne.cmmn.expression.spel.api.cmmn.plan.PlanItemAPI;
-import org.cafienne.cmmn.expression.spel.api.cmmn.team.CurrentMemberAPI;
-import org.cafienne.cmmn.expression.spel.api.cmmn.team.MemberAPI;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.expression.spel.api.cmmn.plan.CaseAPI;
+import com.casefabric.cmmn.expression.spel.api.cmmn.plan.PlanItemAPI;
+import com.casefabric.cmmn.expression.spel.api.cmmn.team.CurrentMemberAPI;
+import com.casefabric.cmmn.expression.spel.api.cmmn.team.MemberAPI;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItem;
 
 /**
  * Base class for giving object context to Case expressions

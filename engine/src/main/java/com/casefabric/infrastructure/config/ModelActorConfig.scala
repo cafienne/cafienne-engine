@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package com.casefabric.infrastructure.config
 
 import org.apache.pekko.util.Timeout
-import org.cafienne.infrastructure.config.util.ChildConfigReader
+import com.casefabric.infrastructure.config.util.ChildConfigReader
 
 import scala.concurrent.duration.SECONDS
 
-class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
+class ModelActorConfig(val parent: CaseFabricConfig) extends ChildConfigReader {
   def path = "actor"
 
   lazy val askTimout: Timeout = {

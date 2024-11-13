@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.lastmodified
+package com.casefabric.querydb.lastmodified
 
 object Headers {
   final val CASE_LAST_MODIFIED = "Case-Last-Modified"

@@ -28,11 +28,11 @@
             <inputs id="_qgYaQ_18" name="TaskInputParameter"/>
             <outputs id="_qgYaQ_15" name="TaskOutputParameter" bindingRef="_qgYaQ_5">
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                 </extensionElements>
             </outputs>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
                     <parameterMapping id="_qgYaQ_14" sourceRef="_qgYaQ_18" targetRef="_67M8_Content">
                         <transformation id="_qgYaQ_12">
                             <body>
@@ -48,14 +48,14 @@
                             </body>
                         </condition>
                     </duedate>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <processTask id="pi_pt__qgYaQ_0" name="AssertMockServiceIsRunning" isBlocking="true" processRef="AssertMockServiceIsRunning.process">
             <inputs id="_qgYaQ_34" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
             <outputs id="_qgYaQ_30" name="responseCode" bindingRef="_qgYaQ_37">
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                 </extensionElements>
             </outputs>
             <parameterMapping id="_qgYaQ_31" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
@@ -70,13 +70,13 @@
         <humanTask id="pi_ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
             <outputs id="_qgYaQ_54" name="Decision">
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    <casefabric:implementation xmlns:casefabric="com.casefabric" required="true"/>
                 </extensionElements>
             </outputs>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="humanTaskTest.humantask">
                     <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="pi_ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>

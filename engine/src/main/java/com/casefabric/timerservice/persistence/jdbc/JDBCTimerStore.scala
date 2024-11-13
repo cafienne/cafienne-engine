@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence.jdbc
+package com.casefabric.timerservice.persistence.jdbc
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
-import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
-import org.cafienne.timerservice.Timer
-import org.cafienne.timerservice.persistence.TimerStore
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
+import com.casefabric.infrastructure.jdbc.cqrs.JDBCOffsetStorage
+import com.casefabric.timerservice.Timer
+import com.casefabric.timerservice.persistence.TimerStore
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
@@ -32,8 +32,8 @@ import java.time.Instant
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBCConfig with TimerServiceTables {
-  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(Cafienne.config.engine.timerService.store)
+class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CaseFabricJDBCConfig with TimerServiceTables {
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(CaseFabric.config.engine.timerService.store)
 
   import dbConfig.profile.api._
 

@@ -12,9 +12,9 @@
 		<input id="attachment" name="attachment" />
 		<input id="filename" name="filename" />
 		<extensionElements>
-			<cafienne:implementation
-				class="org.cafienne.processtask.implementation.smtp.SMTPCallDefinition"
-				xmlns:cafienne="org.cafienne">
+			<casefabric:implementation
+				class="com.casefabric.processtask.implementation.smtp.SMTPCallDefinition"
+				xmlns:casefabric="com.casefabric">
 				<smtp-server>localhost</smtp-server>
 				<smtp-port>25</smtp-port>
 				<subject>${subject}</subject>
@@ -39,7 +39,7 @@
 						<body>$.._2</body>
 					</transformation>
 				</parameterMapping>
-			</cafienne:implementation>
+			</casefabric:implementation>
 		</extensionElements>
 	</process>
 </definitions>

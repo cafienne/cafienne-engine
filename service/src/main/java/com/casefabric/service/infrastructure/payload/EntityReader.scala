@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.payload
+package com.casefabric.service.infrastructure.payload
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModule}
 import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
-import org.cafienne.infrastructure.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
-import org.cafienne.json.ValueMap
+import com.casefabric.infrastructure.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
+import com.casefabric.json.ValueMap
 
 /**
   * Helper classes to read http entity as an expected type

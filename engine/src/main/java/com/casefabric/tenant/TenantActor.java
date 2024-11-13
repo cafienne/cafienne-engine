@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant;
+package com.casefabric.tenant;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
-import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
-import org.cafienne.system.CaseSystem;
-import org.cafienne.tenant.actorapi.command.TenantCommand;
-import org.cafienne.tenant.actorapi.event.TenantAppliedPlatformUpdate;
-import org.cafienne.tenant.actorapi.event.TenantEvent;
-import org.cafienne.tenant.actorapi.event.TenantModified;
-import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent;
-import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
-import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
-import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
-import org.cafienne.tenant.actorapi.event.user.TenantUserAdded;
-import org.cafienne.tenant.actorapi.event.user.TenantUserChanged;
-import org.cafienne.tenant.actorapi.event.user.TenantUserRemoved;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.actormodel.identity.TenantUser;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.cmmn.actorapi.command.platform.NewUserInformation;
+import com.casefabric.cmmn.actorapi.command.platform.PlatformUpdate;
+import com.casefabric.system.CaseSystem;
+import com.casefabric.tenant.actorapi.command.TenantCommand;
+import com.casefabric.tenant.actorapi.event.TenantAppliedPlatformUpdate;
+import com.casefabric.tenant.actorapi.event.TenantEvent;
+import com.casefabric.tenant.actorapi.event.TenantModified;
+import com.casefabric.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent;
+import com.casefabric.tenant.actorapi.event.platform.TenantCreated;
+import com.casefabric.tenant.actorapi.event.platform.TenantDisabled;
+import com.casefabric.tenant.actorapi.event.platform.TenantEnabled;
+import com.casefabric.tenant.actorapi.event.user.TenantUserAdded;
+import com.casefabric.tenant.actorapi.event.user.TenantUserChanged;
+import com.casefabric.tenant.actorapi.event.user.TenantUserRemoved;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.sentry;
+package com.casefabric.cmmn.definition.sentry;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.sentry.CriteriaListener;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.instance.sentry.CriteriaListener;
+import com.casefabric.cmmn.instance.sentry.ExitCriterion;
 import org.w3c.dom.Element;
 
 public class ExitCriterionDefinition extends CriterionDefinition {

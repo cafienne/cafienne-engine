@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team
+package com.casefabric.cmmn.actorapi.command.team
 
-import org.cafienne.actormodel.identity.{CaseUserIdentity, ConsentGroupMembership, Origin}
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition
-import org.cafienne.cmmn.instance.team.Team
+import com.casefabric.actormodel.identity.{CaseUserIdentity, ConsentGroupMembership, Origin}
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition
+import com.casefabric.cmmn.instance.team.Team
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 

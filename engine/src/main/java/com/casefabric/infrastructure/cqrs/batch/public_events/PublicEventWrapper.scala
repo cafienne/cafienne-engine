@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch.public_events
+package com.casefabric.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import java.time.Instant
 
-case class PublicEventWrapper(timestamp: Instant, sequenceNr: Long = 0, content: CafiennePublicEventContent) extends CafienneJson {
+case class PublicEventWrapper(timestamp: Instant, sequenceNr: Long = 0, content: CaseFabricPublicEventContent) extends CaseFabricJson {
 
   lazy val manifest: String   = content.getClass.getSimpleName
 
@@ -33,7 +33,7 @@ case class PublicEventWrapper(timestamp: Instant, sequenceNr: Long = 0, content:
     // Metadata carries manifest and timestamp.
     val metadata = new ValueMap("manifest", manifest, "timestamp", timestamp)
     // always enrich content with event type as well
-    val contentJson: ValueMap = content.toValue.asMap().plus("cafienne-event-type", manifest)
+    val contentJson: ValueMap = content.toValue.asMap().plus("casefabric-event-type", manifest)
 
     new ValueMap("metadata", metadata, "content", contentJson)
   }

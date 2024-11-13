@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.config.util
+package com.casefabric.infrastructure.config.util
 
 import com.typesafe.config.{Config, ConfigValue, ConfigValueFactory}
 import com.typesafe.scalalogging.LazyLogging

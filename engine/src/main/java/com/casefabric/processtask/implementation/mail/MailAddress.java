@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
 import jakarta.mail.internet.InternetAddress;
 import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.property.Attendee;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
-import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.implementation.mail.definition.AddressDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;

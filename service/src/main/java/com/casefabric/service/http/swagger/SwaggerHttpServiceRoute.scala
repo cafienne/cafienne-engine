@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.swagger
+package com.casefabric.service.http.swagger
 
 import com.github.swagger.pekko._
 import com.github.swagger.pekko.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.infrastructure.authentication.OIDCConfiguration
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.service.infrastructure.authentication.OIDCConfiguration
 
 class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
 
    //override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint
-  override val host = s"${Cafienne.config.api.bindHost}:${Cafienne.config.api.bindPort}"
+  override val host = s"${CaseFabric.config.api.bindHost}:${CaseFabric.config.api.bindPort}"
   override val basePath = "/" //the basePath for the API you are exposing
   override val apiDocsPath = "api-docs" //where you want the swagger-json endpoint exposed
   override val info = Info(description =
-    """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = "1.0.0")
+    """HTTP JSON interface to the CaseFabric APIs""".stripMargin, version = "1.0.0")
 
   val oidc = OIDCConfiguration.config.issuers.head
 

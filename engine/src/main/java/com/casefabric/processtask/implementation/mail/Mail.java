@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.mail;
+package com.casefabric.processtask.implementation.mail;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.implementation.SubProcess;
+import com.casefabric.processtask.implementation.mail.definition.AddressDefinition;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 import java.util.List;
 import java.util.Properties;

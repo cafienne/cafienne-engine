@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice;
+package com.casefabric.timerservice;
 
 import org.apache.pekko.persistence.SnapshotOffer;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.system.CaseSystem;
-import org.cafienne.timerservice.persistence.TimerStore;
-import org.cafienne.timerservice.persistence.TimerStoreProvider;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.event.ModelEvent;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.system.CaseSystem;
+import com.casefabric.timerservice.persistence.TimerStore;
+import com.casefabric.timerservice.persistence.TimerStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimerService extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
-    public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
+    public static final String CASEFABRIC_TIMER_SERVICE = "casefabric-timer-service";
     final TimerStore storage;
     final TimerEventSink eventSink;
     final TimerMonitor monitor;
@@ -42,7 +42,7 @@ public class TimerService extends ModelActor {
         this.storage = new TimerStoreProvider(caseSystem).store();
         this.monitor = new TimerMonitor(this);
         this.eventSink = new TimerEventSink(this);
-        setEngineVersion(Cafienne.version());
+        setEngineVersion(CaseFabric.version());
     }
 
     @Override
@@ -62,18 +62,18 @@ public class TimerService extends ModelActor {
 
     @Override
     public String persistenceId() {
-        return CAFIENNE_TIMER_SERVICE;
+        return CASEFABRIC_TIMER_SERVICE;
     }
 
     @Override
     protected void recoveryCompleted() {
-        logger.warn("Starting Timer Service - loading timers every " + Cafienne.config().engine().timerService().interval() + " for a window of " + Cafienne.config().engine().timerService().window() + " ahead");
+        logger.warn("Starting Timer Service - loading timers every " + CaseFabric.config().engine().timerService().interval() + " for a window of " + CaseFabric.config().engine().timerService().window() + " ahead");
         monitor.start();
         eventSink.start();
     }
 
     @Override
     protected void handleSnapshot(SnapshotOffer snapshot) {
-        logger.error("Timer Service no longer supports snapshot offers. This functionality was deprecated in Cafienne Engine version 1.1.13 and is completely removed in version 1.1.18");
+        logger.error("Timer Service no longer supports snapshot offers. This functionality was deprecated in CaseFabric Engine version 1.1.13 and is completely removed in version 1.1.18");
     }
 }

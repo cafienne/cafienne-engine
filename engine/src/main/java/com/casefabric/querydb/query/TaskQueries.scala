@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
-import org.cafienne.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
-import org.cafienne.querydb.query.filter.TaskFilter
-import org.cafienne.querydb.record.TaskRecord
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.json.{CaseFabricJson, LongValue, Value, ValueMap}
+import com.casefabric.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
+import com.casefabric.querydb.query.filter.TaskFilter
+import com.casefabric.querydb.record.TaskRecord
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
-case class TaskCount(claimed: Long, unclaimed: Long) extends CafienneJson {
+case class TaskCount(claimed: Long, unclaimed: Long) extends CaseFabricJson {
   override def toValue: Value[_] = new ValueMap("claimed", new LongValue(claimed), "unclaimed", new LongValue(unclaimed))
 }
 

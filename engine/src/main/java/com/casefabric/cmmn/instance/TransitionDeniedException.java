@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.actormodel.exception.CommandException;
+import com.casefabric.actormodel.exception.CommandException;
 
 public class TransitionDeniedException extends CommandException {
     public TransitionDeniedException(String msg) {

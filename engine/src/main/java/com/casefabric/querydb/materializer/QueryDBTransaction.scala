@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
 import org.apache.pekko.Done
-import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
+import com.casefabric.infrastructure.cqrs.offset.OffsetRecord
 
 import scala.concurrent.Future
 

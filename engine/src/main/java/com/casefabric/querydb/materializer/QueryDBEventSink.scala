@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
 import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.cqrs.batch.EventBatchSource
-import org.cafienne.system.health.HealthMonitor
+import com.casefabric.infrastructure.cqrs.batch.EventBatchSource
+import com.casefabric.system.health.HealthMonitor
 
 import scala.util.{Failure, Success}
 

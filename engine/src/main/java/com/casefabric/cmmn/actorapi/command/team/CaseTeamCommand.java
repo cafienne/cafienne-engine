@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.team;
+package com.casefabric.cmmn.actorapi.command.team;
 
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.team.Team;
+import com.casefabric.json.ValueMap;
 
 /**
  * Generic abstraction for commands relating to CaseTeam.

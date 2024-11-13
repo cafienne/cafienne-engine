@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import com.nimbusds.jwt.JWTClaimsSet
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import com.casefabric.actormodel.identity.UserIdentity
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{Value, ValueMap}
 
 class AuthenticatedUser(override val token: String, claims: JWTClaimsSet) extends UserIdentity {
   val id: String = claims.getSubject

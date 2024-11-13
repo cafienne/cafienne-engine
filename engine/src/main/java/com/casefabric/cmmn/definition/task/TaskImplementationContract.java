@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.task;
+package com.casefabric.cmmn.definition.task;
 
-import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.cmmn.instance.Task;
+import com.casefabric.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.definition.parameter.OutputParameterDefinition;
+import com.casefabric.cmmn.instance.Task;
 
 import java.util.Map;
 
 /**
- * In the CMMN 1.0 specification, {@link org.cafienne.cmmn.instance.task.cmmn.CaseTask}
- * and {@link org.cafienne.cmmn.instance.task.process.ProcessTask} have an implementation,
- * whereas {@link org.cafienne.cmmn.instance.task.humantask.HumanTask} has not.
+ * In the CMMN 1.0 specification, {@link com.casefabric.cmmn.instance.task.cmmn.CaseTask}
+ * and {@link com.casefabric.cmmn.instance.task.process.ProcessTask} have an implementation,
+ * whereas {@link com.casefabric.cmmn.instance.task.humantask.HumanTask} has not.
  * In practice, however, {@HumanTask} is typically associated with a workflow implementation, providing for it's own lifecycle.
  * The engine also provides an extension on top of CMMN to enable workflow.
  * <p>
  * With that, every {@link Task} has an implementation, and there is mapping and binding of parameters to each implementation.
  * The engine has abstracted this binding in the {@link TaskImplementationContract}, describing the inputs and outputs of the implementation.
- * See also {@link org.cafienne.cmmn.definition.CaseDefinition}, {@link org.cafienne.processtask.definition.ProcessDefinition} & {@link WorkflowTaskDefinition}
+ * See also {@link com.casefabric.cmmn.definition.CaseDefinition}, {@link com.casefabric.processtask.definition.ProcessDefinition} & {@link WorkflowTaskDefinition}
  */
 public interface TaskImplementationContract {
     /**

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
-import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
-import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
+import com.casefabric.querydb.materializer.cases.CaseStorageTransaction
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
+import com.casefabric.querydb.materializer.tenant.TenantStorageTransaction
 import org.apache.pekko.persistence.query.Offset
 
 import scala.concurrent.Future

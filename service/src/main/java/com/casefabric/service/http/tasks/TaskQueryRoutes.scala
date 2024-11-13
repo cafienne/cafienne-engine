@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tasks
+package com.casefabric.service.http.tasks
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
@@ -24,12 +24,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.TaskCount
-import org.cafienne.querydb.query.filter.TaskFilter
-import org.cafienne.service.http.tasks.TaskAPIFormat.TaskResponseFormat
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.querydb.query.TaskCount
+import com.casefabric.querydb.query.filter.TaskFilter
+import com.casefabric.service.http.tasks.TaskAPIFormat.TaskResponseFormat
+import com.casefabric.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")

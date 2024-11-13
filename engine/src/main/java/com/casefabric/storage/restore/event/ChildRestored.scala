@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.event
+package com.casefabric.storage.restore.event
 
-import org.cafienne.infrastructure.serialization.Manifest
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
+import com.casefabric.infrastructure.serialization.Manifest
+import com.casefabric.json.ValueMap
+import com.casefabric.storage.actormodel.ActorMetadata
 
 @Manifest
 case class ChildRestored(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends RestoreEvent

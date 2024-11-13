@@ -15,28 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.team;
+package com.casefabric.cmmn.instance.team;
 
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.team.*;
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
-import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupAdded;
-import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupChanged;
-import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupRemoved;
-import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleAdded;
-import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleChanged;
-import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleRemoved;
-import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserAdded;
-import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserChanged;
-import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserRemoved;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.Case;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.team.*;
+import com.casefabric.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import com.casefabric.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
+import com.casefabric.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
+import com.casefabric.cmmn.actorapi.event.team.group.CaseTeamGroupAdded;
+import com.casefabric.cmmn.actorapi.event.team.group.CaseTeamGroupChanged;
+import com.casefabric.cmmn.actorapi.event.team.group.CaseTeamGroupRemoved;
+import com.casefabric.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleAdded;
+import com.casefabric.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleChanged;
+import com.casefabric.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleRemoved;
+import com.casefabric.cmmn.actorapi.event.team.user.CaseTeamUserAdded;
+import com.casefabric.cmmn.actorapi.event.team.user.CaseTeamUserChanged;
+import com.casefabric.cmmn.actorapi.event.team.user.CaseTeamUserRemoved;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.definition.team.CaseTeamDefinition;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.Case;
 import org.w3c.dom.Element;
 
 import java.util.*;

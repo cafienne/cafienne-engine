@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.process;
+package com.casefabric.cmmn.expression.spel.api.process;
 
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.expression.spel.api.ProcessActorRootObject;
-import org.cafienne.json.Value;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.expression.spel.api.ProcessActorRootObject;
+import com.casefabric.json.Value;
+import com.casefabric.processtask.instance.ProcessTaskActor;
 
 /**
  * Provides context for input/output transformation of parameters.

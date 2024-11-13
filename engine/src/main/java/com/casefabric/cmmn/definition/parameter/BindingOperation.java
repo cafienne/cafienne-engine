@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.parameter;
+package com.casefabric.cmmn.definition.parameter;
 
 /**
  * Various methods how to update Task Output into a Case File Item

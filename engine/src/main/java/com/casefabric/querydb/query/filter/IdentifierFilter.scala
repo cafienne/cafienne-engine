@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query.filter
+package com.casefabric.querydb.query.filter
 
 case class IdentifierFilter(tenant: Option[String] = None, name: Option[String] = None)

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.util;
+package com.casefabric.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

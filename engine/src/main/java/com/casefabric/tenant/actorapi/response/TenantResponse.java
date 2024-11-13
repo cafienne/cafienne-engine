@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.tenant.actorapi.response;
+package com.casefabric.tenant.actorapi.response;
 
-import org.cafienne.actormodel.response.BaseModelResponse;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.actorapi.TenantMessage;
-import org.cafienne.tenant.actorapi.command.TenantCommand;
+import com.casefabric.actormodel.response.BaseModelResponse;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
+import com.casefabric.tenant.actorapi.TenantMessage;
+import com.casefabric.tenant.actorapi.command.TenantCommand;
 
 @Manifest
 public class TenantResponse extends BaseModelResponse implements TenantMessage {

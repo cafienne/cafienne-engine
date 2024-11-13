@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.command;
+package com.casefabric.actormodel.command;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.actormodel.message.IncomingActorMessage;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.json.ValueMap;
 
 public interface ModelCommand extends IncomingActorMessage {
     /**

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization.serializers
+package com.casefabric.infrastructure.serialization.serializers
 
-import org.cafienne.infrastructure.serialization.CafienneSerializer
-import org.cafienne.storage.actormodel.event.ChildrenReceived
-import org.cafienne.storage.archival.event._
-import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
-import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
-import org.cafienne.storage.deletion.event._
-import org.cafienne.storage.deletion.response.RemovalRejected
-import org.cafienne.storage.restore.command.RestoreArchive
-import org.cafienne.storage.restore.event._
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer
+import com.casefabric.storage.actormodel.event.ChildrenReceived
+import com.casefabric.storage.archival.event._
+import com.casefabric.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
+import com.casefabric.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
+import com.casefabric.storage.deletion.event._
+import com.casefabric.storage.deletion.response.RemovalRejected
+import com.casefabric.storage.restore.command.RestoreArchive
+import com.casefabric.storage.restore.event._
 
 object StorageSerializers {
   def register(): Unit = {
@@ -36,40 +36,40 @@ object StorageSerializers {
     registerDeletionMessages()
     registerArchivalMessages()
     registerRestoreMessages()
-    CafienneSerializer.addManifestWrapper(classOf[ChildrenReceived], ChildrenReceived.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ChildrenReceived], ChildrenReceived.deserialize)
   }
 
   def registerDeletionMessages(): Unit = {
-    CafienneSerializer.addManifestWrapper(classOf[RemovalStarted], RemovalStarted.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RemovalRequested], RemovalRequested.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[QueryDataRemoved], QueryDataRemoved.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ChildrenRemovalInitiated], ChildrenRemovalInitiated.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RemovalCompleted], RemovalCompleted.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RemovalRejected], RemovalRejected.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RemovalStarted], RemovalStarted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RemovalRequested], RemovalRequested.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[QueryDataRemoved], QueryDataRemoved.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ChildrenRemovalInitiated], ChildrenRemovalInitiated.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RemovalCompleted], RemovalCompleted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RemovalRejected], RemovalRejected.deserialize)
   }
 
   def registerArchivalMessages(): Unit = {
     // Archival process related events
-    CafienneSerializer.addManifestWrapper(classOf[ArchivalStarted], ArchivalStarted.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchivalRequested], ArchivalRequested.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[QueryDataArchived], QueryDataArchived.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchiveCreated], ArchiveCreated.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchiveReceived], ArchiveReceived.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchivalCompleted], ArchivalCompleted.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchiveStored], ArchiveStored.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchivalRejected], ArchivalRejected.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchivalStarted], ArchivalStarted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchivalRequested], ArchivalRequested.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[QueryDataArchived], QueryDataArchived.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchiveCreated], ArchiveCreated.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchiveReceived], ArchiveReceived.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchivalCompleted], ArchivalCompleted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchiveStored], ArchiveStored.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchivalRejected], ArchivalRejected.deserialize)
 
     // ModelActor related "functional" events (the ones that remain in the journal)
-    CafienneSerializer.addManifestWrapper(classOf[CaseArchived], CaseArchived.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ProcessArchived], ProcessArchived.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[CaseArchived], CaseArchived.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ProcessArchived], ProcessArchived.deserialize)
   }
 
   def registerRestoreMessages(): Unit = {
-    CafienneSerializer.addManifestWrapper(classOf[RestoreRequested], RestoreRequested.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RestoreArchive], RestoreArchive.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RestoreStarted], RestoreStarted.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ArchiveRetrieved], ArchiveRetrieved.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ChildRestored], ChildRestored.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[RestoreCompleted], RestoreCompleted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RestoreRequested], RestoreRequested.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RestoreArchive], RestoreArchive.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RestoreStarted], RestoreStarted.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ArchiveRetrieved], ArchiveRetrieved.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[ChildRestored], ChildRestored.deserialize)
+    CaseFabricSerializer.addManifestWrapper(classOf[RestoreCompleted], RestoreCompleted.deserialize)
   }
 }

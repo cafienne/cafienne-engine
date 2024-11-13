@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.router
+package com.casefabric.system.router
 
 import org.apache.pekko.actor.{ActorRef, Props, Terminated}
-import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
-import org.cafienne.actormodel.response.ActorTerminated
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.command.{ModelCommand, TerminateModelActor}
+import com.casefabric.actormodel.response.ActorTerminated
+import com.casefabric.system.CaseSystem
 
 import scala.collection.mutable
 

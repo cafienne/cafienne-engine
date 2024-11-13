@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer
+package com.casefabric.querydb.materializer
 
 import org.apache.pekko.Done
-import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.infrastructure.cqrs.batch.EventBatch
+import com.casefabric.actormodel.event.CommitEvent
+import com.casefabric.infrastructure.cqrs.ModelEventEnvelope
+import com.casefabric.infrastructure.cqrs.batch.EventBatch
 
 import scala.concurrent.Future
 

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.processtask.definition.ProcessDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.definition.parameter.OutputParameterDefinition;
+import com.casefabric.processtask.definition.ProcessDefinition;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

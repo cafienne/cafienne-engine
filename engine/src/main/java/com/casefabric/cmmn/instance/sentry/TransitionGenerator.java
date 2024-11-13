@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Path;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Path;
 
 public interface TransitionGenerator<E extends StandardEvent<?,?>> {
     void updateStandardEvent(E event);

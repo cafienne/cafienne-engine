@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.constraint;
+package com.casefabric.cmmn.expression.spel.api.cmmn.constraint;
 
-import org.cafienne.cmmn.definition.ConstraintDefinition;
-import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
-import org.cafienne.cmmn.expression.spel.api.cmmn.file.CaseFileItemAPI;
-import org.cafienne.cmmn.expression.spel.api.cmmn.file.ValueAPI;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.cmmn.definition.ConstraintDefinition;
+import com.casefabric.cmmn.expression.spel.api.CaseRootObject;
+import com.casefabric.cmmn.expression.spel.api.cmmn.file.CaseFileItemAPI;
+import com.casefabric.cmmn.expression.spel.api.cmmn.file.ValueAPI;
+import com.casefabric.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
 
 /**
  * Context of current plan item. Can be referred to by it's type (task, stage, milestone or event), or by plain "planitem".

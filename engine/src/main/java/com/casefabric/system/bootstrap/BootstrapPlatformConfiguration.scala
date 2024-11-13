@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.bootstrap
+package com.casefabric.system.bootstrap
 
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.actormodel.response.{ActorExistsFailure, CommandFailure, ModelResponse}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.platform.CreateTenant
-import org.cafienne.tenant.actorapi.response.TenantResponse
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.actormodel.response.{ActorExistsFailure, CommandFailure, ModelResponse}
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.command.platform.CreateTenant
+import com.casefabric.tenant.actorapi.response.TenantResponse
 
 import java.io.File
 import scala.concurrent._
@@ -49,7 +49,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def findConfigFile: Seq[File] = {
     logger.info("Checking presence of bootstrap configuration for the case system")
-    val bootstrapTenantConfFiles = Cafienne.config.platform.bootstrapFile
+    val bootstrapTenantConfFiles = CaseFabric.config.platform.bootstrapFile
     if (bootstrapTenantConfFiles.nonEmpty) {
       val files = bootstrapTenantConfFiles.map(fileName => {
         val configFile = new File(fileName)
@@ -66,7 +66,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       return files
     }
 
-    val defaultTenant = Cafienne.config.platform.defaultTenant
+    val defaultTenant = CaseFabric.config.platform.defaultTenant
     if (defaultTenant.isBlank) {
       logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
       return Seq()
@@ -86,7 +86,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
   }
 
   private def parseConfigFile(configFile: File): CreateTenant = {
-    val defaultTenant = Cafienne.config.platform.defaultTenant
+    val defaultTenant = CaseFabric.config.platform.defaultTenant
     logger.info(s"Bootstrapping tenant '$defaultTenant' from file ${configFile.getAbsolutePath}")
 
     val tenantConfig: Config = ConfigFactory.parseFile(configFile)
@@ -124,7 +124,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure(msg)
       }
 
-      val aPlatformOwner = Cafienne.config.platform.platformOwners.head
+      val aPlatformOwner = CaseFabric.config.platform.platformOwners.head
 
       new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 

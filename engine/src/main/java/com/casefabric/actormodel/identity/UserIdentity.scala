@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package com.casefabric.actormodel.identity
 
 
-import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.serialization.{DeserializationError, Fields}
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.cmmn.repository.file.SimpleLRUCache
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.infrastructure.serialization.{DeserializationError, Fields}
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import scala.collection.immutable.HashSet
 
-trait UserIdentity extends CafienneJson {
+trait UserIdentity extends CaseFabricJson {
   val id: String
 
   val roles: Set[String] = new HashSet()
@@ -56,7 +56,7 @@ trait UserIdentity extends CafienneJson {
 }
 
 object UserIdentity {
-  private val tokens = new SimpleLRUCache[String, String](Cafienne.config.api.security.tokenCacheSize)
+  private val tokens = new SimpleLRUCache[String, String](CaseFabric.config.api.security.tokenCacheSize)
 
   def cacheUserToken(userId: String, token: String): Unit = {
     tokens.put(userId, token)

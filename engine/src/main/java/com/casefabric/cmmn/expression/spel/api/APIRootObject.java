@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package com.casefabric.cmmn.expression.spel.api;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
 
 /**
  * Base context for SPEL expressions, enabling access to the case and it's public members from any expression.

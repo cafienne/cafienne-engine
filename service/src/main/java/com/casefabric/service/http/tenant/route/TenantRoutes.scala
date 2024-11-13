@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tenant.route
+package com.casefabric.service.http.tenant.route
 
-import org.cafienne.system.CaseSystem
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
 

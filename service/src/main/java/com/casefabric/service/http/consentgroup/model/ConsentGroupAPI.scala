@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.consentgroup.model
+package com.casefabric.service.http.consentgroup.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.actormodel.identity.ConsentGroupUser
-import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
-import org.cafienne.service.infrastructure.payload.PayloadValidator
-import org.cafienne.util.Guid
+import com.casefabric.actormodel.identity.ConsentGroupUser
+import com.casefabric.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.infrastructure.payload.PayloadValidator
+import com.casefabric.util.Guid
 
 import scala.annotation.meta.field
 

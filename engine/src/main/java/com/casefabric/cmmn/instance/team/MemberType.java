@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.team;
+package com.casefabric.cmmn.instance.team;
 
 public enum MemberType {
     User("User"),

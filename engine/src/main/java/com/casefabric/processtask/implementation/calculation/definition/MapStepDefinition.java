@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.calculation.definition;
+package com.casefabric.processtask.implementation.calculation.definition;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.expression.MapExpressionDefinition;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.processtask.implementation.calculation.definition.expression.MapExpressionDefinition;
 import org.w3c.dom.Element;
 
 public class MapStepDefinition extends StepDefinition {

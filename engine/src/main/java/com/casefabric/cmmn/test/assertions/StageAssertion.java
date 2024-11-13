@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.instance.CasePlan;
-import org.cafienne.cmmn.instance.PlanItemType;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.cmmn.test.filter.EventFilter;
+import com.casefabric.cmmn.actorapi.event.plan.PlanItemCreated;
+import com.casefabric.cmmn.instance.CasePlan;
+import com.casefabric.cmmn.instance.PlanItemType;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.test.CaseTestCommand;
+import com.casefabric.cmmn.test.filter.EventFilter;
 
 import java.util.stream.Stream;
 

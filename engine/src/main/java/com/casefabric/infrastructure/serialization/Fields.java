@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization;
+package com.casefabric.infrastructure.serialization;
 
 /**
- * Big long enum with all field names that are used in places with CafienneJson (ValueMap and so)
+ * Big long enum with all field names that are used in places with CaseFabricJson (ValueMap and so)
  */
 public enum Fields {
     messageId,

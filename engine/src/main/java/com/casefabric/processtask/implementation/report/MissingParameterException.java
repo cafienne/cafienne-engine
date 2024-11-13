@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.report;
+package com.casefabric.processtask.implementation.report;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.exception.InvalidCommandException;
 
 public class MissingParameterException extends InvalidCommandException {
     public MissingParameterException(String msg) {

@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence
+package com.casefabric.timerservice.persistence
 
 import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
 import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
-import org.cafienne.infrastructure.cqrs.ReadJournalProvider
-import org.cafienne.system.CaseSystem
-import org.cafienne.timerservice.persistence.cassandra.CassandraTimerStore
-import org.cafienne.timerservice.persistence.inmemory.InMemoryStore
-import org.cafienne.timerservice.persistence.jdbc.JDBCTimerStore
+import com.casefabric.infrastructure.cqrs.ReadJournalProvider
+import com.casefabric.system.CaseSystem
+import com.casefabric.timerservice.persistence.cassandra.CassandraTimerStore
+import com.casefabric.timerservice.persistence.inmemory.InMemoryStore
+import com.casefabric.timerservice.persistence.jdbc.JDBCTimerStore
 
 /**
   * TimerStoreProvider can return a storage object to persist timer events

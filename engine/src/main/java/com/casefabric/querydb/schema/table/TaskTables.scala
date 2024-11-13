@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.table
+package com.casefabric.querydb.schema.table
 
-import org.cafienne.querydb.record.TaskRecord
-import org.cafienne.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.record.TaskRecord
+import com.casefabric.querydb.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
 
 import java.time.Instant
@@ -28,7 +28,7 @@ trait TaskTables extends QueryDBSchema {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TaskTable(tag: Tag) extends CafienneTenantTable[TaskRecord](tag, "task") {
+  final class TaskTable(tag: Tag) extends CaseFabricTenantTable[TaskRecord](tag, "task") {
 
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "taskstate" => taskState

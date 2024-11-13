@@ -1,20 +1,20 @@
 /* 
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.test;
+package com.casefabric.cmmn.test;
 
-import org.cafienne.cmmn.instance.TestValueClasses;
-import org.cafienne.cmmn.test.basic.BasicTests;
-import org.cafienne.cmmn.test.casefile.CaseFileTests;
-import org.cafienne.cmmn.test.expression.ExpressionTests;
-import org.cafienne.cmmn.test.plan.CasePlanTests;
-import org.cafienne.cmmn.test.sentry.SentryNetworkTests;
-import org.cafienne.cmmn.test.task.TaskTests;
-import org.cafienne.cmmn.test.team.TeamTests;
+import com.casefabric.cmmn.instance.TestValueClasses;
+import com.casefabric.cmmn.test.basic.BasicTests;
+import com.casefabric.cmmn.test.casefile.CaseFileTests;
+import com.casefabric.cmmn.test.expression.ExpressionTests;
+import com.casefabric.cmmn.test.plan.CasePlanTests;
+import com.casefabric.cmmn.test.sentry.SentryNetworkTests;
+import com.casefabric.cmmn.test.task.TaskTests;
+import com.casefabric.cmmn.test.team.TeamTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

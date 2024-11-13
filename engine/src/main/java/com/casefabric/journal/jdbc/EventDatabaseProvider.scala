@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.journal.jdbc
+package com.casefabric.journal.jdbc
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
@@ -28,5 +28,5 @@ import org.apache.pekko.persistence.jdbc.db.DefaultSlickDatabaseProvider
   *
   */
 class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabaseProvider(system) with LazyLogging {
-  logger.warn("Kindly remove the configuration property 'database-provider-fqcn = \"org.cafienne.journal.jdbc.EventDatabaseProvider\n' as this is no longer supported and will be dropped in a future release")
+  logger.warn("Kindly remove the configuration property 'database-provider-fqcn = \"com.casefabric.journal.jdbc.EventDatabaseProvider\n' as this is no longer supported and will be dropped in a future release")
 }

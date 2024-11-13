@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.authentication
+package com.casefabric.service.infrastructure.authentication
 
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.jwk.source.{JWKSource, JWKSourceBuilder}

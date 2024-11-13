@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.parameter;
+package com.casefabric.cmmn.definition.parameter;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.json.Value;
 import org.w3c.dom.Element;
 
 public class InputParameterDefinition extends ParameterDefinition {

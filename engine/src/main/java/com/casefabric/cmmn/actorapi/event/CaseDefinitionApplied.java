@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event;
+package com.casefabric.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BootstrapMessage;
+import com.casefabric.cmmn.actorapi.event.definition.CaseDefinitionEvent;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.infrastructure.CaseFabricVersion;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionApplied extends CaseDefinitionEvent implements BootstrapMessage {
-    public final CafienneVersion engineVersion;
+    public final CaseFabricVersion engineVersion;
     private final String parentCaseId;
     private final String rootCaseId;
     public final Instant createdOn;
@@ -49,7 +49,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent implements Bootst
         //  So, at that moment we also store the engine version.
         //  TODO: perhaps better to distinguish CaseStarted or CaseCreated from CaseDefinitionApplied
         //   If so, then we can also suffice with storing root id and so in the CaseCreated, rather than in case definition applied. Same for engine version.
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = CaseFabric.version();
     }
 
     public CaseDefinitionApplied(ValueMap json) {
@@ -58,7 +58,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent implements Bootst
         this.createdBy = json.readString(Fields.createdBy);
         this.rootCaseId = json.readString(Fields.rootActorId);
         this.parentCaseId = json.readString(Fields.parentActorId);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, CaseFabricVersion::new);
     }
 
     /**

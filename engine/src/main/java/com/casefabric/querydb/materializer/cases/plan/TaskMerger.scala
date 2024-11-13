@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.plan
+package com.casefabric.querydb.materializer.cases.plan
 
-import org.cafienne.cmmn.actorapi.event.CaseModified
-import org.cafienne.humantask.actorapi.event._
-import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated
-import org.cafienne.querydb.record.TaskRecord
+import com.casefabric.cmmn.actorapi.event.CaseModified
+import com.casefabric.humantask.actorapi.event._
+import com.casefabric.humantask.actorapi.event.migration.HumanTaskMigrated
+import com.casefabric.querydb.record.TaskRecord
 
 object TaskMerger {
   def create(evt: HumanTaskActivated): TaskRecord = TaskRecord(id = evt.getTaskId, caseInstanceId = evt.getActorId, tenant = evt.tenant, taskName = evt.getTaskName, createdOn = evt.getCreatedOn, createdBy = evt.getCreatedBy, lastModified = evt.getCreatedOn, modifiedBy = evt.getCreatedBy, role = evt.getPerformer, taskState = evt.getCurrentState.name, taskModel = evt.getTaskModel)

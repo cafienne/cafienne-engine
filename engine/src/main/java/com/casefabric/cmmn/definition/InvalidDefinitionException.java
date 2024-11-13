@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.json.Value;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.json.Value;
+import com.casefabric.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -71,7 +71,7 @@ public class InvalidDefinitionException extends Exception {
      */
     public Document toXML() {
         try {
-            Document doc = XMLHelper.loadXML("<invalid-definition xmlns=\"org.cafienne\"/>");
+            Document doc = XMLHelper.loadXML("<invalid-definition xmlns=\"com.casefabric\"/>");
             definitionErrors.forEach(error -> {
                 Element errorTag = (Element) doc.getDocumentElement().appendChild(doc.createElement("error"));
                 errorTag.appendChild(doc.createTextNode(error));

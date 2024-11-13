@@ -52,7 +52,7 @@
             <applicabilityRule id="rule_csQA1_1" name="isValid">
                 <condition>
                     <body>
-                        <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.T2 != null && stage.T2.state == T(org.cafienne.cmmn.instance.State).Active)]]>
+                        <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.T2 != null && stage.T2.state == T(com.casefabric.cmmn.instance.State).Active)]]>
                     </body>
                 </condition>
             </applicabilityRule>
@@ -60,7 +60,7 @@
     </casePlanModel>
     <caseRoles/>
     <extensionElements mustUnderstand="false">
-        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+        <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
@@ -68,6 +68,6 @@
     }
   }
 }
-                                        </cafienne:start-case-model>
+                                        </casefabric:start-case-model>
     </extensionElements>
 </case>

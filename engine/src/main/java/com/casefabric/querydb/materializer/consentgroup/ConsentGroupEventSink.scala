@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.consentgroup
+package com.casefabric.querydb.materializer.consentgroup
 
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
-import org.cafienne.system.CaseSystem
+import com.casefabric.consentgroup.actorapi.event.ConsentGroupEvent
+import com.casefabric.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
+import com.casefabric.system.CaseSystem
 
 import scala.concurrent.Future
 

@@ -1,17 +1,17 @@
-package org.cafienne.cmmn.test.basic;
+package com.casefabric.cmmn.test.basic;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
-import org.cafienne.humantask.actorapi.event.HumanTaskAssigned;
-import org.cafienne.humantask.actorapi.event.HumanTaskDueDateFilled;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.Transition;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.humantask.actorapi.command.CompleteHumanTask;
+import com.casefabric.humantask.actorapi.event.HumanTaskAssigned;
+import com.casefabric.humantask.actorapi.event.HumanTaskDueDateFilled;
+import com.casefabric.json.ValueMap;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestHelloWorld {
     private final CaseDefinition definitions = loadCaseDefinition("testdefinition/helloworld.xml");

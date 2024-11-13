@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.json.Value;
 
 import java.io.Serializable;
 

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.command
+package com.casefabric.actormodel.command
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
+import com.casefabric.infrastructure.serialization.JacksonSerializable
 
 case class TerminateModelActor(actorId: String) extends JacksonSerializable

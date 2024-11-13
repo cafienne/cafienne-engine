@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.identifiers.route
+package com.casefabric.service.http.identifiers.route
 
 import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -23,12 +23,12 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.IdentifierQueriesImpl
-import org.cafienne.querydb.query.filter.IdentifierFilter
-import org.cafienne.service.http.cases.CasesRoute
-import org.cafienne.service.http.identifiers.model.BusinessIdentifierFormat
-import org.cafienne.system.CaseSystem
+import com.casefabric.infrastructure.jdbc.query.{Area, Sort}
+import com.casefabric.querydb.query.IdentifierQueriesImpl
+import com.casefabric.querydb.query.filter.IdentifierFilter
+import com.casefabric.service.http.cases.CasesRoute
+import com.casefabric.service.http.identifiers.model.BusinessIdentifierFormat
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
 

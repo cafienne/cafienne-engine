@@ -86,7 +86,7 @@ and Send response]]>
                 <inputs id="inTP_cm_cs2F1_174_1" name="Greeting" bindingRef="cfi_csVQy_0"/>
                 <outputs id="outTP_cm_cs2F1_174_1" name="Response" bindingRef="cfi_csVQy_1"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation name="SendResponse" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="sendresponse.humantask">
+                    <casefabric:implementation name="SendResponse" xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="sendresponse.humantask">
                         <documentation textFormat="text/plain">
                             <text>
                                 <![CDATA[Sends a response back to the initiator of the hello world case]]>
@@ -172,13 +172,13 @@ and Send response]]>
                         </assignment>
                         <parameterMapping id="inPM_cm_cshJq_4_0" sourceRef="inTP_cm_cs2F1_174_1" targetRef="Greeting"/>
                         <parameterMapping id="outPM_cm_csuYs_174_0" sourceRef="Response" targetRef="outTP_cm_cs2F1_174_1"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_cs3hg_196" name="Read response" isBlocking="true">
                 <inputs id="inTP_cm_cs3hg_196_0" name="Response" bindingRef="cfi_csVQy_1"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation name="undefined" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="readresponse.humantask">
+                    <casefabric:implementation name="undefined" xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="readresponse.humantask">
                         <documentation textFormat="text/plain">
                             <text>
                                 <![CDATA[undefined]]>
@@ -239,7 +239,7 @@ and Send response]]>
                             </condition>
                         </assignment>
                         <parameterMapping id="inPM_cm_cs3hg_196_0" sourceRef="inTP_cm_cs3hg_196_0" targetRef="Response"/>
-                    </cafienne:implementation>
+                    </casefabric:implementation>
                 </extensionElements>
             </humanTask>
         </casePlanModel>
@@ -254,7 +254,7 @@ and Send response]]>
         </caseRoles>
         <input id="csVQy_inCPs_0" name="Greeting" bindingRef="cfi_csVQy_0"/>
         <extensionElements mustUnderstand="false">
-            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+            <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema": {
     "title": "Greeting",
     "type": "object",
@@ -290,7 +290,7 @@ and Send response]]>
       "From" :  {"ui:widget": "user-selector", "multiSelect" : false, "role" : "Sender"}
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
         </extensionElements>
     </case>
     <CMMNDI>

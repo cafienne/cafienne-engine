@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases.file;
+package com.casefabric.querydb.materializer.cases.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
+import com.casefabric.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;

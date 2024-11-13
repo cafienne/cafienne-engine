@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
-import org.cafienne.cmmn.expression.DefaultValueEvaluator;
+import com.casefabric.cmmn.expression.CMMNExpressionEvaluator;
+import com.casefabric.cmmn.expression.DefaultValueEvaluator;
 import org.w3c.dom.Element;
 
 import java.lang.reflect.Constructor;
@@ -27,10 +27,10 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Implementation of 5.4.7 Expressions have a language and a body. When an expression is encountered (e.g., inside a repetition rule) then an Evaluator will be instantiated for that expression. This
  * evaluator is based on the language of the expression. The engine will look for a class named ExpressionEvaluator inside a package that is created based on the language, following the
- * convention "org.cafienne.cmmn.expression.[language]". The constructor of the ExpressionEvaluator class must take {@link ExpressionDefinition} as an argument. Examples:
+ * convention "com.casefabric.cmmn.expression.[language]". The constructor of the ExpressionEvaluator class must take {@link ExpressionDefinition} as an argument. Examples:
  * <ul>
  * <li>ExpressionEvaluator</li>
- * <li>org.cafienne.cmmn.expression.xpath.ExpresionEvaluator</li>
+ * <li>com.casefabric.cmmn.expression.xpath.ExpresionEvaluator</li>
  * <li>ExpressionEvaluator</li>
  * </ul>
  */
@@ -57,7 +57,7 @@ public class ExpressionDefinition extends CMMNElementDefinition {
     }
 
     private CMMNExpressionEvaluator instantiateEvaluator() {
-        String evaluatorClassName = "org.cafienne.cmmn.expression." + language + ".ExpressionEvaluator";
+        String evaluatorClassName = "com.casefabric.cmmn.expression." + language + ".ExpressionEvaluator";
         try {
             Class<?> evaluatorClass = Class.forName(evaluatorClassName);
             if (!CMMNExpressionEvaluator.class.isAssignableFrom(evaluatorClass)) {

@@ -5,31 +5,31 @@
         </encoder>
     </appender>
 
-    <logger name="org.cafienne" level="WARN"/>
+    <logger name="com.casefabric" level="WARN"/>
 
     <!-- Show Storage Service logging INFO is light, DEBUG is full logging -->
-    <!--    <logger name="org.cafienne.storage" level="INFO"/>-->
-    <!--    <logger name="org.cafienne.storage" level="DEBUG"/>-->
+    <!--    <logger name="com.casefabric.storage" level="INFO"/>-->
+    <!--    <logger name="com.casefabric.storage" level="DEBUG"/>-->
 
     <!-- Show HTTP traffic logging -->
-    <!--        <logger name="org.cafienne.service.http" level="DEBUG" />-->
+    <!--        <logger name="com.casefabric.service.http" level="DEBUG" />-->
 
     <!-- Show Authentication Setup logging -->
-    <!--    <logger name="org.cafienne.authentication" level="INFO" />-->
+    <!--    <logger name="com.casefabric.authentication" level="INFO" />-->
 
     <!-- Show logging for offset of projections -->
-    <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseEventSink" level="DEBUG" />-->
-    <!--    <logger name="org.cafienne.querydb.materializer.tenant.TenantEventSink"    level="DEBUG" />-->
-    <!--    <logger name="org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink"    level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.querydb.materializer.cases.CaseEventSink" level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.querydb.materializer.tenant.TenantEventSink"    level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.querydb.materializer.consentgroup.ConsentGroupEventSink"    level="DEBUG" />-->
 
     <!-- Show all projections logging, including info on event being handled -->
-    <!--    <logger name="org.cafienne.querydb.materializer" level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.querydb.materializer" level="DEBUG" />-->
 
     <!-- Show logging for cases in the engine -->
-    <!--    <logger name="org.cafienne.cmmn" level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.cmmn" level="DEBUG" />-->
 
     <!-- Show timer service logging -->
-    <!--    <logger name="org.cafienne.timerservice" level="DEBUG" />-->
+    <!--    <logger name="com.casefabric.timerservice" level="DEBUG" />-->
 
     <logger name="com.datastax" level="WARN"/>
     <logger name="com.wordnik" level="ERROR"/>

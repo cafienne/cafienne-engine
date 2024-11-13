@@ -1,28 +1,28 @@
 /*
- * Copyright 2014 - 2019 Cafienne B.V.
+ * Copyright 2014 - 2019 CaseFabric B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.test.casefile;
+package com.casefabric.cmmn.test.casefile;
 
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
-import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
-import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.Guid;
+import com.casefabric.cmmn.actorapi.command.StartCase;
+import com.casefabric.cmmn.actorapi.command.casefile.CreateCaseFileItem;
+import com.casefabric.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
+import com.casefabric.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
+import com.casefabric.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
+import com.casefabric.cmmn.definition.CaseDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.test.TestScript;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueList;
+import com.casefabric.json.ValueMap;
+import com.casefabric.util.Guid;
 import org.junit.Test;
 
-import static org.cafienne.cmmn.test.TestScript.*;
+import static com.casefabric.cmmn.test.TestScript.*;
 
 public class TestBasicTypes {
     // This tests a set of basic case file types and properties

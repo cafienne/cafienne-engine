@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.DeserializationError;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.infrastructure.serialization.DeserializationError;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueMap;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -35,7 +35,7 @@ import java.io.IOException;
  * Base class for parsing XML elements defined in the CMMN specification.
  */
 public abstract class CMMNElementDefinition extends XMLElementDefinition {
-    private final static Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
+    private final static Logger logger = LoggerFactory.getLogger(CaseFabricSerializer.class);
     public final CMMNDocumentationDefinition documentation;
 
     protected CMMNElementDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean... identifierRequired) {

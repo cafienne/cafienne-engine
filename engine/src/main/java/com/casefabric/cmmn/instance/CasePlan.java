@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance;
+package com.casefabric.cmmn.instance;
 
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
-import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
-import org.cafienne.cmmn.actorapi.command.plan.task.HandleTaskImplementationTransition;
-import org.cafienne.cmmn.actorapi.event.CaseOutputFilled;
-import org.cafienne.cmmn.definition.CasePlanDefinition;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.command.CaseCommand;
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import com.casefabric.cmmn.actorapi.command.plan.task.CompleteTask;
+import com.casefabric.cmmn.actorapi.command.plan.task.FailTask;
+import com.casefabric.cmmn.actorapi.command.plan.task.HandleTaskImplementationTransition;
+import com.casefabric.cmmn.actorapi.event.CaseOutputFilled;
+import com.casefabric.cmmn.definition.CasePlanDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package com.casefabric.storage.actormodel.message
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.Fields
+import com.casefabric.infrastructure.serialization.Fields
 
 trait StorageActionRejected extends StorageActionCompleted {
   val msg: String

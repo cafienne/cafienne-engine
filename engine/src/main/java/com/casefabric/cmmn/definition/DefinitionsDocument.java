@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
-import org.cafienne.cmmn.definition.casefile.ImportDefinition;
-import org.cafienne.cmmn.repository.MissingDefinitionException;
-import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
+import com.casefabric.cmmn.definition.casefile.ImportDefinition;
+import com.casefabric.cmmn.repository.MissingDefinitionException;
+import com.casefabric.processtask.definition.ProcessDefinition;
+import com.casefabric.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -156,7 +156,7 @@ public class DefinitionsDocument implements Serializable {
     }
 
     /**
-     * Returns the first case in the definitions file. Typically the main case when deployed using Cafienne IDE
+     * Returns the first case in the definitions file. Typically the main case when deployed using CaseFabric IDE
      *
      * @return The first case in the definitions file, or throws a {@link MissingDefinitionException} if none is there.
      * @throws MissingDefinitionException if there is no case definition inside this definitions document.

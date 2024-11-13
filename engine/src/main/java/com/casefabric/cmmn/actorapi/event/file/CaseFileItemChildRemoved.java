@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.event.file;
+package com.casefabric.cmmn.actorapi.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.cmmn.instance.casefile.InvalidPathException;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemCollection;
+import com.casefabric.cmmn.instance.casefile.CaseFileItemTransition;
+import com.casefabric.cmmn.instance.casefile.InvalidPathException;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.io.IOException;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tasks
+package com.casefabric.service.http.tasks
 
 import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -24,11 +24,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.humantask.actorapi.command._
-import org.cafienne.service.infrastructure.payload.HttpJsonReader._
-import org.cafienne.json.ValueMap
-import org.cafienne.service.http.tasks.TaskAPIFormat._
-import org.cafienne.system.CaseSystem
+import com.casefabric.humantask.actorapi.command._
+import com.casefabric.service.infrastructure.payload.HttpJsonReader._
+import com.casefabric.json.ValueMap
+import com.casefabric.service.http.tasks.TaskAPIFormat._
+import com.casefabric.system.CaseSystem
 
 import jakarta.ws.rs._
 

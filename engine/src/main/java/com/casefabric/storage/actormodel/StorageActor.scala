@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package com.casefabric.storage.actormodel
 
 import org.apache.pekko.persistence.RecoveryCompleted
 import org.apache.pekko.persistence.journal.Tagged
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.{QueryDBState, StorageActorState}
-import org.cafienne.system.CaseSystem
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.state.{QueryDBState, StorageActorState}
+import com.casefabric.system.CaseSystem
 
 trait StorageActor[S <: StorageActorState]
   extends BaseStorageActor

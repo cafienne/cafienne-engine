@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.mapping;
+package com.casefabric.cmmn.expression.spel.api.cmmn.mapping;
 
-import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
-import org.cafienne.cmmn.instance.Task;
+import com.casefabric.cmmn.expression.spel.api.CaseRootObject;
+import com.casefabric.cmmn.instance.Task;
 
 public class TaskInputRoot extends CaseRootObject {
     public TaskInputRoot(Task<?> task) {

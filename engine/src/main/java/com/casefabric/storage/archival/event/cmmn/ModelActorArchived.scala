@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event.cmmn
+package com.casefabric.storage.archival.event.cmmn
 
-import org.cafienne.storage.archival.event.ArchivalEvent
+import com.casefabric.storage.archival.event.ArchivalEvent
 
 trait ModelActorArchived extends ArchivalEvent
 

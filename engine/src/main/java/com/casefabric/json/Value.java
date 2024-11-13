@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.json;
+package com.casefabric.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -190,7 +190,7 @@ public abstract class Value<T> implements Serializable {
      * @return
      */
     public static Value<?> convert(Object object) {
-        // NOTE: order of if statements is measured by running Cafienne TypeScript test framework;
+        // NOTE: order of if statements is measured by running CaseFabric TypeScript test framework;
         //  String convert happens 6500 times, Seq conversion 400, Array conversion 200, etc.
         if (object == null) {
             return Value.NULL;
@@ -223,8 +223,8 @@ public abstract class Value<T> implements Serializable {
                 valueList.add(convert(Array.get(object, i)));
             }
             return valueList;
-        } else if (object instanceof CafienneJson) {
-            return ((CafienneJson) object).toValue();
+        } else if (object instanceof CaseFabricJson) {
+            return ((CaseFabricJson) object).toValue();
         } else if (object instanceof Collection) {
             Collection<?> list = (Collection<?>) object;
             ValueList valueList = new ValueList();
@@ -260,8 +260,8 @@ public abstract class Value<T> implements Serializable {
             return valueList;
         } else if (object instanceof Throwable) {
             return convertThrowable((Throwable) object);
-        } else if (object instanceof CafienneSerializable) {
-            return new CafienneSerializableValue((CafienneSerializable) object);
+        } else if (object instanceof CaseFabricSerializable) {
+            return new CaseFabricSerializableValue((CaseFabricSerializable) object);
         } else if (object instanceof Serializable) {
             return new SerializableValue(object);
         } else {

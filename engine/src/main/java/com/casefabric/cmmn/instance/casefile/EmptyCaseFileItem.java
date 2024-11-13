@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.json.Value;
+import com.casefabric.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

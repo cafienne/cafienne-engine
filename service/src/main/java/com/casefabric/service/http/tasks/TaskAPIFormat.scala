@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.tasks
+package com.casefabric.service.http.tasks
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
 
 import java.time.Instant
 import scala.annotation.meta.field

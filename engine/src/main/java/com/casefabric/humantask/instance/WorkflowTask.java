@@ -15,28 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.instance;
+package com.casefabric.humantask.instance;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.actormodel.identity.Origin;
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.definition.HumanTaskDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.AssignmentDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.DueDateDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.TaskModelDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.task.validation.ValidationError;
-import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.humantask.actorapi.event.*;
-import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.actormodel.identity.Origin;
+import com.casefabric.cmmn.actorapi.command.platform.NewUserInformation;
+import com.casefabric.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import com.casefabric.cmmn.definition.HumanTaskDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.AssignmentDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.DueDateDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.TaskModelDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.instance.CMMNElement;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.cmmn.instance.task.validation.ValidationError;
+import com.casefabric.cmmn.instance.task.validation.ValidationResponse;
+import com.casefabric.humantask.actorapi.event.*;
+import com.casefabric.humantask.actorapi.event.migration.HumanTaskMigrated;
+import com.casefabric.json.StringValue;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 
 import java.time.Instant;
 import java.util.Objects;

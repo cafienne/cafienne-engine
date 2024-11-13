@@ -18,7 +18,7 @@
             <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
             <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="humanTaskTest.humantask">
                     <parameterMapping id="_kBPkc_14" sourceRef="_kBPkc_18" targetRef="_67M8_Content">
                         <transformation id="_kBPkc_20">
                             <body>
@@ -33,7 +33,7 @@
                             </body>
                         </transformation>
                     </parameterMapping>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
         <humanTask id="pi_ht__kBPkc_1" name="AdminTask" isBlocking="true" performerRef="_kBPkc_17"/>

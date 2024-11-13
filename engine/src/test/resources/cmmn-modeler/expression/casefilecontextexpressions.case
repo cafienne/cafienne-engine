@@ -16,7 +16,7 @@
             <inputs id="_X87XC_4" name="Container" bindingRef="cfi_X87XC_0"/>
             <outputs id="_iWNoI" name="Result"/>
             <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                <casefabric:implementation xmlns:casefabric="com.casefabric" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_mMaHf" sourceRef="_X87XC_4" targetRef="_Hun3_Input">
                         <transformation>
                             <body>
@@ -32,20 +32,20 @@
                             </body>
                         </transformation>
                     </parameterMapping>
-                </cafienne:implementation>
+                </casefabric:implementation>
             </extensionElements>
         </humanTask>
     </casePlanModel>
     <caseRoles/>
     <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_X87XC_0"/>
     <extensionElements mustUnderstand="false">
-        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+        <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
     "properties":{
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
     </extensionElements>
 </case>

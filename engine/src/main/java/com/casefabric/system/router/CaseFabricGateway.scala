@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.router
+package com.casefabric.system.router
 
 import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
-import org.cafienne.cmmn.actorapi.command.CaseCommand
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.processtask.actorapi.command.ProcessCommand
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.TenantCommand
+import com.casefabric.cmmn.actorapi.command.CaseCommand
+import com.casefabric.consentgroup.actorapi.command.ConsentGroupCommand
+import com.casefabric.infrastructure.CaseFabric
+import com.casefabric.processtask.actorapi.command.ProcessCommand
+import com.casefabric.system.CaseSystem
+import com.casefabric.tenant.actorapi.command.TenantCommand
 
 import scala.concurrent.Future
 
-class CafienneGateway(caseSystem: CaseSystem) {
+class CaseFabricGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
   private val terminationRequests = collection.concurrent.TrieMap[String, ActorRef]()
   private val actors = collection.concurrent.TrieMap[String, ActorRef]()
@@ -40,7 +40,7 @@ class CafienneGateway(caseSystem: CaseSystem) {
 
   def request(message: Any): Future[Any] = {
     import org.apache.pekko.pattern.ask
-    implicit val timeout: Timeout = Cafienne.config.actor.askTimout
+    implicit val timeout: Timeout = CaseFabric.config.actor.askTimout
 
     getRouter(message).ask(message)
   }

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.definition.task.TaskImplementationContract;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.parameter.ParameterDefinition;
+import com.casefabric.cmmn.definition.task.TaskImplementationContract;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.parameter.TaskInputParameter;
+import com.casefabric.json.Value;
 import org.w3c.dom.Element;
 
 import java.util.Map;

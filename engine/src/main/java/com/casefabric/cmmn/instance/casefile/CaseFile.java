@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.cmmn.definition.casefile.CaseFileDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
+import com.casefabric.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

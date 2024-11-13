@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command;
+package com.casefabric.cmmn.actorapi.command;
 
-import org.cafienne.actormodel.command.BaseModelCommand;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.CaseMessage;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.command.BaseModelCommand;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.actorapi.CaseMessage;
+import com.casefabric.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import com.casefabric.cmmn.actorapi.event.CaseEvent;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.json.ValueMap;
 
 /**
  * A {@link Case} instance is designed to handle various CaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.humantask.actorapi.command;
+package com.casefabric.humantask.actorapi.command;
 
-import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.json.ValueMap;
+import com.casefabric.actormodel.identity.CaseUserIdentity;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.json.ValueMap;
 
 /**
  * This is the basis for tasks that can be executed during while the task is alive.

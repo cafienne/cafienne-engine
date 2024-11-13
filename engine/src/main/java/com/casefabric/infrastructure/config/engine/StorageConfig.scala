@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.engine
+package com.casefabric.infrastructure.config.engine
 
-import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.storage.archive.Storage
-import org.cafienne.storage.archive.file.FileBasedStorage
+import com.casefabric.infrastructure.config.util.ChildConfigReader
+import com.casefabric.storage.archive.Storage
+import com.casefabric.storage.archive.file.FileBasedStorage
 
 import java.io.File
 

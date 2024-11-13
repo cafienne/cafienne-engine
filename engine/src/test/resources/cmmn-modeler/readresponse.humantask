@@ -1,5 +1,5 @@
 <humantask>
-    <cafienne:implementation name="undefined" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
+    <casefabric:implementation name="undefined" xmlns:casefabric="com.casefabric" class="com.casefabric.cmmn.definition.task.WorkflowTaskDefinition">
         <documentation textFormat="text/plain">
             <text>
                 <![CDATA[undefined]]>
@@ -45,5 +45,5 @@
 				}
 			}
 		</task-model>
-    </cafienne:implementation>
+    </casefabric:implementation>
 </humantask>

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.querydb
+package com.casefabric.storage.querydb
 
-import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
+import com.casefabric.querydb.materializer.slick.SlickQueryDBTransaction
 
 import scala.concurrent.ExecutionContext
 

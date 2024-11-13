@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.test.assertions;
+package com.casefabric.cmmn.test.assertions;
 
-import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueList;
+import com.casefabric.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.ValueList;
 
 import java.util.ArrayList;
 import java.util.Collection;

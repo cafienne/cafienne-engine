@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.javadsl
+package com.casefabric.infrastructure.cqrs.javadsl
 
 import org.apache.pekko.persistence.query.Offset
 import scala.concurrent.Future
@@ -26,7 +26,7 @@ import scala.concurrent.Future
   * @param name
   * @param getOffset
   */
-class OffsetStorage(name: String, getOffset: (() => Future[Offset])) extends org.cafienne.infrastructure.cqrs.offset.OffsetStorage {
+class OffsetStorage(name: String, getOffset: (() => Future[Offset])) extends com.casefabric.infrastructure.cqrs.offset.OffsetStorage {
   /**
     * Unique name of the storage.
     */

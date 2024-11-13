@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence
+package com.casefabric.timerservice.persistence
 
 import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.timerservice.Timer
+import com.casefabric.timerservice.Timer
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}

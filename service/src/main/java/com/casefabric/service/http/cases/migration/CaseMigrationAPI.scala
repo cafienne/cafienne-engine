@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.migration
+package com.casefabric.service.http.cases.migration
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
-import org.cafienne.service.http.cases.team.CaseTeamAPI
+import com.casefabric.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
+import com.casefabric.service.http.cases.team.CaseTeamAPI
 
 import scala.annotation.meta.field
 

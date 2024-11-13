@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api.cmmn.constraint;
+package com.casefabric.cmmn.expression.spel.api.cmmn.constraint;
 
-import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
-import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
+import com.casefabric.cmmn.definition.ApplicabilityRuleDefinition;
+import com.casefabric.cmmn.definition.DiscretionaryItemDefinition;
+import com.casefabric.cmmn.instance.PlanItem;
 
 /**
  * Applicability rules are executed on discretionary items related to a Stage or HumanTask.

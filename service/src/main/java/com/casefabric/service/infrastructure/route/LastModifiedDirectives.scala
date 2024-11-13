@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.infrastructure.route
+package com.casefabric.service.infrastructure.route
 
 import org.apache.pekko.http.scaladsl.marshalling.Marshaller
 import org.apache.pekko.http.scaladsl.model.headers.RawHeader
@@ -23,8 +23,8 @@ import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCod
 import org.apache.pekko.http.scaladsl.server.Directives.{complete, optionalHeaderValueByName, respondWithHeader, respondWithHeaders}
 import org.apache.pekko.http.scaladsl.server.{Directive0, Route}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response._
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
+import com.casefabric.actormodel.response._
+import com.casefabric.querydb.lastmodified.LastModifiedHeader
 
 trait LastModifiedDirectives extends LazyLogging {
   /**

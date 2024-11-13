@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.sentry;
+package com.casefabric.cmmn.instance.sentry;
 
-import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import com.casefabric.infrastructure.enginedeveloper.EngineDeveloperConsole;
 
 import java.util.ArrayList;
 import java.util.List;

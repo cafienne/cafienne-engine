@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package com.casefabric.infrastructure.cqrs
 
 import org.apache.pekko.persistence.query.EventEnvelope
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.infrastructure.serialization.{DeserializationFailure, UnrecognizedManifest}
+import com.casefabric.actormodel.event.ModelEvent
+import com.casefabric.infrastructure.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 trait ModelEventFilter extends LazyLogging {
   def validateModelEvents(element: EventEnvelope): Boolean = {

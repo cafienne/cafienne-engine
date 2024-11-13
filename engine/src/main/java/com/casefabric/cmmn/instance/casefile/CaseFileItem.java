@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.casefile;
+package com.casefabric.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.actorapi.event.file.*;
-import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemDropped;
-import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.event.file.*;
+import com.casefabric.cmmn.actorapi.event.migration.CaseFileItemDropped;
+import com.casefabric.cmmn.actorapi.event.migration.CaseFileItemMigrated;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.casefile.CaseFileError;
+import com.casefabric.cmmn.definition.casefile.CaseFileItemDefinition;
+import com.casefabric.cmmn.definition.casefile.PropertyDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.Path;
+import com.casefabric.cmmn.instance.State;
+import com.casefabric.cmmn.instance.sentry.CaseFileItemOnPart;
+import com.casefabric.cmmn.instance.sentry.TransitionGenerator;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;

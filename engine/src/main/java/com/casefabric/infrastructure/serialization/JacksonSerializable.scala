@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.serialization
+package com.casefabric.infrastructure.serialization
 
 trait JacksonSerializable {
 

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.query
+package com.casefabric.querydb.query
 
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.querydb.record.CaseBusinessIdentifierRecord
+import com.casefabric.json.{CaseFabricJson, Value, ValueList, ValueMap}
+import com.casefabric.querydb.record.CaseBusinessIdentifierRecord
 
-final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CaseFabricJson {
   override def toValue: Value[_] = {
     val list = new ValueList
     records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.orNull)))

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository;
+package com.casefabric.cmmn.repository;
 
 import com.typesafe.config.Config;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.cmmn.definition.DefinitionsDocument;
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.repository.file.SimpleLRUCache;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.util.XMLHelper;
+import com.casefabric.actormodel.exception.AuthorizationException;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.cmmn.definition.DefinitionsDocument;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.cmmn.repository.file.SimpleLRUCache;
+import com.casefabric.infrastructure.CaseFabric;
+import com.casefabric.util.XMLHelper;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StartCaseDefinitionProvider implements DefinitionProvider {
-    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
+    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(CaseFabric.config().repository().cacheSize());
     private final static String AUTHORIZED_TENANT_ROLES = "authorized-tenant-roles";
     private final List<String> authorizedTenantRoles;
 
@@ -48,7 +48,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     }
 
     private List<String> readTenantRoles() {
-        Config config = Cafienne.config().repository().config();
+        Config config = CaseFabric.config().repository().config();
         if (config.hasPath(AUTHORIZED_TENANT_ROLES)) {
             return config.getStringList(AUTHORIZED_TENANT_ROLES);
         } else {

@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.command;
+package com.casefabric.actormodel.command;
 
 import org.apache.pekko.actor.ActorPath;
 import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.Guid;
+import com.casefabric.actormodel.ModelActor;
+import com.casefabric.actormodel.exception.InvalidCommandException;
+import com.casefabric.actormodel.identity.UserIdentity;
+import com.casefabric.actormodel.response.ModelResponse;
+import com.casefabric.cmmn.actorapi.response.CaseResponse;
+import com.casefabric.infrastructure.serialization.CaseFabricSerializer;
+import com.casefabric.infrastructure.serialization.Fields;
+import com.casefabric.json.JSONParseFailure;
+import com.casefabric.json.JSONReader;
+import com.casefabric.json.Value;
+import com.casefabric.json.ValueMap;
+import com.casefabric.util.Guid;
 
 import java.io.IOException;
 import java.io.StringWriter;

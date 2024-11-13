@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.expression;
+package com.casefabric.cmmn.definition.expression;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.expression.spel.Resolver;
-import org.cafienne.cmmn.expression.spel.api.APIRootObject;
+import com.casefabric.cmmn.definition.CMMNElementDefinition;
+import com.casefabric.cmmn.definition.ModelDefinition;
+import com.casefabric.cmmn.definition.parameter.InputParameterDefinition;
+import com.casefabric.cmmn.expression.spel.Resolver;
+import com.casefabric.cmmn.expression.spel.api.APIRootObject;
 import org.w3c.dom.Element;
 
 import java.util.Map;

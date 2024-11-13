@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.cases.history
+package com.casefabric.service.http.cases.history
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.json.Value
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.debug.ModelEventsReader
-import org.cafienne.system.CaseSystem
+import com.casefabric.json.Value
+import com.casefabric.querydb.lastmodified.Headers
+import com.casefabric.service.http.debug.ModelEventsReader
+import com.casefabric.system.CaseSystem
 
 import scala.util.{Failure, Success}
 

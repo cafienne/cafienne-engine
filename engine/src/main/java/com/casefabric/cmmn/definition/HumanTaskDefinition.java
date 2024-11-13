@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition;
+package com.casefabric.cmmn.definition;
 
-import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItemType;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.processtask.definition.ProcessDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
+import com.casefabric.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
+import com.casefabric.cmmn.definition.team.CaseRoleDefinition;
+import com.casefabric.cmmn.instance.Case;
+import com.casefabric.cmmn.instance.PlanItemType;
+import com.casefabric.cmmn.instance.Stage;
+import com.casefabric.cmmn.instance.task.humantask.HumanTask;
+import com.casefabric.processtask.definition.ProcessDefinition;
 import org.w3c.dom.Element;
 
 public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> {
@@ -58,7 +58,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     }
 
     private WorkflowTaskDefinition parseWorkflowTaskDefinition() {
-        WorkflowTaskDefinition def = parseExtension(CAFIENNE_IMPLEMENTATION, WorkflowTaskDefinition.class);
+        WorkflowTaskDefinition def = parseExtension(CASEFABRIC_IMPLEMENTATION, WorkflowTaskDefinition.class);
         // If we cannot find the extension, we'll create an empty one.
         return def != null ? def : WorkflowTaskDefinition.createEmptyDefinition(this);
     }

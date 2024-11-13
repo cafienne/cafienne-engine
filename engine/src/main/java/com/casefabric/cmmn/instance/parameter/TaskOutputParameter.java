@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.instance.parameter;
+package com.casefabric.cmmn.instance.parameter;
 
-import org.cafienne.cmmn.definition.parameter.BindingOperation;
-import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
-import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.json.Value;
+import com.casefabric.cmmn.definition.parameter.BindingOperation;
+import com.casefabric.cmmn.definition.parameter.BindingRefinementDefinition;
+import com.casefabric.cmmn.definition.parameter.TaskOutputParameterDefinition;
+import com.casefabric.cmmn.instance.Task;
+import com.casefabric.cmmn.instance.TransitionDeniedException;
+import com.casefabric.cmmn.instance.casefile.CaseFileItem;
+import com.casefabric.json.Value;
 
 /**
  * A TaskOutputParameter is created right before a task completes.

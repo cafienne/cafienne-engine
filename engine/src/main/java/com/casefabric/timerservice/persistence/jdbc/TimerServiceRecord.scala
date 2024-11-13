@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence.jdbc
+package com.casefabric.timerservice.persistence.jdbc
 
 import java.time.Instant
 

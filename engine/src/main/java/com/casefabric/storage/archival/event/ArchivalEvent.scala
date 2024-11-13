@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package com.casefabric.storage.archival.event
 
-import org.cafienne.storage.actormodel.message.StorageEvent
+import com.casefabric.storage.actormodel.message.StorageEvent
 
 trait ArchivalEvent extends StorageEvent

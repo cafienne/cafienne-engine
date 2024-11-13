@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.timerservice.persistence.jdbc
+package com.casefabric.timerservice.persistence.jdbc
 
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import com.casefabric.infrastructure.jdbc.CaseFabricJDBCConfig
 
 import java.time.Instant
 
@@ -28,11 +28,11 @@ import java.time.Instant
   * tenant: String,
   * user: String)
   */
-trait TimerServiceTables extends CafienneJDBCConfig {
+trait TimerServiceTables extends CaseFabricJDBCConfig {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TimerServiceTable(tag: Tag) extends CafienneTable[TimerServiceRecord](tag, "timer") {
+  final class TimerServiceTable(tag: Tag) extends CaseFabricTable[TimerServiceRecord](tag, "timer") {
 
     def timerId = idColumn[String]("timer_id", O.PrimaryKey)
 

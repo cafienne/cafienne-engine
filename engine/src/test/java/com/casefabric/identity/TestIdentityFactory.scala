@@ -1,7 +1,7 @@
-package org.cafienne.identity
+package com.casefabric.identity
 
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.querydb.record.{CaseTeamUserRecord, UserRoleRecord}
+import com.casefabric.actormodel.identity.{PlatformUser, TenantUser}
+import com.casefabric.querydb.record.{CaseTeamUserRecord, UserRoleRecord}
 
 object TestIdentityFactory {
 

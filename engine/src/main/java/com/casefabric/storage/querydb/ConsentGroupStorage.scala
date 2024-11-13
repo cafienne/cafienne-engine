@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.querydb
+package com.casefabric.storage.querydb
 
 import org.apache.pekko.Done
 

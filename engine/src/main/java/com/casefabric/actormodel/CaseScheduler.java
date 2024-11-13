@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel;
+package com.casefabric.actormodel;
 
 import org.apache.pekko.actor.Cancellable;
-import org.cafienne.util.Guid;
+import com.casefabric.util.Guid;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.HashMap;

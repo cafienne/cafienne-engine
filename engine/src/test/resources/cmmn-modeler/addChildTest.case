@@ -23,13 +23,13 @@
     <caseRoles/>
     <output id="_uKIcG_outCPs_0" name="out"/>
     <extensionElements mustUnderstand="false">
-        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+        <casefabric:start-case-model xmlns:casefabric="com.casefabric">{
   "schema":{
     "title": "",
     "type": "object",
     "properties":{
     }
   }
-}</cafienne:start-case-model>
+}</casefabric:start-case-model>
     </extensionElements>
 </case>

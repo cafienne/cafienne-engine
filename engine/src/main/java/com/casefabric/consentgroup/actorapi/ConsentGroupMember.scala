@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.consentgroup.actorapi
+package com.casefabric.consentgroup.actorapi
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import com.casefabric.infrastructure.serialization.Fields
+import com.casefabric.json.{CaseFabricJson, Value, ValueMap}
 
 import scala.jdk.CollectionConverters.SetHasAsJava
 
-case class ConsentGroupMember(userId: String, roles: Set[String] = Set(), isOwner: Boolean = false) extends CafienneJson {
+case class ConsentGroupMember(userId: String, roles: Set[String] = Set(), isOwner: Boolean = false) extends CaseFabricJson {
 
   def getRoles: java.util.Set[String] = roles.asJava
 

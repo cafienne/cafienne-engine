@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs.batch
+package com.casefabric.infrastructure.cqrs.batch
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.stream.stage.{GraphStage, GraphStageLogic}
 import org.apache.pekko.stream.{Attributes, FlowShape, Inlet, Outlet}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
+import com.casefabric.actormodel.event.CommitEvent
+import com.casefabric.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
 
 /**
   * Reads model events with a certain tag into batches per persistence id.

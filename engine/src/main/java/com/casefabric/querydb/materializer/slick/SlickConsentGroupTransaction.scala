@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.slick
+package com.casefabric.querydb.materializer.slick
 
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
-import org.cafienne.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
+import com.casefabric.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
+import com.casefabric.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
 
 class SlickConsentGroupTransaction extends SlickQueryDBTransaction with ConsentGroupStorageTransaction {
 

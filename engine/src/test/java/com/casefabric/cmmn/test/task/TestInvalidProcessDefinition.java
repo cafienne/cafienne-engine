@@ -1,7 +1,7 @@
-package org.cafienne.cmmn.test.task;
+package com.casefabric.cmmn.test.task;
 
-import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.test.TestScript;
+import com.casefabric.cmmn.definition.InvalidDefinitionException;
+import com.casefabric.cmmn.test.TestScript;
 import org.junit.Test;
 
 public class TestInvalidProcessDefinition {

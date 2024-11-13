@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.http.anonymous
+package com.casefabric.service.http.anonymous
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
-import org.cafienne.actormodel.exception.SerializedException
-import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
-import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.service.infrastructure.route.CaseServiceRoute
+import com.casefabric.actormodel.exception.SerializedException
+import com.casefabric.actormodel.response.{CommandFailure, EngineChokedFailure}
+import com.casefabric.cmmn.actorapi.command.StartCase
+import com.casefabric.service.infrastructure.route.CaseServiceRoute
 
 import scala.util.{Failure, Success}
 

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.response;
+package com.casefabric.cmmn.actorapi.response;
 
-import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
-import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import com.casefabric.cmmn.actorapi.command.plan.AddDiscretionaryItem;
+import com.casefabric.cmmn.actorapi.command.plan.GetDiscretionaryItems;
+import com.casefabric.infrastructure.serialization.Manifest;
+import com.casefabric.json.ValueMap;
 
 /**
  * Response to a {@link GetDiscretionaryItems} command

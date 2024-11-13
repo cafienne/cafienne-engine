@@ -1,6 +1,6 @@
-package org.cafienne.querydb.lastmodified
+package com.casefabric.querydb.lastmodified
 
-import org.cafienne.querydb.materializer.cases.CaseReader
+import com.casefabric.querydb.materializer.cases.CaseReader
 
 case class CaseLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
   override val name: String = Headers.CASE_LAST_MODIFIED

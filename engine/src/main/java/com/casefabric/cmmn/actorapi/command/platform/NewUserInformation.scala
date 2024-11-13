@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.command.platform
+package com.casefabric.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import com.casefabric.actormodel.identity.TenantUser
+import com.casefabric.json.{CaseFabricJson, Value, ValueList, ValueMap}
 
 import java.util
 
-case class NewUserInformation(existingUserId: String, newUserId: String) extends CafienneJson{
+case class NewUserInformation(existingUserId: String, newUserId: String) extends CaseFabricJson{
   override def toValue: Value[_] = new ValueMap("existingUserId", existingUserId, "newUserId", newUserId)
 
   def copyTo(tenantUser: TenantUser): TenantUser = tenantUser.copy(id = newUserId)

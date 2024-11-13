@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.schema.versions
+package com.casefabric.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.querydb.schema.QueryDBSchema
-import org.cafienne.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
+import com.casefabric.infrastructure.jdbc.cqrs.OffsetStoreTables
+import com.casefabric.infrastructure.jdbc.schema.DbSchemaVersion
+import com.casefabric.querydb.schema.QueryDBSchema
+import com.casefabric.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
 import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration
 
-trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables with CafienneTablesV2 {
+trait CaseFabricTablesV1 extends QueryDBSchema with CaseTables with TenantTables with CaseFabricTablesV2 {
 
   import dbConfig.profile.api._
 
@@ -63,7 +63,7 @@ trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables w
 
 object QueryDB_1_0_0 extends DbSchemaVersion with QueryDBSchema
   with TaskTables
-  with CafienneTablesV1
+  with CaseFabricTablesV1
   with TenantTables
   with OffsetStoreTables {
   val version = "1.0.0"
