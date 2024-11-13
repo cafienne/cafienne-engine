@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.infrastructure.authentication
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
-
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+class AuthenticationException(msg: String) extends RuntimeException(msg) {
+  def this(msg: String, cause: Throwable) = {
+    this(msg)
+    initCause(cause)
+  }
 }

@@ -15,10 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.actormodel.identity
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import org.cafienne.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.querydb.record.TenantRecord
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+import scala.concurrent.Future
+
+trait IdentityProvider {
+  def getTenant(tenant: String): Future[TenantRecord] = ???
+
+  def getPlatformUser(user: UserIdentity, tlm: LastModifiedHeader): Future[PlatformUser] = ???
+
+  def clear(userId: String): Unit = ???
 }

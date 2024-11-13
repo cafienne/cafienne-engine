@@ -19,8 +19,8 @@ package org.cafienne.system
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
+import org.cafienne.actormodel.identity.IdentityCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.http.authentication.IdentityCache
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
 import org.cafienne.timerservice.TimerService

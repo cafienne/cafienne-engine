@@ -15,10 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.http.anonymous
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.system.CaseSystem
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+import jakarta.ws.rs._
+import org.cafienne.service.infrastructure.route.CaseServiceRoute
+
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
+@Path("/request")
+class AnonymousRequestRoutes(override val caseSystem: CaseSystem) extends CaseServiceRoute {
+
+  override val prefix: String = "request"
+
+  addSubRoute(new CaseRequestRoute(caseSystem))
 }

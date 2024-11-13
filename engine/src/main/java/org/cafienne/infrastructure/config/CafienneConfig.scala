@@ -19,7 +19,7 @@ package org.cafienne.infrastructure.config
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.config.api.{ApiConfig, OIDCConfig}
+import org.cafienne.infrastructure.config.api.ApiConfig
 import org.cafienne.infrastructure.config.engine.EngineConfig
 import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
@@ -73,11 +73,6 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     * Returns configuration options for the HTTP APIs
     */
   lazy val api: ApiConfig = new ApiConfig(this)
-
-  /**
-    * Returns the Open ID Connect configuration settings of this Case System
-    */
-  lazy val OIDC: OIDCConfig = api.security.oidc
 
   /**
     * Returns configuration options for reading and writing case definitions

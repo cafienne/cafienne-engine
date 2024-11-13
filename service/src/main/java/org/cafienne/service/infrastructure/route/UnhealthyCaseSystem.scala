@@ -15,10 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.infrastructure.route
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
-
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
-}
+class UnhealthyCaseSystem(msg:String) extends Exception(msg)

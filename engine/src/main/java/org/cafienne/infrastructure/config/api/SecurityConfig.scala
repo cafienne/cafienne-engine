@@ -22,8 +22,6 @@ import org.cafienne.infrastructure.config.util.MandatoryConfig
 class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
   def path = "security"
 
-  lazy val oidc = new OIDCConfig(this)
-
   lazy val identityCacheSize: Int = {
     val key = "identity.cache.size"
     val size = readInt(key, 1000)

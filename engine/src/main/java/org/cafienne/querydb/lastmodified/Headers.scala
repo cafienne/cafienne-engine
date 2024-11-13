@@ -15,10 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.querydb.lastmodified
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+object Headers {
+  final val CASE_LAST_MODIFIED = "Case-Last-Modified"
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+  final val TENANT_LAST_MODIFIED = "Tenant-Last-Modified"
+
+  final val CONSENT_GROUP_LAST_MODIFIED = "Consent-Group-Last-Modified"
 }
+
+
+
+
+
+
+
+
+
+

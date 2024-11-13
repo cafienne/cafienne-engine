@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel.identity
 
-import org.cafienne.authentication.AuthenticatedUser
+
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.{DeserializationError, Fields}
@@ -58,8 +58,8 @@ trait UserIdentity extends CafienneJson {
 object UserIdentity {
   private val tokens = new SimpleLRUCache[String, String](Cafienne.config.api.security.tokenCacheSize)
 
-  def cacheUserToken(user: AuthenticatedUser): Unit = {
-    tokens.put(user.id, user.token)
+  def cacheUserToken(userId: String, token: String): Unit = {
+    tokens.put(userId, token)
   }
 
   def deserialize(json: ValueMap): UserIdentity = {
