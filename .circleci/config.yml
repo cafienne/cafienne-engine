@@ -80,7 +80,7 @@ commands:
           name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
-            git clone https://$GIT_USER:$GIT_TOKEN@github.com/casefabric/cmmn-test-framework.git
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
             cd ./cmmn-test-framework
             echo "Trying to checkout corresponding test branch" 
             echo
