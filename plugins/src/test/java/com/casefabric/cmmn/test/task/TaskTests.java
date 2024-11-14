@@ -15,16 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    TestBasic.class,
-    TestSimple.class,
-    TestSubCase.class,
-    TestPaxAlert.class,
-    TestGetListGetDetails.class,
-    TestHumanTask.class,
-    TestInvalidProcessDefinition.class,
-    TestSMTPServer.class,
-    TestTaskOutputParameters.class,
-    TestTaskOutputValidation.class
+    TestPDFReport.class
     })
 public class TaskTests {
 

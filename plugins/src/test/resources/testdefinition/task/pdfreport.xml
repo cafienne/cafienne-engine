@@ -1,0 +1,97 @@
+<definitions>
+	<caseFileItemDefinition
+		definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified"
+		name="Request">
+		<property name="jsonData"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="customerJrXml"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="orderJrXml"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="pdfReportData"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+	</caseFileItemDefinition>
+	<caseFileItemDefinition name="String" />
+	<case description="pdfreport" id="pdfreport.case_pdfreport" name="pdfreport">
+		<caseFileModel>
+			<caseFileItem definitionRef="Request" id="cfi_csIJ7_0"
+				multiplicity="ExactlyOne" name="Request">
+				<children>
+					<caseFileItem id="cfi_csIJ7_1" name="pdfReportData" multiplicity="ExactlyOne" definitionRef="String" />
+				</children>
+			</caseFileItem>
+		</caseFileModel>
+		<casePlanModel autocomplete="true"
+			id="cm_pdfreport.case_pdfreport_0" name="pdfreport">
+			<planItem definitionRef="pid_cm_csIJ7_4" id="cm_csIJ7_4"
+				name="Generate Report" />
+			<processTask id="pid_cm_csIJ7_4" isBlocking="true"
+				name="Generate Report" processRef="pdfreport">
+				<inputs bindingRef="cfi_csIJ7_0" id="inTP_cm_csk9m_4_7" name="request" />
+				<outputs bindingRef="cfi_csIJ7_1" id="inTP_cm_csk9m_4_12" name="request2" />
+				<parameterMapping id="inPM_cm_csk9m_4_8" sourceRef="inTP_cm_csk9m_4_7"
+					targetRef="customerData">
+					<transformation language="spel">
+						<body>
+							request.jsonData
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_9" sourceRef="inTP_cm_csk9m_4_7"
+					targetRef="customerJrXml">
+					<transformation language="spel">
+						<body>
+							request.customerJrXml
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_11" sourceRef="inTP_cm_csk9m_4_7"
+					targetRef="orderJrXml">
+					<transformation language="spel">
+						<body>
+							request.orderJrXml
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_10"
+					sourceRef="pdfReportData" targetRef="inTP_cm_csk9m_4_12">
+					<transformation language="spel">
+						<body>
+							pdfReportData
+						</body>
+					</transformation>
+				</parameterMapping>
+			</processTask>
+		</casePlanModel>
+		<input bindingRef="cfi_csIJ7_0" id="csIJ7_inCPs_0" name="Request" />
+	</case>
+	<process id="pdfreport"
+		implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified"
+		name="pdfreport">
+		<input id="customerData" name="customerData" />
+		<input id="customerJrXml" name="customerJrXml" />
+		<input id="orderJrXml" name="orderJrXml" />
+		<output id="pdfReportData" name="pdfReportData" />
+		<extensionElements>
+			<casefabric:implementation
+				class="com.casefabric.processtask.implementation.report.PDFReportDefinition"
+				xmlns:casefabric="com.casefabric">
+				<reportXml name="customerJrXml" />
+				<subReportXml name="orderJrXml" parameterName="ORDER_REPORT" />
+				<reportData name="customerData" />
+				<parameterMapping sourceRef="pdfReportData" targetRef="pdfReportData" />
+			</casefabric:implementation>
+		</extensionElements>
+	</process>
+	<CMMNDI>
+		<CMMNDiagram>
+			<CMMNShape cmmnElementRef="cm_pdfreport.case_pdfreport_0"
+				name="pdfreport">
+				<Bounds height="264" width="324" x="33" y="10" />
+			</CMMNShape>
+			<CMMNShape cmmnElementRef="cm_csIJ7_4" name="Generate Report">
+				<Bounds height="60" width="100" x="78" y="55" />
+			</CMMNShape>
+		</CMMNDiagram>
+	</CMMNDI>
+</definitions>

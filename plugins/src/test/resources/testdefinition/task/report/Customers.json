@@ -1,0 +1,99 @@
+{"Northwind": {
+  "Customers": [
+    {
+      "Phone": "(5) 555-4729",
+      "PostalCode": 5021,
+      "ContactName": "Ana Trujillo",
+      "Fax": "(5) 555-3745",
+      "Address": "Avda. de la Constitución 2222",
+      "CustomerID": "ANATR",
+      "CompanyName": "Ana Trujillo Emparedados y helados",
+      "Country": "Mexico",
+      "City": "México D.F.",
+      "ContactTitle": "Owner"
+    },
+    {
+      "Phone": "(5) 555-3932",
+      "PostalCode": 5023,
+      "ContactName": "Antonio Moreno",
+      "Address": "Mataderos  2312",
+      "CustomerID": "ANTON",
+      "CompanyName": "Antonio Moreno Taquería",
+      "Country": "Mexico",
+      "City": "México D.F.",
+      "ContactTitle": "Owner"
+    },
+    {
+      "Phone": "(171) 555-7788",
+      "PostalCode": "WA1 1DP",
+      "ContactName": "Thomas Hardy",
+      "Fax": "(171) 555-6750",
+      "Address": "120 Hanover Sq.",
+      "CustomerID": "AROUT",
+      "CompanyName": "Around the Horn",
+      "Country": "UK",
+      "City": "London",
+      "ContactTitle": "Sales Representative"
+    },
+    {
+      "Phone": "0921-12 34 65",
+      "PostalCode": "S-958 22",
+      "ContactName": "Christina Berglund",
+      "Fax": "0921-12 34 67",
+      "Address": "Berguvsvägen  8",
+      "CustomerID": "BERGS",
+      "CompanyName": "Berglunds snabbköp",
+      "Country": "Sweden",
+      "City": "Luleå",
+      "ContactTitle": "Order Administrator"
+    },
+    {
+      "Phone": "0621-08460",
+      "PostalCode": 68306,
+      "ContactName": "Hanna Moos",
+      "Fax": "0621-08924",
+      "Address": "Forsterstr. 57",
+      "CustomerID": "BLAUS",
+      "CompanyName": "Blauer See Delikatessen",
+      "Country": "Germany",
+      "City": "Mannheim",
+      "ContactTitle": "Sales Representative"
+    },
+    {
+      "Phone": "88.60.15.31",
+      "PostalCode": 67000,
+      "ContactName": "Frédérique Citeaux",
+      "Fax": "88.60.15.32",
+      "Address": "24, place Kléber",
+      "CustomerID": "BLONP",
+      "CompanyName": "Blondesddsl père et fils",
+      "Country": "France",
+      "City": "Strasbourg",
+      "ContactTitle": "Marketing Manager"
+    },
+    {
+      "Phone": "(91) 555 22 82",
+      "PostalCode": 28023,
+      "ContactName": "Martín Sommer",
+      "Fax": "(91) 555 91 99",
+      "Address": "C/ Araquil, 67",
+      "CustomerID": "BOLID",
+      "CompanyName": "Bólido Comidas preparadas",
+      "Country": "Spain",
+      "City": "Madrid",
+      "ContactTitle": "Owner"
+    },
+    {
+      "Phone": "91.24.45.40",
+      "PostalCode": 13008,
+      "ContactName": "Laurence Lebihan",
+      "Fax": "91.24.45.41",
+      "Address": "12, rue des Bouchers",
+      "CustomerID": "BONAP",
+      "CompanyName": "Bon app'",
+      "Country": "France",
+      "City": "Marseille",
+      "ContactTitle": "Owner"
+    }
+  ]
+}}
