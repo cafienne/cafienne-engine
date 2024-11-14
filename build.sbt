@@ -121,7 +121,7 @@ val plugins = (project in file("plugins"))
   .settings(basicSettings: _*)
   .settings(
     name := "case-plugins",
-    publishArtifact := false,
+    publishArtifact := true,
     publish / skip := true,
     libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps)
 
