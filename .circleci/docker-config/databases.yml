@@ -49,7 +49,7 @@ services:
       
       sleep infinity;"
     volumes:
-    - /home/circleci/cafienne-engine/.circleci/docker-config/mssql-init.sql:/tmp/mssql-init.sql
+    - /home/circleci/casefabric-engine/.circleci/docker-config/mssql-init.sql:/tmp/mssql-init.sql
 
   postgres-empty-event-db:
     image: postgres:12.1-alpine

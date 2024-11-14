@@ -17,8 +17,8 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/casefabric/journal
-      - /home/circleci/cafienne-engine/.circleci/run/cafienne/archive:/opt/casefabric/archive
-      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/casefabric/definitions
-      - /home/circleci/cafienne-engine/.circleci/src/cassandra-conf:/opt/casefabric/conf
-      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/casefabric/bootstrap
+      - /home/circleci/casefabric-engine/.circleci/run/cafienne/journal:/opt/casefabric/journal
+      - /home/circleci/casefabric-engine/.circleci/run/cafienne/archive:/opt/casefabric/archive
+      - /home/circleci/ccasefabric-engine/.circleci/target/definitions:/opt/casefabric/definitions
+      - /home/circleci/casefabric-engine/.circleci/src/cassandra-conf:/opt/casefabric/conf
+      - /home/circleci/casefabric-engine/.circleci/src/bootstrap:/opt/casefabric/bootstrap
