@@ -3,7 +3,7 @@ orbs:
   sonarcloud: sonarsource/sonarcloud@2.0.0
 jobs:
   branch-build:
-    working_directory: ~/cafienne-engine
+    working_directory: ~/casefabric-engine
     machine:
       image: ubuntu-2204:2023.04.2
     resource_class: large
@@ -17,7 +17,7 @@ jobs:
       - show-engine-logs-on-fail
 
   main-build:
-    working_directory: ~/cafienne-engine
+    working_directory: ~/casefabric-engine
     machine:
       image: ubuntu-2204:2023.04.2
     resource_class: large
@@ -41,14 +41,14 @@ jobs:
             then
               docker buildx create --use --name multi-arch-builder
               sbt docker:stage
-              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest ./target/docker/stage
+              docker buildx build --platform=linux/arm64,linux/amd64 --push -t casefabric/engine:latest ./target/docker/stage
             else
               echo "Not pushing image to docker hub"
             fi
 
   
   release-build:
-    working_directory: ~/cafienne-engine
+    working_directory: ~/casefabric-engine
     machine:
       image: ubuntu-2204:2023.04.2
     resource_class: large
@@ -70,7 +70,7 @@ jobs:
             docker buildx create --use --name multi-arch-builder
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             sbt docker:stage
-            docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$CIRCLE_TAG ./target/docker/stage
+            docker buildx build --platform=linux/arm64,linux/amd64 --push -t casefabric/engine:latest -t casefabric/engine:$CIRCLE_TAG ./target/docker/stage
 
 commands:
   build-preparation:
@@ -80,7 +80,7 @@ commands:
           name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
-            git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/casefabric/cmmn-test-framework.git
             cd ./cmmn-test-framework
             echo "Trying to checkout corresponding test branch" 
             echo
@@ -126,7 +126,7 @@ commands:
     steps:
       # Build the image to test
       - run:
-          name: Build and publish local docker image 'cafienne/engine:latest'
+          name: Build and publish local docker image 'casefabric/engine:latest'
           command: sbt docker:publishLocal
 
   docker-login:
@@ -168,13 +168,13 @@ commands:
     - run:
         name: Start CaseFabric Engine for anonymous start case testing
         command: |
-          docker-compose -f .circleci/docker-config/engine-with-anonymous-configuration.yml up -d cafienne
+          docker-compose -f .circleci/docker-config/engine-with-anonymous-configuration.yml up -d casefabric
           sleep 10
     - run:
         name: Docker logs of engine before running test
         command: |
           sudo chmod -R 777 ./
-          docker logs cafienne
+          docker logs casefabric
     - run:
         name: Test StartCase anonymously
         command: |
@@ -193,22 +193,22 @@ commands:
           npm run test TestNoFaultBubbling
     - run:
         name: Docker logs of engine after the test
-        command: docker logs cafienne
+        command: docker logs casefabric
     - run:
         name: Stop and remove the CaseFabric container
-        command: docker rm -f cafienne
+        command: docker rm -f casefabric
 
     # Starting docker environment for testing start case with inline definitions
     - run:
         name: Start CaseFabric Engine for testing start case with inline definitions
         command: |
-          docker-compose -f .circleci/docker-config/engine-with-startcase-with-definition-configuration.yml up -d cafienne
+          docker-compose -f .circleci/docker-config/engine-with-startcase-with-definition-configuration.yml up -d casefabric
           sleep 10
     - run:
         name: Docker logs of engine before running test
         command: |
           sudo chmod -R 777 ./
-          docker logs cafienne
+          docker logs casefabric
     - run:
         name: Test StartCase With Inline Definition
         command: |
@@ -217,22 +217,22 @@ commands:
           npm run test PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
     - run:
         name: Docker logs of engine after the test
-        command: docker logs cafienne
+        command: docker logs casefabric
     - run:
         name: Stop and remove the CaseFabric container
-        command: docker rm -f cafienne
+        command: docker rm -f casefabric
 
     # Starting docker environment for in-memory testing
     - run:
         name: Start CaseFabric Engine for in-memory testing
         command: |
-          docker-compose -f .circleci/docker-config/engine-with-inmemory-db.yml up -d cafienne
+          docker-compose -f .circleci/docker-config/engine-with-inmemory-db.yml up -d casefabric
           sleep 10
     - run:
         name: Docker logs of engine before running test
         command: |
           sudo chmod -R 777 ./
-          docker logs cafienne
+          docker logs casefabric
     - run:
         name: Test engine against framework
         command: |
@@ -247,10 +247,10 @@ commands:
           npm run test storage
     - run:
         name: Docker logs of engine after the test
-        command: docker logs cafienne
+        command: docker logs casefabric
     - run:
         name: Stop and remove the CaseFabric container
-        command: docker rm -f cafienne
+        command: docker rm -f casefabric
 
   run-jdbc-tests:
     steps:
@@ -258,7 +258,7 @@ commands:
       - run:
           name: Start CaseFabric Engine for MS SQL Server testing
           command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-sqlserver-empty.yml up -d cafienne
+            sudo docker-compose -f .circleci/docker-config/engine-with-sqlserver-empty.yml up -d casefabric
             sleep 10
       - run:
           name: Docker logs of database
@@ -266,7 +266,7 @@ commands:
             docker logs empty-sql-server
       - run:
           name: Docker logs of engine before starting test
-          command: docker logs cafienne
+          command: docker logs casefabric
       - run:
           name: Test engine against framework
           command: |
@@ -281,12 +281,12 @@ commands:
             npm run test storage
       - run:
           name: Docker logs of engine after the test
-          command: docker logs cafienne
+          command: docker logs casefabric
       # Stop engine, but also the sql server "without events" instance, and start the one "with events" for later usage
       - run:
           name: Stop and remove the CaseFabric container, and also MS SQL Server container
           command: |
-            docker rm -f cafienne empty-sql-server
+            docker rm -f casefabric empty-sql-server
             sleep 3
             docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
 
@@ -294,7 +294,7 @@ commands:
       - run:
           name: Start CaseFabric Engine for PostgreSQL testing
           command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-postgres-empty.yml up -d cafienne
+            sudo docker-compose -f .circleci/docker-config/engine-with-postgres-empty.yml up -d casefabric
             sleep 10
       - run:
           name: Docker logs of database
@@ -309,7 +309,7 @@ commands:
             docker logs postgres-empty-query-db
       - run:
           name: Docker logs of engine before starting test
-          command: docker logs cafienne
+          command: docker logs casefabric
       - run:
           name: Test engine against framework
           command: |
@@ -324,10 +324,10 @@ commands:
             npm run test storage
       - run:
           name: Docker logs of engine after the test
-          command: docker logs cafienne
+          command: docker logs casefabric
       - run:
           name: Stop and remove the CaseFabric container
-          command: docker rm -f cafienne
+          command: docker rm -f casefabric
 
   run-cassandra-tests:
     steps:
@@ -335,7 +335,7 @@ commands:
       - run:
           name: Start CaseFabric Engine for Cassandra testing
           command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-cassandra.yml up -d cafienne
+            sudo docker-compose -f .circleci/docker-config/engine-with-cassandra.yml up -d casefabric
             sleep 10
       - run:
           name: Docker logs of database
@@ -350,7 +350,7 @@ commands:
             docker logs postgres-for-cassandra
       - run:
           name: Docker logs of engine before starting test
-          command: docker logs cafienne
+          command: docker logs casefabric
       - run:
           name: Test engine against framework
           command: |
@@ -360,15 +360,15 @@ commands:
       - run:
           name: Stop and remove the CaseFabric container
           command: |
-            docker logs cafienne
-            docker rm -f cafienne
+            docker logs casefabric
+            docker rm -f casefabric
 
   show-engine-logs-on-fail:
     steps:
-      # Always show docker logs. This will give the cafienne engine console info when any of above tests fails.
+      # Always show docker logs. This will give the casefabric engine console info when any of above tests fails.
       - run:
           name: Docker logs of engine after the test
-          command: docker logs cafienne
+          command: docker logs casefabric
           when: on_fail
 
   reset-git-local-changes:
