@@ -48,5 +48,5 @@ trait QueryDBSchema extends CaseFabricJDBCConfig {
 }
 
 object QueryDBSchema extends QueryDBSchema {
-   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseFabric.config.persistence.queryDB.config)
+   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", casefabric.config.persistence.queryDB.config)
 }
