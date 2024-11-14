@@ -46,5 +46,5 @@ public class TestInvalidProcessDefinition {
             throw new AssertionError("Test failed, as the error with text " + expectedErrorText + " was not encountered", e);
         }
     }
-    
+
 }
