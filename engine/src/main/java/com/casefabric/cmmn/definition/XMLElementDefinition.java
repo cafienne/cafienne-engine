@@ -36,7 +36,8 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     private static final Logger logger = LoggerFactory.getLogger(XMLElementDefinition.class);
 
     public static final String EXTENSION_ELEMENTS = "extensionElements";
-    public static final String CASEFABRIC_NAMESPACE = "com.casefabric";
+    //NOTE the namespace for extensions is now referring to cafienne to ensure compatiblity
+    public static final String CASEFABRIC_NAMESPACE = "com.cafienne";
     public static final String CASEFABRIC_IMPLEMENTATION = "implementation";
 
     private final String id;
