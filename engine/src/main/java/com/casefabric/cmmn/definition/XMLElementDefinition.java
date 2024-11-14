@@ -37,7 +37,8 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     public static final String EXTENSION_ELEMENTS = "extensionElements";
     //NOTE the namespace for extensions is now referring to cafienne to ensure compatiblity
-    public static final String CASEFABRIC_NAMESPACE = "com.cafienne";
+    public static final String CASEFABRIC_NAMESPACE = "com.casefabric";
+    public static final String CAFIENNE_NAMESPACE = "org.cafienne";
     public static final String CASEFABRIC_IMPLEMENTATION = "implementation";
 
     private final String id;
@@ -356,7 +357,10 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
         Element implementationElement = XMLHelper.getElementNS(extensionsElement, CASEFABRIC_NAMESPACE, CASEFABRIC_IMPLEMENTATION);
         if (implementationElement == null && presenceRequired) {
-            getModelDefinition().addDefinitionError("A custom " + CASEFABRIC_IMPLEMENTATION + " tag is not found in " + printElement() + "/" + EXTENSION_ELEMENTS + " in " + CASEFABRIC_NAMESPACE + " namespace, but it is required");
+            implementationElement = XMLHelper.getElementNS(extensionsElement, CAFIENNE_NAMESPACE, CASEFABRIC_IMPLEMENTATION);
+            if (implementationElement == null) {
+                getModelDefinition().addDefinitionError("A custom " + CASEFABRIC_IMPLEMENTATION + " tag is not found in " + printElement() + "/" + EXTENSION_ELEMENTS + " in " + CASEFABRIC_NAMESPACE + " namespace, but it is required");
+            }
         }
 
         return implementationElement;
