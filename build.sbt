@@ -115,8 +115,18 @@ val engine = (project in file("engine"))
     libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps)
     //libraryDependencies ++= Dependencies.baseEngineDeps ++ Dependencies.engineTestDeps)
 
-val service = (project in file("service"))
+val plugins = (project in file("plugins"))
   .dependsOn(engine)
+  .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
+  .settings(basicSettings: _*)
+  .settings(
+    name := "case-plugins",
+    publishArtifact := false,
+    publish / skip := true,
+    libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps)
+
+val service = (project in file("service"))
+  .dependsOn(engine, plugins)
    //AutomateHeaderPlugin
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt, JavaAppPackaging, AshScriptPlugin, DockerPlugin, ClasspathJarPlugin)
   .settings(basicSettings: _*)

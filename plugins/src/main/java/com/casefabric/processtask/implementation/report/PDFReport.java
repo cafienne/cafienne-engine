@@ -21,7 +21,6 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
 import com.casefabric.json.StringValue;
 import com.casefabric.json.ValueMap;
-import com.casefabric.processtask.definition.SubProcessDefinition;
 import com.casefabric.processtask.implementation.SubProcess;
 import com.casefabric.processtask.instance.ProcessTaskActor;
 
