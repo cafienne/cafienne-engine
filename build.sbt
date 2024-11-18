@@ -112,8 +112,7 @@ val engine = (project in file("engine"))
   .settings(basicSettings: _*)
   .settings(
     name := "case-engine",
-    libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps)
-    //libraryDependencies ++= Dependencies.baseEngineDeps ++ Dependencies.engineTestDeps)
+    libraryDependencies ++= Dependencies.baseEngineDeps ++ Dependencies.engineTestDeps)
 
 val plugins = (project in file("plugins"))
   .dependsOn(engine)
@@ -123,7 +122,7 @@ val plugins = (project in file("plugins"))
     name := "case-plugins",
     publishArtifact := true,
     publish / skip := true,
-    libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps)
+    libraryDependencies ++= Dependencies.pluginDeps ++ Dependencies.baseEngineDeps ++ Dependencies.engineTestDeps)
 
 val service = (project in file("service"))
   .dependsOn(engine, plugins)
@@ -132,7 +131,7 @@ val service = (project in file("service"))
   .settings(basicSettings: _*)
   .settings(
     name := "case-service",
-    libraryDependencies ++= Dependencies.extendEngineDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps,
+    libraryDependencies ++= Dependencies.pluginDeps ++ Dependencies.serviceDeps ++ Dependencies.serviceTestDeps,
     Compile / mainClass := Some("com.casefabric.service.Main"),
     // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
     packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("com.casefabric.service.Main"),

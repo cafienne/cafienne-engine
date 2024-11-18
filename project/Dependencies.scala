@@ -56,16 +56,18 @@ object Dependencies {
       , "com.h2database"          %  "h2"                                   % "2.2.220"
       , "org.postgresql"          %  "postgresql"                           % "42.5.5"
       , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
+      //persistence cassandra support
+      ,"org.apache.pekko"       %% "pekko-persistence-cassandra"           % "1.0.0"
+      , "com.datastax.oss"        %  "java-driver-core"                     % "4.17.0"
+      , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.17.0"
+      //persistence in memory support
+      , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
     )
 
   //Extended engine deps are bundled with service
-  val extendEngineDeps = Seq(
-      //persistence cassandra support
-      "org.apache.pekko"       %% "pekko-persistence-cassandra"           % "1.0.0"
-      , "com.datastax.oss"        %  "java-driver-core"                     % "4.17.0"
-      , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.17.0"
+  val pluginDeps = Seq(
       // PDF Task support
-      , "net.sf.jasperreports"    %  "jasperreports"                        % jasperVersion
+       "net.sf.jasperreports"    %  "jasperreports"                        % jasperVersion
       , "net.sf.jasperreports"    %  "jasperreports-fonts"                  % jasperVersion
       // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7 because that is what Jasper needs.
       , "com.lowagie"             %  "itext"                                % "2.1.7" // DO NOT CHANGE THIS VALUE
@@ -75,8 +77,7 @@ object Dependencies {
       //, "jakarta.ws.rs"           %  "jakarta.ws.rs-api"                    % "3.1.0" // For mail & calendar support
       , "org.mnode.ical4j"        %  "ical4j"                               % "3.2.3"
       // Persistence support
-      , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
-      , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+      , "org.hsqldb"              %  "hsqldb"                               % "2.7.4"
       // metrics support
     //  ,"io.kamon"                 %% "kamon-pekko"                          % "2.7.3"
     //  ,"io.kamon"                 % "kanela-agent"                          % "1.0.18"
@@ -115,6 +116,7 @@ object Dependencies {
     //, "org.apache.pekko"       %% "pekko-multi-node-testkit"              % pekkoVersion
     , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
     , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
+    , "org.hsqldb"              %  "hsqldb"                               % "2.7.4"
   ).map(dep => dep % Test)
 
   val serviceTestDeps = engineTestDeps ++ Seq(

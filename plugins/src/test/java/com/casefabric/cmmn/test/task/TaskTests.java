@@ -15,7 +15,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    TestPDFReport.class
+    TestPDFReport.class,
+    TestSMTPServer.class
     })
 public class TaskTests {
 

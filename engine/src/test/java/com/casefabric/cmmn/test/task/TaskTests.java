@@ -22,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
     TestGetListGetDetails.class,
     TestHumanTask.class,
     TestInvalidProcessDefinition.class,
-    TestSMTPServer.class,
     TestTaskOutputParameters.class,
     TestTaskOutputValidation.class
     })
