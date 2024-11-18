@@ -38,8 +38,8 @@ class JDBCConfig(val parent: PersistenceConfig, val systemConfig: Config, val jd
 //  println("DB Config: " + jdbcJournalConfig.getConfig(s"$databaseKey.db").root().render(ConfigRenderOptions.concise().setFormatted(true)))
 
   lazy val url: String = dbConfig.getString(s"$databaseKey.db.url")
-  lazy val user: String = dbConfig.getString(s"$databaseKey.db.user")
-  lazy val password: String = dbConfig.getString(s"$databaseKey.db.password")
+  lazy val user: Option[String] = if (dbConfig.hasPath(s"$databaseKey.db.user")) Some(dbConfig.getString(s"$databaseKey.db.user")) else None
+  lazy val password: Option[String] = if (dbConfig.hasPath(s"$databaseKey.db.password")) Some(dbConfig.getString(s"$databaseKey.db.password")) else None
   lazy val profile: String = dbConfig.getString("slick.profile")
 
   lazy val isPostgres: Boolean = profile.contains("Postgres")
