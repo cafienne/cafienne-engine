@@ -23,10 +23,20 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.{DeserializationError, Fields}
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
+import scala.collection.immutable.HashSet
+
 trait UserIdentity extends CafienneJson {
   val id: String
 
-  override def toValue: Value[_] = new ValueMap(Fields.userId, id)
+  val roles: Set[String] = new HashSet()
+
+  override def toValue: Value[_] = {
+    val json = new ValueMap(Fields.userId, id)
+    if (roles.nonEmpty) {
+      json.put(Fields.roles, Value.convert(roles))
+    }
+    json
+  }
 
   def token: String = {
     val token = UserIdentity.tokens.get(id)
