@@ -203,6 +203,8 @@ libraryDependencies ++= Seq(
   , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
   , "org.postgresql"          %  "postgresql"                           % "42.5.5"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
+  , "com.microsoft.azure"     % "msal4j"                                % "1.17.2"
+  , "com.azure"               % "azure-identity"                        % "1.14.2"
 
   // Swagger support
   ,"jakarta.ws.rs" % "jakarta.ws.rs-api" % "4.0.0"
