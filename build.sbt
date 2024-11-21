@@ -127,9 +127,9 @@ val pekkoHttpVersion    = "1.1.0"
 val pekkoVersion        = "1.1.2"
 val pekkoPersistenceVersion = "1.1.2"
 val jacksonVersion     = "2.17.2"
-val enumeratumVersion  = "1.7.4"
-val swaggerVersion     = "2.2.23"
-val slickVersion       = "3.5.1"
+val enumeratumVersion  = "1.7.5"
+val swaggerVersion     = "2.2.26"
+val slickVersion       = "3.5.2"
 val jasperVersion      = "6.20.0"
 
 /**
@@ -144,6 +144,7 @@ libraryDependencies ++= Seq(
   , "org.apache.pekko"       %% "pekko-http-core"                       % pekkoHttpVersion
   , "org.apache.pekko"       %% "pekko-http-xml"                        % pekkoHttpVersion
   , "org.apache.pekko"       %% "pekko-http-jackson"                    % pekkoHttpVersion
+  , "org.apache.pekko"       %% "pekko-http-cors"                       % pekkoHttpVersion
   , "org.apache.pekko"       %% "pekko-persistence"                     % pekkoPersistenceVersion
   , "org.apache.pekko"       %% "pekko-persistence-query"               % pekkoPersistenceVersion
   , "org.apache.pekko"       %% "pekko-persistence-jdbc"                % "1.1.0"
@@ -156,11 +157,10 @@ libraryDependencies ++= Seq(
   , "org.apache.pekko"       %% "pekko-stream"                          % pekkoVersion
   , "com.typesafe"            %  "config"                               % "1.4.3"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.5.6"
-  , "org.apache.commons"      %  "commons-text"                         % "1.11.0" // StrSubstitutor usage inside process tasks
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.5.12"
+  , "org.apache.commons"      %  "commons-text"                         % "1.12.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.2" // Used in StringValue xsd date conversions
-  , "org.apache.pekko"        %% "pekko-http-cors"                       % "1.1.0-M1"
 
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
@@ -173,7 +173,7 @@ libraryDependencies ++= Seq(
   , "org.flywaydb"            %  "flyway-sqlserver"                      % "9.22.3"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
-  , "com.zaxxer"              %  "HikariCP"                              % "5.1.0"
+  , "com.zaxxer"              %  "HikariCP"                              % "6.2.1"
   , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.11.0"
   , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.10.0"
 
@@ -189,7 +189,7 @@ libraryDependencies ++= Seq(
 
   // Mail & Calendar support
   , "com.sun.activation"      %  "jakarta.activation"                   % "2.0.1" // For mail & calendar support
-  , "jakarta.activation"      %  "jakarta.activation-api"               % "2.1.0" // For mail & calendar support
+  , "jakarta.activation"      %  "jakarta.activation-api"               % "2.1.3" // For mail & calendar support
   //, "jakarta.ws.rs"           %  "jakarta.ws.rs-api"                    % "3.1.0" // For mail & calendar support
   , "org.mnode.ical4j"        %  "ical4j"                               % "3.2.3"
 
@@ -198,10 +198,10 @@ libraryDependencies ++= Seq(
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          %  "h2"                                   % "2.2.220"
-  , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
+  , "com.h2database"          %  "h2"                                   % "2.3.232"
+  , "org.hsqldb"              %  "hsqldb"                               % "2.7.4"
   , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
-  , "org.postgresql"          %  "postgresql"                           % "42.5.5"
+  , "org.postgresql"          %  "postgresql"                           % "42.7.4"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
   , "com.microsoft.azure"     % "msal4j"                                % "1.17.2"
   , "com.azure"               % "azure-identity"                        % "1.14.2"
@@ -211,10 +211,10 @@ libraryDependencies ++= Seq(
   , "io.swagger.core.v3"      %  "swagger-core"                         % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
-  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
-  ,"com.github.swagger-akka-http"  %% "swagger-scala-module"            % "2.12.3" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
+  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.14.0" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
+  ,"com.github.swagger-akka-http"  %% "swagger-scala-module"            % "2.13.0" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
   , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
-  ,"org.yaml"                 %"snakeyaml"                              % "2.0"
+  ,"org.yaml"                 %"snakeyaml"                              % "2.3"
   // metrics support
 //  ,"io.kamon"                 %% "kamon-pekko"                          % "2.7.3"
 //  ,"io.kamon"                 % "kanela-agent"                          % "1.0.18"
@@ -224,14 +224,14 @@ libraryDependencies ++= Seq(
   * Add test dependencies
   */
 libraryDependencies ++= Seq(
-  "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.10.3"
+  "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.11.3"
   , "com.novocode"            %  "junit-interface"                      % "0.11"
-  , "org.scalamock"           %% "scalamock"                            % "5.2.0"
+  , "org.scalamock"           %% "scalamock"                            % "6.0.0"
   , "org.scalatest"           %% "scalatest"                            % "3.2.19"
   , "commons-io"              %  "commons-io"                           % "20030203.000550"
   , "org.apache.pekko"       %% "pekko-testkit"                         % pekkoVersion
   , "org.apache.pekko"       %% "pekko-http-testkit"                    % pekkoHttpVersion
   , "org.apache.pekko"       %% "pekko-multi-node-testkit"              % pekkoVersion
   , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
-  , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
+  , "com.github.tomakehurst"  %  "wiremock"                             % "3.0.1"
 ).map(dep => dep % Test)
