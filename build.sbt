@@ -45,7 +45,7 @@ Docker / publish / skip := true
 /**
   * Compiler settings
   */
-scalaVersion := "2.13.11"
+scalaVersion := "2.13.15"
 Compile / doc / sources := List()
 Compile / mainClass := Some("org.cafienne.service.Main")
 // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
