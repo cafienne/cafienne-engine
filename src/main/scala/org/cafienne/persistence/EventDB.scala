@@ -22,11 +22,13 @@ object EventDB extends LazyLogging {
 
     logger.info("Running event database migrations with scripts " + dbScriptsLocation)
 
-    Flyway
-      // First create proper configuration
-      .configure()
-//      .mixed(true)
-      .dataSource(jdbcConfig.url, jdbcConfig.user, jdbcConfig.password)
+    val flyway = Flyway.configure()
+    jdbcConfig.user.fold{
+      flyway.dataSource(jdbcConfig.url, null, null)
+    }{ user =>
+      jdbcConfig.password.fold(flyway.dataSource(jdbcConfig.url, user, ""))(password => flyway.dataSource(jdbcConfig.url, user, password))
+    }
+    flyway
       .locations("classpath:db/events/" + dbScriptsLocation)
       //  Then create an actual connection
       .load()

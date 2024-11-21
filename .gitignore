@@ -24,3 +24,4 @@ target
 /run/**/*log
 
 *.log
+.DS_Store
