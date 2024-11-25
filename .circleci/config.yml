@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 jobs:
   branch-build:
     working_directory: ~/cafienne-engine
@@ -7,6 +9,7 @@ jobs:
     resource_class: large
     steps:
       - build-preparation
+      - sonarcloud/scan
       - docker-login
       - setup-test-infra
       - build-docker-image
@@ -20,6 +23,7 @@ jobs:
     resource_class: large
     steps:
       - build-preparation
+      - sonarcloud/scan
       - docker-login
       - setup-test-infra
       - setup-databases
@@ -86,7 +90,7 @@ commands:
           command: sbt compile
       - run:
           name: Unit tests
-          command: sbt test
+          command: cat /dev/null | sbt coverage test coverageReport
       - run:
           name: Compile CMMN Test Framwork
           command: |
