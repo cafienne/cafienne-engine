@@ -28,7 +28,7 @@ object Cafienne {
   /**
     * Configuration settings of this Cafienne Platform
     */
-  lazy val config = new CafienneConfig
+  lazy val config = CafienneConfig()
 
   /**
     * Returns the BuildInfo as a string (containing JSON)

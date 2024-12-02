@@ -25,12 +25,13 @@ import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.infrastructure.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.querydb.query.exception.CaseSearchFailure
 import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
+import org.cafienne.querydb.schema.QueryDBSchema
 import org.cafienne.service.http.Headers
 
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
+  val caseQueries: CaseQueries = new CaseQueriesImpl(QueryDBSchema._db)
   override val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def caseUser(subRoute: AuthenticatedUser => Route): Route = {

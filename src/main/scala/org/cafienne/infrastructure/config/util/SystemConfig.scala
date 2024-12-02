@@ -42,14 +42,14 @@ object SystemConfig extends ConfigMigrator with LazyLogging {
 
   def getConfig: Config = config
 
-  def load(fileName: String = ""): SystemConfig.type = {
+  def load(fileName: String = "", classLoader: ClassLoader = this.getClass.getClassLoader): SystemConfig.type = {
     if (loaded) {
       println("loading config again?")
     }
     if (fileName.isBlank) {
-      config = ConfigFactory.load().withFallback(config)
+      config = ConfigFactory.load(classLoader).withFallback(config)
     } else {
-      config = ConfigFactory.load(fileName).withFallback(config)
+      config = ConfigFactory.load(classLoader, fileName).withFallback(config)
     }
     loaded = true
     this
