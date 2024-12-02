@@ -32,8 +32,8 @@ import java.time.Instant
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBCConfig with TimerServiceTables {
-  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(Cafienne.config.engine.timerService.store)
+class JDBCTimerStore(config: DatabaseConfig[JdbcProfile]) extends TimerStore with JDBCOffsetStorage with CafienneJDBCConfig with TimerServiceTables {
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = config
 
   import dbConfig.profile.api._
 
