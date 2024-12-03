@@ -75,9 +75,9 @@ class TenantUserProjection(override val batch: TenantEventBatch)(implicit val ex
         other match {
           case _: TenantUserAdded =>
             user.roles.foreach(role => userRolesAdded += UserRoleRecord(userId = user.id, tenant = user.tenant, role_name = role, name = "", "", isOwner = false, enabled = true))
-          case event: TenantUserChanged =>
+          case tucEvent: TenantUserChanged =>
             user.roles.foreach(role => userRolesAdded += UserRoleRecord(userId = user.id, tenant = user.tenant, role_name = role, name = "", "", isOwner = false, enabled = true))
-            event.rolesRemoved.forEach(role => userRolesRemoved += UserRoleRecord(userId = user.id, tenant = user.tenant, role_name = role, name = "", "", isOwner = false, enabled = true))
+            tucEvent.rolesRemoved.forEach(role => userRolesRemoved += UserRoleRecord(userId = user.id, tenant = user.tenant, role_name = role, name = "", "", isOwner = false, enabled = true))
           case _ => // Ignore others (there aren't any)
         }
     }
