@@ -7,14 +7,13 @@
  */
 package com.casefabric.cmmn.test.task;
 
-import com.casefabric.cmmn.test.basic.TestBasic;
-import com.casefabric.cmmn.test.basic.TestSimple;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+    TestInvalidProcessDefinition.class,
     TestPDFReport.class,
     TestSMTPServer.class
     })

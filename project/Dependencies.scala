@@ -9,10 +9,10 @@ object Dependencies {
   val pekkoHttpVersion    = "1.1.0"
   val pekkoVersion        = "1.1.2"
   val pekkoPersistenceVersion = "1.1.2"
-  val jacksonVersion     = "2.17.2"
-  val enumeratumVersion  = "1.7.4"
-  val swaggerVersion     = "2.2.23"
-  val slickVersion       = "3.5.1"
+  val jacksonVersion     = "2.18.2"
+  val enumeratumVersion  = "1.7.5"
+  val swaggerVersion     = "2.2.26"
+  val slickVersion       = "3.5.2"
   val jasperVersion      = "6.20.0"
 
   def pekkoModule(name: String, version: String = pekkoVersion) =
@@ -34,8 +34,8 @@ object Dependencies {
       ,pekkoModule("slf4j")
       , "com.typesafe"            %  "config"                               % "1.4.3"
       , "com.typesafe.scala-logging" %% "scala-logging"                     % "3.9.5"
-      , "ch.qos.logback"          %  "logback-classic"                      % "1.5.6"
-      , "org.apache.commons"      %  "commons-text"                         % "1.11.0" // StrSubstitutor usage inside process tasks
+      , "ch.qos.logback"          %  "logback-classic"                      % "1.5.12"
+      , "org.apache.commons"      %  "commons-text"                         % "1.12.0" // StrSubstitutor usage inside process tasks
       , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
       , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.2" // Used in StringValue xsd date conversions
       // DB Schema
@@ -43,18 +43,18 @@ object Dependencies {
       , "org.flywaydb"            %  "flyway-sqlserver"                     % "9.22.3"
       , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
       , "com.typesafe.slick"      %% "slick"                                % slickVersion
-      , "com.zaxxer"              %  "HikariCP"                              % "5.1.0"
+      , "com.zaxxer"              %  "HikariCP"                             % "6.2.1"
       , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.11.0"
       , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.10.0"
-      , "com.fasterxml.jackson.core"   %  "jackson-databind"			    % jacksonVersion
-      , "com.fasterxml.jackson.core"   %  "jackson-core"					% jacksonVersion
+      , "com.fasterxml.jackson.core"   %  "jackson-databind"			          % jacksonVersion
+      , "com.fasterxml.jackson.core"   %  "jackson-core"					          % jacksonVersion
       , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % jacksonVersion
       // Expression support (SPEL and JSONPath)
       , "com.jayway.jsonpath"  	  %  "json-path"                            % "2.6.0" // 2.7.0 is not compatible in expressions
       , "org.springframework"     %  "spring-expression"                    % "5.3.23"
       // Persistence support
-      , "com.h2database"          %  "h2"                                   % "2.2.220"
-      , "org.postgresql"          %  "postgresql"                           % "42.5.5"
+      , "com.h2database"          %  "h2"                                   % "2.3.232"
+      , "org.postgresql"          %  "postgresql"                           % "42.7.4"
       , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
       //persistence cassandra support
       ,"org.apache.pekko"       %% "pekko-persistence-cassandra"           % "1.0.0"
@@ -103,19 +103,21 @@ object Dependencies {
       ,"com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
       ,"com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.40"
       ,"com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
+      ,"com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.47"
+      ,"com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.20.1"
     )
   
   val engineTestDeps = Seq(
-    "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.10.3"
+    "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.11.3"
     , "com.novocode"            %  "junit-interface"                      % "0.11"
-    , "org.scalamock"           %% "scalamock"                            % "5.2.0"
+    , "org.scalamock"           %% "scalamock"                            % "6.0.0"
     , "org.scalatest"           %% "scalatest"                            % "3.2.19"
     , "commons-io"              %  "commons-io"                           % "20030203.000550"
     , "org.apache.pekko"       %% "pekko-testkit"                         % pekkoVersion
       ,"org.apache.pekko"      %% "pekko-persistence-testkit"             % pekkoVersion
     //, "org.apache.pekko"       %% "pekko-multi-node-testkit"              % pekkoVersion
     , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
-    , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
+    , "com.github.tomakehurst"  %  "wiremock"                             % "3.0.1"
     , "org.hsqldb"              %  "hsqldb"                               % "2.7.4"
   ).map(dep => dep % Test)
 

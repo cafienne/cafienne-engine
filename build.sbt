@@ -104,7 +104,7 @@ lazy val engineRoot = (project in file("."))
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
    //AutomateHeaderPlugin
   //.settings(releaseSettings)
-  .aggregate(engine, service)
+  .aggregate(engine, plugins, service)
 
 val engine = (project in file("engine"))
    //AutomateHeaderPlugin
