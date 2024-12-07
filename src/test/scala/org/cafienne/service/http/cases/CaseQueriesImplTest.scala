@@ -24,7 +24,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-  val caseQueries = new CaseQueriesImpl
+  val caseQueries = new CaseQueriesImpl(QueryDBSchema._db)
   val caseUpdater = SlickQueryDB.createCaseTransaction(null)
   val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
 

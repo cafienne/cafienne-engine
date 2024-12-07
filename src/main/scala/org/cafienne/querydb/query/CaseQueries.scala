@@ -25,6 +25,8 @@ import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFa
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
 import org.cafienne.querydb.record._
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 
@@ -58,10 +60,11 @@ trait CaseQueries {
   def getCases(user: UserIdentity, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 }
 
-class CaseQueriesImpl
+class CaseQueriesImpl(databaseConfig: DatabaseConfig[JdbcProfile])
   extends CaseQueries
     with BaseQueryImpl {
 
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = databaseConfig
   import dbConfig.profile.api._
 
   override def getCaseMembership(caseInstanceId: String, user: UserIdentity): Future[CaseMembership] = {
