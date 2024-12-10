@@ -39,11 +39,25 @@ class JDBCConfig(val parent: PersistenceConfig, val systemConfig: Config, val jd
 //  println("DB Config: " + jdbcJournalConfig.getConfig(s"$databaseKey.db").root().render(ConfigRenderOptions.concise().setFormatted(true)))
 
   lazy val url: String = dbConfig.getString(s"$databaseKey.db.url")
-  lazy val user: Option[String] = if (dbConfig.hasPath(s"$databaseKey.db.user")) Some(dbConfig.getString(s"$databaseKey.db.user")) else None
-  lazy val password: Option[String] = if (dbConfig.hasPath(s"$databaseKey.db.password")) Some(dbConfig.getString(s"$databaseKey.db.password")) else None
-  lazy val profile: String = dbConfig.getString("slick.profile")
+  lazy val user: String = {
+    if (dbConfig.hasPath(s"$databaseKey.db.user")) {
+      dbConfig.getString(s"$databaseKey.db.user")
+    } else {
+      null
+    }
+  }
+  lazy val password: String = { // Return null if we have no user, otherwise configured pwd or an empty string
+    if (user == null) {
+      null
+    } else if (dbConfig.hasPath(s"$databaseKey.db.password")) {
+      dbConfig.getString(s"$databaseKey.db.password")
+    } else {
+      ""
+    }
+  }
+  lazy val profile: Profile = Profile.from(dbConfig.getString("slick.profile"))
 
-  lazy val isPostgres: Boolean = profile.contains("Postgres")
-  lazy val isSQLServer: Boolean = profile.contains("SQLServer")
-  lazy val isH2: Boolean = profile.contains("H2")
+  lazy val isPostgres: Boolean = profile.isPostgres;
+  lazy val isSQLServer: Boolean = profile.isSQLServer
+  lazy val isH2: Boolean = profile.isH2
 }
