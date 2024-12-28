@@ -103,18 +103,29 @@ lazy val engineRoot = (project in file("."))
     crossScalaVersions := Nil)
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
 //  .enablePlugins(AutomateHeaderPlugin)
-  .aggregate(engine, service)
+  .aggregate(engine, plugins, service)
 
 val engine = (project in file("engine"))
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
 //  .enablePlugins(AutomateHeaderPlugin)
-  .settings(basicSettings: _*)
+.settings(basicSettings: _*)
   .settings(
     name := "case-engine",
-    libraryDependencies ++= Dependencies.plugins ++ Dependencies.service ++ Dependencies.testService)
+    libraryDependencies ++= Dependencies.engine ++ Dependencies.testEngine)
+
+val plugins = (project in file("plugins"))
+  .dependsOn(engine)
+  .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
+//  .enablePlugins(AutomateHeaderPlugin)
+  .settings(basicSettings: _*)
+  .settings(
+    name := "case-plugins",
+    publishArtifact := true,
+    publish / skip := true,
+    libraryDependencies ++= Dependencies.plugins ++ Dependencies.engine ++ Dependencies.testEngine)
 
 val service = (project in file("service"))
-  .dependsOn(engine)
+  .dependsOn(engine, plugins)
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt, JavaAppPackaging, AshScriptPlugin, DockerPlugin, ClasspathJarPlugin)
 //  .enablePlugins(AutomateHeaderPlugin)
   .settings(basicSettings: _*)
