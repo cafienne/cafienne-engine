@@ -126,7 +126,7 @@ configs(MultiJvm) // Not sure what this adds, actually
 val pekkoHttpVersion    = "1.1.0"
 val pekkoVersion        = "1.1.2"
 val pekkoPersistenceVersion = "1.1.2"
-val jacksonVersion     = "2.17.2"
+val jacksonVersion     = "2.18.2"
 val enumeratumVersion  = "1.7.5"
 val swaggerVersion     = "2.2.26"
 val slickVersion       = "3.5.2"
@@ -165,8 +165,8 @@ libraryDependencies ++= Seq(
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.40"
-  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.47"
+  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.20.1"
 
   // DB Schema
   , "org.flywaydb"            %  "flyway-core"                          % "9.22.3"
