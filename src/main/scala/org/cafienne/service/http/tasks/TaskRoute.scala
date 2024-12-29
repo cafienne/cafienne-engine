@@ -24,12 +24,13 @@ import org.cafienne.humantask.actorapi.command.HumanTaskCommand
 import org.cafienne.infrastructure.http.route.CaseTeamValidator
 import org.cafienne.querydb.query._
 import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.querydb.schema.QueryDBSchema
 import org.cafienne.service.http.cases.CasesRoute
 
 import scala.util.{Failure, Success}
 
 trait TaskRoute extends CasesRoute with CaseTeamValidator {
-  val taskQueries: TaskQueries = new TaskQueriesImpl
+  val taskQueries: TaskQueries = new TaskQueriesImpl(QueryDBSchema._db)
 
   def askTaskWithAssignee(user: UserIdentity, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, user)) {

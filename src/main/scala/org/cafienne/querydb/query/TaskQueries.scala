@@ -23,6 +23,8 @@ import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
 import org.cafienne.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.querydb.record.TaskRecord
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
@@ -47,9 +49,11 @@ trait TaskQueries {
 }
 
 
-class TaskQueriesImpl extends TaskQueries
+class TaskQueriesImpl(databaseConfig: DatabaseConfig[JdbcProfile])
+  extends TaskQueries
   with BaseQueryImpl {
 
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = databaseConfig
   import dbConfig.profile.api._
 
   override def getCaseMembership(taskId: String, user: UserIdentity): Future[CaseMembership] = {
