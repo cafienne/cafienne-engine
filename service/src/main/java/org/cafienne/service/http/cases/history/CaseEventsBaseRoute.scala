@@ -21,7 +21,8 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
-import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
+import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
+import org.cafienne.infrastructure.cqrs.instance.InstanceEventSource
 import org.cafienne.querydb.query.exception.PlanItemSearchFailure
 import org.cafienne.querydb.record.PlanItemHistoryRecord
 import org.cafienne.service.http.cases.CasesRoute

@@ -17,26 +17,27 @@
 
 package org.cafienne.service.http.debug
 
-import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import jakarta.ws.rs.{GET, PATCH, Path, Produces}
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.cqrs.instance.ModelEventsReader
+import org.cafienne.service.infrastructure.route.CommandRoute
 import org.cafienne.system.CaseSystem
 
-import jakarta.ws.rs.{GET, PATCH, Path, Produces}
-import org.cafienne.service.infrastructure.route.CommandRoute
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/debug")
 class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 
-  val modelEventsReader = new ModelEventsReader(caseSystem)
+  private val modelEventsReader = new ModelEventsReader(caseSystem)
 
   // NOTE: although documented with Swagger, this route is not exposed in the public Swagger documentation!
   //  Reason: avoid too easily using this route in development of applications, as that introduces a potential security issue.

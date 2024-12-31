@@ -27,7 +27,6 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.json.Value
 import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.service.http.debug.ModelEventsReader
 import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
@@ -36,8 +35,6 @@ import scala.util.{Failure, Success}
 @Path("/cases")
 class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBaseRoute {
   override def routes: Route = concat(getCaseEvents, getPlanHistory, getPlanItemHistory)
-
-  val modelEventsReader = new ModelEventsReader(caseSystem)
 
   @Path("/{caseInstanceId}/history/events")
   @GET

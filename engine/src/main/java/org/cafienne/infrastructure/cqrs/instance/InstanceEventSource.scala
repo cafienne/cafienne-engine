@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.cqrs
+package org.cafienne.infrastructure.cqrs.instance
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.NotUsed
 import org.apache.pekko.persistence.query.EventEnvelope
 import org.apache.pekko.stream.scaladsl.Source
-import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, ModelEventFilter, ReadJournalProvider}
 
 /**
   * Provides a Source of ModelEvents with the events of a specific persistence id (typically a case or a tenant or a consent group)
@@ -33,13 +34,13 @@ trait InstanceEventSource extends ReadJournalProvider with ModelEventFilter with
     * @param offset
     * @return
     */
-  def query(actorId: String): Source[EventEnvelope, NotUsed] = journal().currentEventsByPersistenceId(actorId, 0L, Long.MaxValue)
+  def query(actorId: String, from: Long, to: Long): Source[EventEnvelope, NotUsed] = journal().currentEventsByPersistenceId(actorId, from, to)
 
   /**
     * Composes the Source
     */
-  def events(actorId: String): Source[ModelEventEnvelope, NotUsed] =
-    query(actorId)
+  def events(actorId: String, from: Long = 0L, to: Long = Long.MaxValue): Source[ModelEventEnvelope, NotUsed] =
+    query(actorId, from, to)
       .filter(validateModelEvents) // Only interested in ModelEvents, but we log errors if it is an unexpected event or deserialization issue
       .map(ModelEventEnvelope) // Construct a simple wrapper that understands we're dealing with ModelEvents
 }
