@@ -74,7 +74,7 @@ object Dependencies {
     , jacksonModule("databind")
     , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % jacksonVersion
     // Expression support (SPEL and JSONPath)
-    , "com.jayway.jsonpath"     %  "json-path"                            % "2.6.0" // 2.7.0 is not compatible in expressions
+    , "com.jayway.jsonpath"     %  "json-path"                            % "2.9.0" // 2.7.0 is not compatible in expressions
     , "org.springframework"     %  "spring-expression"                    % "5.3.23"
   )
 
