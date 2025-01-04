@@ -20,6 +20,8 @@ package org.cafienne.infrastructure.config.util
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * Static helper to load config settings for this JVM
   * Also migrates deprecated property values if found
@@ -28,6 +30,7 @@ object SystemConfig extends ConfigMigrator with LazyLogging {
 
   private var config: Config = ConfigFactory.defaultReference()
   private var loaded: Boolean = false
+  private val initialMigrators = new ListBuffer[ConfigMigrator]()
 
   def migrate(migrators: ConfigMigrator*): SystemConfig.type = {
     if (!loaded) {
@@ -38,6 +41,16 @@ object SystemConfig extends ConfigMigrator with LazyLogging {
       config = migrator.run(config)
     })
     this
+  }
+
+  /**
+   * Option to set migrators before the SystemConfig is loaded
+   */
+  def addMigrators(migrators: ConfigMigrator*): Unit = {
+    if (loaded) {
+      throw new Exception("Config has already been loaded. Cannot add migrators anymore")
+    }
+    migrators.foreach(migrator => initialMigrators += migrator)
   }
 
   def getConfig: Config = config
@@ -51,6 +64,11 @@ object SystemConfig extends ConfigMigrator with LazyLogging {
     } else {
       config = ConfigFactory.load(fileName).withFallback(config)
     }
+    initialMigrators.foreach(migrator => {
+      logger.info("Running ConfigMigrator " + migrator.getClass.getName)
+      config = migrator.run(config)
+    })
+
     loaded = true
     this
   }
