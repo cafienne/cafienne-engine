@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 
 class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
-  val taskQueries = new TaskQueriesImpl
+  val taskQueries = new TaskQueriesImpl(SlickQueryDB.dbConfig)
   val caseUpdater = SlickQueryDB.createCaseTransaction(null)
   val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
 
