@@ -17,14 +17,11 @@
 
 package org.cafienne.querydb.materializer.cases
 
-import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.querydb.record._
-
-import scala.concurrent.Future
 
 trait CaseStorageTransaction extends QueryDBTransaction {
   def upsert(record: CaseRecord): Unit
@@ -61,13 +58,13 @@ trait CaseStorageTransaction extends QueryDBTransaction {
 
   def removeCaseRoles(caseInstanceId: String): Unit
 
-  def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]]
+  def getPlanItem(planItemId: String): Option[PlanItemRecord]
 
-  def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]]
+  def getCaseFile(caseInstanceId: String): Option[CaseFileRecord]
 
-  def getCaseInstance(caseInstanceId: String): Future[Option[CaseRecord]]
+  def getCaseInstance(caseInstanceId: String): Option[CaseRecord]
 
-  def getTask(taskId: String): Future[Option[TaskRecord]]
+  def getTask(taskId: String): Option[TaskRecord]
 
-  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done]
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Unit
 }

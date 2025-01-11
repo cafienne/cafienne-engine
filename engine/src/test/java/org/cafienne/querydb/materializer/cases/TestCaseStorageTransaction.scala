@@ -48,14 +48,14 @@ class TestCaseStorageTransaction(caseInstanceId: String) extends TestQueryDBTran
 
   override def removeCaseRoles(caseInstanceId: String): Unit = {}
 
-  override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = Future.successful(None)
+  override def getPlanItem(planItemId: String): Option[PlanItemRecord] = None
 
-  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
+  override def getCaseFile(caseInstanceId: String): Option[CaseFileRecord] = None
 
-  override def getCaseInstance(id: String): Future[Option[CaseRecord]] = Future.successful(None)
+  override def getCaseInstance(id: String): Option[CaseRecord] = None
 
-  override def getTask(taskId: String): Future[Option[TaskRecord]] = Future.successful(Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
+  override def getTask(taskId: String): Option[TaskRecord] = Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now))
 
-  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
+  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Unit = {}
 
 }

@@ -66,10 +66,8 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     caseUpdater.upsert(planItem2_1)
     caseTeamMemberRecords.foreach(caseUpdater.upsert)
     TestIdentityFactory.asDatabaseRecords(user).foreach(tenantUpdater.upsert)
-    Await.ready({
-      caseUpdater.commit()
-      tenantUpdater.commit()
-    }, 1.seconds)
+    caseUpdater.commit()
+    tenantUpdater.commit()
   }
 
   // *******************************************************************************************************************

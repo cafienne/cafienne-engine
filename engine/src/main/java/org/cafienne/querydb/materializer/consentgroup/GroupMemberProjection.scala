@@ -17,12 +17,10 @@
 
 package org.cafienne.querydb.materializer.consentgroup
 
-import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event._
 import org.cafienne.querydb.record.ConsentGroupMemberRecord
 
-import scala.concurrent.Future
 import scala.jdk.CollectionConverters.SetHasAsScala
 
 class GroupMemberProjection(override val batch: ConsentGroupEventBatch) extends ConsentGroupEventMaterializer with LazyLogging {
@@ -31,7 +29,7 @@ class GroupMemberProjection(override val batch: ConsentGroupEventBatch) extends 
 
   private val removedMembers = scala.collection.mutable.Set[String]()
 
-  def handleMemberEvent(event: ConsentGroupMemberEvent): Future[Done] = {
+  def handleMemberEvent(event: ConsentGroupMemberEvent): Unit = {
 
     event match {
       case event: ConsentGroupMemberAdded =>
@@ -44,7 +42,6 @@ class GroupMemberProjection(override val batch: ConsentGroupEventBatch) extends 
       case event: ConsentGroupMemberRemoved => removedMembers.add(event.member.userId)
       case _ => // Others not known currently
     }
-    Future.successful(Done)
   }
 
   def affectedUserIds: Set[String] = (rolesAdded.map(_.userId) ++ rolesRemoved.map(_.userId) ++ removedMembers).toSet

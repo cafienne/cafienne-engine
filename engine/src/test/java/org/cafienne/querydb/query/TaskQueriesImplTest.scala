@@ -35,7 +35,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     println("Writing cases")
     caseUpdater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
     caseUpdater.upsert(CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
-    Await.ready(caseUpdater.commit(), 2.seconds)
+    caseUpdater.commit()
 
     println("Writing case team members")
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, ""))
@@ -50,7 +50,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, ""))
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "A"))
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "B"))
-    Await.ready(caseUpdater.commit(), 2.seconds)
+    caseUpdater.commit()
 
     println("Writing tasks and tenant users")
     caseUpdater.upsert(TaskRecord("1", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now))
@@ -58,10 +58,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     caseUpdater.upsert(TaskRecord("3", case44, tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now))
     TestIdentityFactory.asDatabaseRecords(Seq(testUser, userWithAandB, userWithBandC)).foreach(user => tenantUpdater.upsert(user))
 
-    Await.ready({
-      caseUpdater.commit()
-      tenantUpdater.commit()
-    }, 1.seconds)
+    caseUpdater.commit()
+    tenantUpdater.commit()
+
   }
 
   "Create a table" should "succeed the second time as well" in {
@@ -152,10 +151,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "update a task" in {
     val current = Await.result(taskQueries.getTask("1", testUser), 3.seconds)
     val freshTask = current.copy(taskState = "Assigned")
-    Await.ready({
-      caseUpdater.upsert(freshTask)
-      caseUpdater.commit()
-    }, 3.seconds)
+    caseUpdater.upsert(freshTask)
+    caseUpdater.commit()
+
     val res = Await.result(taskQueries.getTask("1", testUser), 3.seconds)
     res.id must be("1")
     res.taskState must be("Assigned")

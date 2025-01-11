@@ -17,14 +17,11 @@
 
 package org.cafienne.storage.deletion.state
 
-import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.deletion.ActorDataRemover
 import org.cafienne.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
-
-import scala.concurrent.Future
 
 trait DeletionState extends QueryDBState {
   override val actor: ActorDataRemover
@@ -44,7 +41,7 @@ trait DeletionState extends QueryDBState {
   /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
     * events of this specific ModelActor.
     */
-  def clearQueryData(): Future[Done]
+  def clearQueryData(): Unit
 
   var hasStarted: Boolean = false
 
@@ -55,10 +52,9 @@ trait DeletionState extends QueryDBState {
     }
     hasStarted = true
     // No classic event found, using new storage processing
-    findCascadingChildren().map { children =>
-      printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
-      informOwner(RemovalStarted(metadata, children))
-    }
+    val children = findCascadingChildren()
+    printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
+    informOwner(RemovalStarted(metadata, children))
   }
 
   /** The removal process is idempotent (i.e., it can be triggered multiple times without ado).
@@ -72,7 +68,8 @@ trait DeletionState extends QueryDBState {
     } else {
       if (!queryDataCleared) {
         printLogMessage("Deleting query data")
-        clearQueryData().map(_ => actor.self ! QueryDataRemoved(metadata))
+        clearQueryData()
+        actor.self ! QueryDataRemoved(metadata)
       } else { // Children found and query data cleared
         if (completing) {
           println(s"$metadata: Already completing upon ${events.last.getClass.getSimpleName}")

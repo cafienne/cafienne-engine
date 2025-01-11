@@ -17,11 +17,13 @@
 
 package org.cafienne.querydb.materializer
 
-import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.Done
+import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.infrastructure.cqrs.batch.EventBatchSource
 import org.cafienne.system.health.HealthMonitor
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait QueryDBEventSink extends EventBatchSource[QueryDBEventBatch] with LazyLogging {
@@ -32,7 +34,10 @@ trait QueryDBEventSink extends EventBatchSource[QueryDBEventBatch] with LazyLogg
     */
   def start(): Unit = {
     batches
-      .mapAsync(1)(_.consume()) // Now handle the batch (would be better if that is done through a real Sink, not yet sure how to achieve that - make EventBatch extend Sink???)
+      .mapAsync(1)(batch => {
+        batch.consume()
+        Future.successful(Done)
+      }) // Now handle the batch (would be better if that is done through a real Sink, not yet sure how to achieve that - make EventBatch extend Sink???)
       .runWith(Sink.ignore)
       .onComplete {
         case Success(_) => //

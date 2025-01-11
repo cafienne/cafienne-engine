@@ -25,9 +25,7 @@ import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeam
 import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.querydb.record.{CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
-import scala.concurrent.ExecutionContext
-
-class DeprecatedCaseTeamEventProjection(dBTransaction: CaseStorageTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class DeprecatedCaseTeamEventProjection(dBTransaction: CaseStorageTransaction) extends LazyLogging {
   private val upsertableUsers = scala.collection.mutable.HashMap[(String, String, String), CaseTeamUserRecord]()
   private val deletableUsers = scala.collection.mutable.HashMap[(String, String, String), CaseTeamUserRecord]()
   private val upsertableTenantRoles = scala.collection.mutable.HashMap[(String, String, String, String), CaseTeamTenantRoleRecord]()

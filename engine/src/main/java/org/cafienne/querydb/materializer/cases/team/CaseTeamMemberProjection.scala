@@ -27,9 +27,8 @@ import org.cafienne.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecor
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.ExecutionContext
 
-class CaseTeamMemberProjection(dBTransaction: CaseStorageTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseTeamMemberProjection(dBTransaction: CaseStorageTransaction) extends LazyLogging {
   private val newCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val removedCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val newCaseTeamTenantRoleRoles = ListBuffer[CaseTeamTenantRoleRecord]()

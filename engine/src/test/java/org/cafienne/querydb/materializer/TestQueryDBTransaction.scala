@@ -1,10 +1,8 @@
 package org.cafienne.querydb.materializer
 
-import org.apache.pekko.Done
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
 
 class TestQueryDBTransaction(val persistenceId: String) extends QueryDBTransaction {
 
@@ -19,5 +17,5 @@ class TestQueryDBTransaction(val persistenceId: String) extends QueryDBTransacti
 
   override def upsert(record: OffsetRecord): Unit = addRecord(record)
 
-  override def commit(): Future[Done] = Future.successful(Done)
+  override def commit(): Unit = ()
 }
