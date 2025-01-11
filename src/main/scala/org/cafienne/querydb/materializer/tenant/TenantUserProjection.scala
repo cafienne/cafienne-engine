@@ -17,14 +17,14 @@
 
 package org.cafienne.querydb.materializer.tenant
 
-import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.querydb.record.{UserRoleKey, UserRoleRecord}
 import org.cafienne.tenant.actorapi.event.deprecated._
 import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext}
 
 class TenantUserProjection(override val batch: TenantEventBatch)(implicit val executionContext: ExecutionContext) extends  TenantEventMaterializer with LazyLogging {
   private val deprecatedUserEventRecords = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
@@ -33,40 +33,38 @@ class TenantUserProjection(override val batch: TenantEventBatch)(implicit val ex
   private val userRolesRemoved = scala.collection.mutable.ListBuffer[UserRoleRecord]()
   private val usersRemoved = scala.collection.mutable.Set[TenantUser]()
 
-  def handleDeprecatedUserEvent(event: DeprecatedTenantUserEvent): Future[Done] = {
+  def handleDeprecatedUserEvent(event: DeprecatedTenantUserEvent): Unit = {
     //    println("Clearing user " + event.userId +" from user cache")
     val key = UserRoleKey(event)
-    getUserRoleRecord(key).map(user => {
-      event match {
-        case t: TenantUserCreated => deprecatedUserEventRecords.put(key, user.copy(name = t.name, email = t.email, enabled = true))
-        case t: TenantUserUpdated => deprecatedUserEventRecords.put(key, user.copy(name = t.name, email = t.email, enabled = true))
-        case _: TenantUserRoleAdded => deprecatedUserEventRecords.put(key, user.copy(enabled = true))
-        case _: TenantUserRoleRemoved => deprecatedUserEventRecords.put(key, user.copy(enabled = false))
-        case _: OwnerAdded => deprecatedUserEventRecords.put(key, user.copy(isOwner = true))
-        case _: OwnerRemoved => deprecatedUserEventRecords.put(key, user.copy(isOwner = false))
-        case _: TenantUserDisabled => deprecatedUserEventRecords.put(key, user.copy(enabled = false))
-        case _: TenantUserEnabled => deprecatedUserEventRecords.put(key, user.copy(enabled = true))
-        case _ => // Others not known currently
-      }
-      Done
-    })
+    val user = getUserRoleRecord(key)
+    event match {
+      case t: TenantUserCreated => deprecatedUserEventRecords.put(key, user.copy(name = t.name, email = t.email, enabled = true))
+      case t: TenantUserUpdated => deprecatedUserEventRecords.put(key, user.copy(name = t.name, email = t.email, enabled = true))
+      case _: TenantUserRoleAdded => deprecatedUserEventRecords.put(key, user.copy(enabled = true))
+      case _: TenantUserRoleRemoved => deprecatedUserEventRecords.put(key, user.copy(enabled = false))
+      case _: OwnerAdded => deprecatedUserEventRecords.put(key, user.copy(isOwner = true))
+      case _: OwnerRemoved => deprecatedUserEventRecords.put(key, user.copy(isOwner = false))
+      case _: TenantUserDisabled => deprecatedUserEventRecords.put(key, user.copy(enabled = false))
+      case _: TenantUserEnabled => deprecatedUserEventRecords.put(key, user.copy(enabled = true))
+      case _ => // Others not known currently
+    }
   }
 
-  private def getUserRoleRecord(key: UserRoleKey): Future[UserRoleRecord] = {
+  private def getUserRoleRecord(key: UserRoleKey): UserRoleRecord = {
     deprecatedUserEventRecords.get(key) match {
       case Some(value) =>
         logger.debug(s"Retrieved user_role[$key] from current transaction cache")
-        Future.successful(value)
+        value
       case None =>
         logger.debug(s"Retrieving user_role[$key] from database")
-        dBTransaction.getUserRole(key).map {
+        Await.result(dBTransaction.getUserRole(key), 21.seconds) match {
           case Some(value) => value
           case None => UserRoleRecord(key.userId, key.tenant, key.role_name, "", "", isOwner = false, enabled = true)
         }
     }
   }
 
-  def handleUserEvent(event: TenantMemberEvent): Future[Done] = {
+  def handleUserEvent(event: TenantMemberEvent): Unit = {
     val user = event.member
     event match {
       case _: TenantUserRemoved => usersRemoved += user
@@ -81,7 +79,6 @@ class TenantUserProjection(override val batch: TenantEventBatch)(implicit val ex
           case _ => // Ignore others (there aren't any)
         }
     }
-    Future.successful(Done)
   }
 
   def affectedUserIds: Set[String] = (deprecatedUserEventRecords.values ++ userRolesAdded ++ userRolesRemoved).map(_.userId).toSet ++ usersRemoved.map(_.id)

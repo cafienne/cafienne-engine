@@ -17,7 +17,6 @@
 
 package org.cafienne.querydb.materializer.slick
 
-import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
@@ -27,7 +26,8 @@ import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTa
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext}
 
 class SlickQueryDBTransaction
   extends QueryDBTransaction
@@ -42,19 +42,19 @@ class SlickQueryDBTransaction
 
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
-  val dbStatements: mutable.ListBuffer[DBIO[_]] = ListBuffer[DBIO[_]]()
+  private val dbStatements: mutable.ListBuffer[DBIO[_]] = ListBuffer[DBIO[_]]()
 
   def addStatement(action: dbConfig.profile.api.DBIO[_]): Unit = dbStatements += action
 
   override def upsert(record: OffsetRecord): Unit = addStatement(TableQuery[OffsetStoreTable].insertOrUpdate(record))
 
-  def commit(): Future[Done] = {
+  def commit(): Unit = {
     val transaction = dbStatements.toSeq
     // Clear statement buffer (the "transaction")
     dbStatements.clear()
-
+    //TODO OW sure you want to clear this out before the transaction is comitted ?
     // Run the actions
-    db.run(DBIO.sequence(transaction).transactionally).map { _ => Done }
+    Await.result(db.run(DBIO.sequence(transaction).transactionally), 21.seconds)
   }
 
   def convertUserUpdate(info: Seq[NewUserInformation]): Set[(String, Set[String])] = {

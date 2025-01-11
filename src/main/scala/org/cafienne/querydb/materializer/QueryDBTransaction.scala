@@ -17,14 +17,11 @@
 
 package org.cafienne.querydb.materializer
 
-import org.apache.pekko.Done
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-
-import scala.concurrent.Future
 
 trait QueryDBTransaction {
 
   def upsert(record: OffsetRecord): Unit
 
-  def commit(): Future[Done]
+  def commit(): Unit
 }

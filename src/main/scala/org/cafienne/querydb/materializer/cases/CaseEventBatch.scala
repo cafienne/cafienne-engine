@@ -48,7 +48,7 @@ class CaseEventBatch(val sink: CaseEventSink, override val persistenceId: String
 
   def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(CaseEventSink.offsetName, offset)
 
-  override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
+  override def handleEvent(envelope: ModelEventEnvelope): Unit = {
     logger.whenDebugEnabled(logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " in case " + caseInstanceId))
     envelope.event match {
       case event: CasePlanEvent => casePlanProjection.handleCasePlanEvent(event)
@@ -59,7 +59,7 @@ class CaseEventBatch(val sink: CaseEventSink, override val persistenceId: String
     }
   }
 
-  override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done] = {
+  override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Unit = {
     transactionEvent match {
       case caseModified: CaseModified => commitCaseRecords(envelope, caseModified)
       case event: CaseAppliedPlatformUpdate => updateUserIds(event, envelope)
@@ -69,7 +69,7 @@ class CaseEventBatch(val sink: CaseEventSink, override val persistenceId: String
     }
   }
 
-  private def commitCaseRecords(envelope: ModelEventEnvelope, caseModified: CaseModified): Future[Done] = {
+  private def commitCaseRecords(envelope: ModelEventEnvelope, caseModified: CaseModified): Unit = {
     // Tell the projections to prepare for commit, i.e. let them update the persistence.
     caseProjection.prepareCommit()
     caseTeamProjection.prepareCommit()
@@ -79,7 +79,8 @@ class CaseEventBatch(val sink: CaseEventSink, override val persistenceId: String
     dBTransaction.upsert(createOffsetRecord(envelope.offset))
 
     // Commit and then inform the last modified registration
-    dBTransaction.commit().andThen(_ => CaseReader.lastModifiedRegistration.handle(caseModified))
+    dBTransaction.commit()
+    CaseReader.lastModifiedRegistration.handle(caseModified)
   }
 
   private def updateUserIds(event: CaseAppliedPlatformUpdate, envelope: ModelEventEnvelope): Future[Done] = {

@@ -42,18 +42,18 @@ class TenantEventBatch(val sink: TenantEventSink, override val persistenceId: St
 
   def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(TenantEventSink.offsetName, offset)
 
-  override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
+  override def handleEvent(envelope: ModelEventEnvelope): Unit = {
     logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " on tenant " + tenant)
 
     envelope.event match {
       case p: PlatformEvent => tenantProjection.handlePlatformEvent(p)
       case m: TenantMemberEvent => userProjection.handleUserEvent(m);
       case t: DeprecatedTenantUserEvent => userProjection.handleDeprecatedUserEvent(t)
-      case _ => Future.successful(Done) // Ignore other events
+      case _ => () // Ignore other event
     }
   }
 
-  override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done] = {
+  override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Unit = {
     transactionEvent match {
       case event: TenantModified => commitTenantRecords(envelope, event)
       case event: TenantAppliedPlatformUpdate => updateUserIds(event, envelope.offset)
@@ -63,21 +63,20 @@ class TenantEventBatch(val sink: TenantEventSink, override val persistenceId: St
     }
   }
 
-  private def commitTenantRecords(envelope: ModelEventEnvelope, tenantModified: TenantModified): Future[Done] = {
+  private def commitTenantRecords(envelope: ModelEventEnvelope, tenantModified: TenantModified): Unit = {
     // Tell the projections to prepare for commit, i.e. let them update the persistence.
     tenantProjection.prepareCommit()
     userProjection.prepareCommit()
     // Update the offset of the last event handled in this projection
     dBTransaction.upsert(createOffsetRecord(envelope.offset))
     // Commit and then inform the last modified registration
-    dBTransaction.commit().andThen(_ => {
-      // Clear the user cache for those user ids that have been updated
-      userProjection.affectedUserIds.foreach(sink.caseSystem.userCache.clear)
-      TenantReader.lastModifiedRegistration.handle(tenantModified)
-    })
+    dBTransaction.commit()
+    // Clear the user cache for those user ids that have been updated
+    userProjection.affectedUserIds.foreach(sink.caseSystem.userCache.clear)
+    TenantReader.lastModifiedRegistration.handle(tenantModified)
   }
 
-  private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Future[Done] = {
+  private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Unit = {
     dBTransaction.updateTenantUserInformation(event.tenant, event.newUserInformation.info, createOffsetRecord(offset))
   }
 }

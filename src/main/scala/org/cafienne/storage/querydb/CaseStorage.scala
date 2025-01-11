@@ -17,15 +17,11 @@
 
 package org.cafienne.storage.querydb
 
-import org.apache.pekko.Done
-
-import scala.concurrent.Future
-
 class CaseStorage extends QueryDBStorage {
 
   import dbConfig.profile.api._
 
-  def deleteCase(caseId: String): Future[Done] = {
+  def deleteCase(caseId: String): Unit = {
     addStatement(TableQuery[CaseInstanceDefinitionTable].filter(_.caseInstanceId === caseId).delete)
     addStatement(TableQuery[PlanItemTable].filter(_.caseInstanceId === caseId).delete)
     addStatement(TableQuery[CaseFileTable].filter(_.caseInstanceId === caseId).delete)

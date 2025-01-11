@@ -29,12 +29,12 @@ class CaseTeamProjection(override val batch: CaseEventBatch)(implicit val execut
   private val memberProjection = new CaseTeamMemberProjection(dBTransaction)
   private val deprecatedEventsProjection = new DeprecatedCaseTeamEventProjection(dBTransaction)
 
-  def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
+  def handleCaseTeamEvent(event: CaseTeamEvent): Unit = {
     // We handle 2 types of event: either the old ones (which carried all info in one shot) or the new ones, which are more particular
     event match {
       case event: CaseTeamMemberEvent[_] => memberProjection.handleEvent(event)
       case event: DeprecatedCaseTeamEvent => deprecatedEventsProjection.handleDeprecatedCaseTeamEvent(event)
-      case _ => // Ignore other events
+      case _ => ()// Ignore other events
     }
     Future.successful(Done)
   }

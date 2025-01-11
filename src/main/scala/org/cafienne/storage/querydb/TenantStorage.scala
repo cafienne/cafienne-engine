@@ -17,27 +17,26 @@
 
 package org.cafienne.storage.querydb
 
-import org.apache.pekko.Done
-
-import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.Await
 
 class TenantStorage extends QueryDBStorage {
 
   import dbConfig.profile.api._
 
-  def deleteTenant(tenant: String): Future[Done] = {
+  def deleteTenant(tenant: String): Unit = {
     addStatement(TableQuery[UserRoleTable].filter(_.tenant === tenant).delete)
     addStatement(TableQuery[TenantTable].filter(_.name === tenant).delete)
     commit()
   }
 
-  def readCases(tenant: String): Future[Seq[String]] = {
+  def readCases(tenant: String): Seq[String] = {
     val query = TableQuery[CaseInstanceTable].filter(_.tenant === tenant).filter(_.parentCaseId === "").map(_.id).distinct
-    db.run(query.result)
+    Await.result(db.run(query.result), 21.seconds)
   }
 
-  def readGroups(tenant: String): Future[Seq[String]] = {
+  def readGroups(tenant: String): Seq[String] = {
     val query = TableQuery[ConsentGroupTable].filter(_.tenant === tenant).map(_.id).distinct
-    db.run(query.result)
+    Await.result(db.run(query.result), 21.seconds)
   }
 }

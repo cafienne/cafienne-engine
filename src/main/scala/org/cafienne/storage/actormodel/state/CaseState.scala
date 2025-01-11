@@ -17,18 +17,15 @@
 
 package org.cafienne.storage.actormodel.state
 
-import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
 import org.cafienne.cmmn.instance.PlanItemType
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.CaseStorage
 
-import scala.concurrent.Future
-
 trait CaseState extends QueryDBState {
   override val dbStorage: CaseStorage = new CaseStorage
 
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = {
+  override def findCascadingChildren(): Seq[ActorMetadata] = {
     def taskCreatedFinder(taskType: PlanItemType, finder: String => ActorMetadata): Seq[ActorMetadata] = {
       events
         .filter(_.isInstanceOf[PlanItemCreated])
@@ -44,19 +41,16 @@ trait CaseState extends QueryDBState {
         .filter(_.getPlanItemId == taskId)
         .exists(_.getCurrentState.isActive)
 
-    Future.successful({
-      val cases = taskCreatedFinder(PlanItemType.CaseTask, metadata.caseMember)
-      val processes = taskCreatedFinder(PlanItemType.ProcessTask, metadata.processMember)
-      //      println(s"Found ${cases.length} cases and ${processes.length} processes: ${cases ++ processes}")
-      cases ++ processes
-    })
+
+    val cases = taskCreatedFinder(PlanItemType.CaseTask, metadata.caseMember)
+    val processes = taskCreatedFinder(PlanItemType.ProcessTask, metadata.processMember)
+    //      println(s"Found ${cases.length} cases and ${processes.length} processes: ${cases ++ processes}")
+    cases ++ processes
+
   }
 
-  override def clearQueryData(): Future[Done] = {
+  override def clearQueryData(): Unit = {
 //    println("Clearing case query data for " + metadata.actorId)
-    dbStorage.deleteCase(metadata.actorId).map(x => {
-//      println("Competed deleting qd")
-      x
-    })
+    dbStorage.deleteCase(metadata.actorId)
   }
 }

@@ -17,29 +17,23 @@
 
 package org.cafienne.storage.actormodel.state
 
-import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.TenantStorage
-
-import scala.concurrent.{ExecutionContext, Future}
 
 trait TenantState extends QueryDBState {
   override val dbStorage: TenantStorage = new TenantStorage
 
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = {
+  override def findCascadingChildren(): Seq[ActorMetadata] = {
     printLogMessage("Running tenant query on cases and groups")
-    implicit val dispatcher: ExecutionContext = dbStorage.dispatcher
-    val childActors = for {
-      cases <- dbStorage.readCases(metadata.actorId)
-      groups <- dbStorage.readGroups(metadata.actorId)
-    } yield (cases, groups)
-    childActors.map(children => {
-      val cases = children._1.map(id => metadata.caseMember(id))
-      val groups = children._2.map(id => metadata.groupMember(id))
-      printLogMessage(s"Found ${cases.length} cases and ${groups.length} groups")
-      cases ++ groups
-    })
+
+    val storedCases = dbStorage.readCases(metadata.actorId)
+    val storedGroups = dbStorage.readGroups(metadata.actorId)
+
+    val cases = storedCases.map(id => metadata.caseMember(id))
+    val groups = storedGroups.map(id => metadata.groupMember(id))
+    printLogMessage(s"Found ${cases.length} cases and ${groups.length} groups")
+    cases ++ groups
   }
 
-  override def clearQueryData(): Future[Done] = dbStorage.deleteTenant(actorId)
+  override def clearQueryData(): Unit = dbStorage.deleteTenant(actorId)
 }
