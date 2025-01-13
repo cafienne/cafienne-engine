@@ -10,8 +10,8 @@ object Persistence {
   def initializeDatabaseSchemas(): Unit = {
     SystemConfig.addMigrators(new JournalTableNameConfigMigrator)
     if (Cafienne.config.persistence.initializeDatabaseSchemas) {
-      EventDB.initializeDatabaseSchema()
       QueryDB.initializeDatabaseSchema()
+      EventDB.initializeDatabaseSchema()
     }
   }
 }
