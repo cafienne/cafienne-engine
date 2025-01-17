@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.config.util
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.lang.reflect.InvocationTargetException
@@ -30,6 +30,13 @@ import scala.jdk.CollectionConverters._
   */
 trait ConfigReader extends LazyLogging {
   def config: Config
+
+  /**
+   * Print the config in a concise manner (i.e., what has been actually found in the configuration, instead of also default values)
+   */
+  def printConfig(): Unit = {
+    println(s"""$toString = ${config.root().render(ConfigRenderOptions.concise().setFormatted(true))}""")
+  }
 
   def warn(msg: String): Unit = {
     logger.warn(msg)

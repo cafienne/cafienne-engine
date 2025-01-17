@@ -60,11 +60,6 @@ class CafienneConfig extends ConfigReader with LazyLogging {
   lazy val persistence = new PersistenceConfig(this, systemConfig)
 
   /**
-    * Returns configuration options for the read journal
-    */
-  lazy val readJournal: String = persistence.readJournal
-
-  /**
     * Returns configuration options for Model Actors
     */
   lazy val actor: ModelActorConfig = new ModelActorConfig(this)

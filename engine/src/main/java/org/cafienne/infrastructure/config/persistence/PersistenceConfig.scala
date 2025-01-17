@@ -18,12 +18,14 @@
 package org.cafienne.infrastructure.config.persistence
 
 import com.typesafe.config.Config
+import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.infrastructure.config.persistence.eventdb.EventDBConfig
+import org.cafienne.infrastructure.config.persistence.querydb.QueryDBConfig
 import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.infrastructure.config.{CafienneConfig, QueryDBConfig}
 
 
 class PersistenceConfig(val parent: CafienneConfig, val systemConfig: Config) extends ChildConfigReader {
-  def path = ""
+  def path = "persistence"
 
   lazy val journalKey: String = systemConfig.getString("pekko.persistence.journal.plugin")
 

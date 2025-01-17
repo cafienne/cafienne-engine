@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.persistence
+package org.cafienne.infrastructure.config.persistence.eventdb
 
 import com.typesafe.config.Config
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 
 

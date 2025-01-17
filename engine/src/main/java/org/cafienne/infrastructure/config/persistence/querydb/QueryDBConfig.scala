@@ -15,18 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.persistence.querydb
 
+import com.typesafe.config.Config
 import org.apache.pekko.stream.RestartSettings
 import org.cafienne.infrastructure.config.persistence.PersistenceConfig
-import org.cafienne.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
-
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.FiniteDuration
+import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 
 class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
   def path = "query-db"
+
+  override lazy val config: Config = {
+    if (parent.config.hasPath(path)) {
+      parent.config.getConfig(path)
+    } else {
+      // For compatibility, also try to read from 'cafienne' config itself, if persistence is not available
+      //  Note: this was the default up until version 1.1.33
+      warn("""QueryDB configuration can be put inside the persistence configuration like:
+          |cafienne {
+          |  persistence {
+          |    query-db = {
+          |      ...
+          |    }
+          |  }
+          |}""".stripMargin)
+      parent.parent.config.getConfig(path)
+    }
+  }
+
   override val msg = "Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings"
 
   lazy val restartSettings: RestartSettings = new RestartConfig(this).settings
@@ -36,17 +53,6 @@ class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
     logger.warn(s"Obtaining read-journal settings from 'cafienne.querydb.read-journal' = $foundJournal is deprecated; please place these settings in 'cafienne.read-journal' instead")
     foundJournal
   }
-
 }
 
-class RestartConfig(val parent: QueryDBConfig) extends ChildConfigReader {
-  def path = "restart-stream"
 
-  lazy val minBackoff: FiniteDuration = readDuration("min-back-off", FiniteDuration(500, TimeUnit.MILLISECONDS))
-  lazy val maxBackoff: FiniteDuration = readDuration("max-back-off", FiniteDuration(30, TimeUnit.SECONDS))
-  lazy val randomFactor: Double = readNumber("random-factor", 0.2).doubleValue()
-  lazy val maxRestarts: Int = readInt("max-restarts", 20)
-  lazy val maxRestartsWithin: FiniteDuration = readDuration("max-restarts-within", FiniteDuration(5, TimeUnit.MINUTES))
-
-  lazy val settings: RestartSettings = RestartSettings(minBackoff, maxBackoff, randomFactor).withMaxRestarts(maxRestarts, maxRestartsWithin)
-}
