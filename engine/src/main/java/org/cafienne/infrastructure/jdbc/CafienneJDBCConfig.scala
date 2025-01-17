@@ -42,7 +42,7 @@ trait CafienneJDBCConfig {
 
   import dbConfig.profile.api._
 
-  lazy val isSQLServer = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
+  lazy val isSQLServer: Boolean = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
 
   val prefix: String = Cafienne.config.persistence.tablePrefix
 
@@ -67,7 +67,7 @@ trait CafienneJDBCConfig {
      * @tparam T
      * @return
      */
-    def idColumn[C](columnName: String, options: ColumnOption[String]*) = {
+    def idColumn[C](columnName: String, options: ColumnOption[String]*): Rep[String] = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -142,7 +142,7 @@ trait CafienneJDBCConfig {
      * @tparam T
      * @return
      */
-    def userColumn[C](columnName: String, options: ColumnOption[String]*) = {
+    def userColumn[C](columnName: String, options: ColumnOption[String]*): Rep[String] = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -170,7 +170,7 @@ trait CafienneJDBCConfig {
      * @tparam T
      * @return
      */
-    def stateColumn[C](columnName: String, options: ColumnOption[String]*) = {
+    def stateColumn[C](columnName: String, options: ColumnOption[String]*): Rep[String] = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -198,7 +198,7 @@ trait CafienneJDBCConfig {
      * @tparam T
      * @return
      */
-    def jsonColumn[C](columnName: String, options: ColumnOption[String]*) = {
+    def jsonColumn[C](columnName: String, options: ColumnOption[String]*): Rep[String] = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -226,7 +226,7 @@ trait CafienneJDBCConfig {
    * @tparam T
    */
   abstract class CafienneTenantTable[T](tag: Tag, tableName: String) extends CafienneTable[T](tag, tableName) {
-    def tenant = idColumn[String]("tenant")
+    def tenant: Rep[String] = idColumn[String]("tenant")
   }
 
   implicit class QueryHelper[CT <: CafienneTable[_], E](query: Query[CT, E, Seq]) {

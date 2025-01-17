@@ -24,6 +24,8 @@ import org.cafienne.infrastructure.config.util.ChildConfigReader
 class EventDBConfig(val parent: PersistenceConfig, val systemConfig: Config) extends ChildConfigReader {
   def path = "event-db"
 
+  lazy val schemaHistoryTable: String = readString("schema-history-table", "flyway_schema_history")
+
   lazy val journalKey: String = systemConfig.getString("pekko.persistence.journal.plugin")
 
   /**

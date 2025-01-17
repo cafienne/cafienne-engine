@@ -44,6 +44,8 @@ class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
     }
   }
 
+  lazy val schemaHistoryTable: String = readString("schema-history-table", "flyway_schema_history")
+
   override val msg = "Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings"
 
   lazy val restartSettings: RestartSettings = new RestartConfig(this).settings

@@ -18,6 +18,7 @@
 package org.cafienne.infrastructure.jdbc.schema
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 import org.flywaydb.core.api.output.MigrateResult
 import slick.migration.api.Migration
@@ -37,7 +38,11 @@ trait CafienneDatabaseDefinition extends CafienneJDBCConfig with LazyLogging {
 
   def useSchema(schemas: Seq[DbSchemaVersion]): MigrateResult = {
     try {
-      val flyway = SlickFlyway(db)(schemas.flatMap(schema => schema.getScript)).load()
+      val flywayConfiguration = SlickFlyway(db)(schemas.flatMap(schema => schema.getScript))
+        .table(Cafienne.config.persistence.queryDB.schemaHistoryTable)
+
+      // Create a connection and run migration
+      val flyway = flywayConfiguration.load()
       flyway.migrate()
     } catch {
       case e: Exception => {
