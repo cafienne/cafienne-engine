@@ -31,10 +31,13 @@ class PersistenceConfig(val parent: CafienneConfig, val systemConfig: Config) ex
 
   lazy val initializeDatabaseSchemas: Boolean = readBoolean("initialize-database-schema", default = true)
 
+  lazy val tablePrefix: String = readString("table-prefix", "")
+
   /**
     * Returns configuration options for the QueryDB
     */
   lazy val queryDB: QueryDBConfig = new QueryDBConfig(this)
+
   lazy val eventDB: EventDBConfig = new EventDBConfig(this, systemConfig)
 
   lazy val readJournal: String = findReadJournalSetting()

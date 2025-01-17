@@ -13,7 +13,7 @@ class V1_1_16__CreateAkkaSchema extends ClassicEventDBSchemaScript {
   override def getChecksum: Integer = -2024270051
 
   override def sql: String = {
-    s"""CREATE TABLE event_journal(
+    s"""CREATE TABLE ${Cafienne.config.persistence.tablePrefix}event_journal(
        |    "ordering" BIGINT IDENTITY(1,1) NOT NULL,
        |    "deleted" BIT DEFAULT 0 NOT NULL,
        |    "persistence_id" VARCHAR(255) NOT NULL,
@@ -30,19 +30,19 @@ class V1_1_16__CreateAkkaSchema extends ClassicEventDBSchemaScript {
        |    PRIMARY KEY ("persistence_id", "sequence_number")
        |);
        |
-       |CREATE UNIQUE INDEX event_journal_ordering_idx ON event_journal(ordering);
+       |CREATE UNIQUE INDEX ${Cafienne.config.persistence.tablePrefix}event_journal_ordering_idx ON ${Cafienne.config.persistence.tablePrefix}event_journal(ordering);
        |
-       |CREATE TABLE event_tag (
+       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}event_tag (
        |    "event_id" BIGINT NOT NULL,
        |    "tag" VARCHAR(255) NOT NULL
        |    PRIMARY KEY ("event_id","tag")
        |    constraint "fk_event_journal"
        |        foreign key("event_id")
-       |        references "dbo"."event_journal"("ordering")
+       |        references "dbo"."${Cafienne.config.persistence.tablePrefix}event_journal"("ordering")
        |        on delete CASCADE
        |);
        |
-       |CREATE TABLE "snapshot" (
+       |CREATE TABLE "${Cafienne.config.persistence.tablePrefix}snapshot" (
        |    "persistence_id" VARCHAR(255) NOT NULL,
        |    "sequence_number" NUMERIC(10,0) NOT NULL,
        |    "created" BIGINT NOT NULL,

@@ -17,6 +17,7 @@
 
 package org.cafienne.querydb.schema.versions
 
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
 import org.cafienne.querydb.schema.QueryDBSchema
 import org.cafienne.querydb.schema.table.{CaseTables, TaskTables}
@@ -122,7 +123,7 @@ object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
 
   def addUserRoleOwnerColumn = TableMigration(TableQuery[UserRoleTable]).addColumns(_.isOwner)
 
-  def resetTenantProjection = SqlMigration(s"""DELETE FROM "offset_storage" where "name" = 'TenantProjectionsWriter' """)
+  def resetTenantProjection = SqlMigration(s"""DELETE FROM "${Cafienne.config.persistence.tablePrefix}offset_storage" where "name" = 'TenantProjectionsWriter' """)
 
   def dropTenantOwnersTable = TableMigration(TableQuery[TenantOwnersTable]).drop
 

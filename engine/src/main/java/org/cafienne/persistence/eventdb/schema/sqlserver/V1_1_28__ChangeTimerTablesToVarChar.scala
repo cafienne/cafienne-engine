@@ -14,30 +14,30 @@ class V1_1_28__ChangeTimerTablesToVarChar extends ClassicEventDBSchemaScript {
 
   override def sql: String = {
     s"""
-       |DECLARE @timer_pk_name VARCHAR(255);
-       |(SELECT @timer_pk_name = CONSTRAINT_NAME
+       |DECLARE @${Cafienne.config.persistence.tablePrefix}timer_pk_name VARCHAR(255);
+       |(SELECT @${Cafienne.config.persistence.tablePrefix}timer_pk_name = CONSTRAINT_NAME
        |    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-       |    WHERE TABLE_NAME = 'timer'
+       |    WHERE TABLE_NAME = '${Cafienne.config.persistence.tablePrefix}timer'
        |    AND CONSTRAINT_TYPE = 'PRIMARY KEY');
        |
-       |EXEC('ALTER TABLE [timer] DROP CONSTRAINT ' + @timer_pk_name);
+       |EXEC('ALTER TABLE [${Cafienne.config.persistence.tablePrefix}timer] DROP CONSTRAINT ' + @${Cafienne.config.persistence.tablePrefix}timer_pk_name);
        |
-       |ALTER TABLE [timer] ALTER COLUMN [timer_id] varchar(255) NOT null;
-       |ALTER TABLE [timer] ALTER COLUMN [case_instance_id] varchar(255) NOT null;
-       |ALTER TABLE [timer] ALTER COLUMN [tenant] varchar(255) NOT null;
-       |ALTER TABLE [timer] ALTER COLUMN [user] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}timer] ALTER COLUMN [timer_id] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}timer] ALTER COLUMN [case_instance_id] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}timer] ALTER COLUMN [tenant] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}timer] ALTER COLUMN [user] varchar(255) NOT null;
        |
-       |ALTER TABLE timer ADD PRIMARY KEY (timer_id);
+       |ALTER TABLE ${Cafienne.config.persistence.tablePrefix}timer ADD PRIMARY KEY (timer_id);
        |
        |
        |DECLARE @offset_storage_pk_name NVARCHAR(255);
-       |(SELECT @offset_storage_pk_name = CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'offset_storage' AND CONSTRAINT_TYPE = 'PRIMARY KEY');
-       |EXEC('ALTER TABLE [offset_storage] DROP CONSTRAINT ' + @offset_storage_pk_name);
+       |(SELECT @offset_storage_pk_name = CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '${Cafienne.config.persistence.tablePrefix}offset_storage' AND CONSTRAINT_TYPE = 'PRIMARY KEY');
+       |EXEC('ALTER TABLE [${Cafienne.config.persistence.tablePrefix}offset_storage] DROP CONSTRAINT ' + @offset_storage_pk_name);
        |
-       |ALTER TABLE [offset_storage] ALTER COLUMN [name] varchar(255) NOT null;
-       |ALTER TABLE [offset_storage] ALTER COLUMN [offset-type] varchar(255) NOT null;
-       |ALTER TABLE [offset_storage] ALTER COLUMN [offset-value] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}offset_storage] ALTER COLUMN [name] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}offset_storage] ALTER COLUMN [offset-type] varchar(255) NOT null;
+       |ALTER TABLE [${Cafienne.config.persistence.tablePrefix}offset_storage] ALTER COLUMN [offset-value] varchar(255) NOT null;
        |
-       |ALTER TABLE offset_storage ADD PRIMARY KEY (name);""".stripMargin
+       |ALTER TABLE ${Cafienne.config.persistence.tablePrefix}offset_storage ADD PRIMARY KEY (name);""".stripMargin
   }
 }

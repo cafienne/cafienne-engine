@@ -14,27 +14,27 @@ class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
   override def getChecksum: Integer = 1905604043
 
   override def sql: String = {
-    s"""DROP TABLE IF EXISTS timer;
+    s"""DROP TABLE IF EXISTS ${Cafienne.config.persistence.tablePrefix}timer;
        |
-       |CREATE TABLE timer (
+       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}timer (
        |	"timer_id" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"case_instance_id" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"moment" timestamp without time zone NOT NULL,
        |    "tenant" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"user" character varying COLLATE pg_catalog."default" NOT NULL,
        |
-       |	CONSTRAINT timer_pkey PRIMARY KEY (timer_id)
+       |	CONSTRAINT ${Cafienne.config.persistence.tablePrefix}timer_pkey PRIMARY KEY (timer_id)
        |);
        |
-       |DROP TABLE IF EXISTS offset_storage;
+       |DROP TABLE IF EXISTS ${Cafienne.config.persistence.tablePrefix}offset_storage;
        |
-       |CREATE TABLE offset_storage (
+       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}offset_storage (
        |	"name" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"offset-type" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"offset-value" character varying COLLATE pg_catalog."default" NOT NULL,
        |	"timestamp" timestamp without time zone NOT NULL,
        |
-       |	CONSTRAINT offset_pkey PRIMARY KEY (name)
+       |	CONSTRAINT ${Cafienne.config.persistence.tablePrefix}offset_pkey PRIMARY KEY (name)
        |);""".stripMargin
   }
 }

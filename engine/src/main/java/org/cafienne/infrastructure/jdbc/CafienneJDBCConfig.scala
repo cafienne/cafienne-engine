@@ -17,6 +17,7 @@
 
 package org.cafienne.infrastructure.jdbc
 
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
@@ -42,7 +43,9 @@ trait CafienneJDBCConfig {
   import dbConfig.profile.api._
   lazy val isSQLServer = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
 
-  abstract class CafienneTable[T](tag: Tag, tableName: String) extends Table[T](tag, tableName) {
+  val prefix: String = Cafienne.config.persistence.tablePrefix
+
+  abstract class CafienneTable[T](tag: Tag, name: String) extends Table[T](tag, prefix + name) {
 
     /**
       * If queries on the table use the Sort case class, then the table must implement this method

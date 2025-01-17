@@ -12,7 +12,7 @@ class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
   val description = "AddTimerService"
 
   override def sql: String = {
-    s"""CREATE TABLE IF NOT EXISTS PUBLIC."timer" (
+    s"""CREATE TABLE IF NOT EXISTS PUBLIC."${Cafienne.config.persistence.tablePrefix}timer" (
        |  "timer_id" VARCHAR NOT NULL,
        |  "case_instance_id" VARCHAR NOT NULL,
        |  "moment" TIMESTAMP NOT NULL,
@@ -21,7 +21,7 @@ class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
        |  PRIMARY KEY("timer_id")
        |);
        |
-       |DROP TABLE IF EXISTS PUBLIC."offset_storage";
+       |DROP TABLE IF EXISTS PUBLIC."${Cafienne.config.persistence.tablePrefix}offset_storage";
        |
        |CREATE TABLE PUBLIC."offset_storage" (
        |	"name" VARCHAR NOT NULL,
