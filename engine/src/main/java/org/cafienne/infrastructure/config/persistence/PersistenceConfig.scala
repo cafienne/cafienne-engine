@@ -29,6 +29,8 @@ class PersistenceConfig(val parent: CafienneConfig, val systemConfig: Config) ex
 
   lazy val journalKey: String = systemConfig.getString("pekko.persistence.journal.plugin")
 
+  lazy val initializeDatabaseSchemas: Boolean = readBoolean("initialize-database-schema", default = true)
+
   /**
     * Returns configuration options for the QueryDB
     */
