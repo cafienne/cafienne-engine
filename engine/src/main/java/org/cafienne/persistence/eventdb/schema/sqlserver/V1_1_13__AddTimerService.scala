@@ -13,26 +13,31 @@ class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
 
   override def getChecksum: Integer = 235057769
 
+  val timerTableName = s"${Cafienne.config.persistence.tablePrefix}timer"
+  val offsetTableName = s"${Cafienne.config.persistence.tablePrefix}offset_storage"
+
   override def sql: String = {
-    s"""DROP TABLE IF EXISTS ${Cafienne.config.persistence.tablePrefix}timer;
-       |
-       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}timer (
+    s"""IF OBJECT_ID(N'[$timerTableName]', 'U') IS NULL
+       |BEGIN
+       |CREATE TABLE $timerTableName (
        |	"timer_id" NVARCHAR(255) NOT NULL,
        |	"case_instance_id" NVARCHAR(255) NOT NULL,
        |	"moment" [datetimeoffset](6) NOT NULL,
        |    "tenant" NVARCHAR(255) NOT NULL,
        |	"user" NVARCHAR(255) NOT NULL,
        |	PRIMARY KEY ("timer_id")
-       |);
+       |)
+       |END;
        |
-       |DROP TABLE IF EXISTS ${Cafienne.config.persistence.tablePrefix}offset_storage;
-       |
-       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}offset_storage (
+       |IF OBJECT_ID(N'[$offsetTableName]', 'U') IS NULL
+       |BEGIN
+       |CREATE TABLE $offsetTableName (
        |	"name" NVARCHAR(255) NOT NULL,
        |	"offset-type" NVARCHAR(255) NOT NULL,
        |	"offset-value" NVARCHAR(255) NOT NULL,
        |	"timestamp" [datetimeoffset](6) NOT NULL,
        |    PRIMARY KEY ("name")
-       |);""".stripMargin
+       |)
+       |END;""".stripMargin
   }
 }

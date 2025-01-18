@@ -13,8 +13,7 @@ class V1_1_28__ChangeTimerTablesToVarChar extends ClassicEventDBSchemaScript {
   override def getChecksum: Integer = -2037901020
 
   override def sql: String = {
-    s"""
-       |DECLARE @${Cafienne.config.persistence.tablePrefix}timer_pk_name VARCHAR(255);
+    s"""DECLARE @${Cafienne.config.persistence.tablePrefix}timer_pk_name VARCHAR(255);
        |(SELECT @${Cafienne.config.persistence.tablePrefix}timer_pk_name = CONSTRAINT_NAME
        |    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
        |    WHERE TABLE_NAME = '${Cafienne.config.persistence.tablePrefix}timer'

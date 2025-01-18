@@ -31,6 +31,7 @@ object EventDB extends LazyLogging {
     val flywayConfiguration = Flyway
       .configure()
       .dataSource(eventDB.jdbcConfig.url, eventDB.jdbcConfig.user, eventDB.jdbcConfig.password)
+      .baselineOnMigrate(true)
       .table(eventDB.schemaHistoryTable)
       .resolvers((_: MigrationResolver.Context) => schema.migrationScripts())
 
