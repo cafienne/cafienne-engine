@@ -22,7 +22,7 @@ import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.querydb.lastmodified.Headers
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.service.infrastructure.authentication.{AuthenticatedUser, AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
 import org.cafienne.system.health.HealthMonitor

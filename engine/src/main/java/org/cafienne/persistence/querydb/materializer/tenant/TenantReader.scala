@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.materializer.tenant
 
-import org.cafienne.persistence.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedRegistration}
 
 object TenantReader {
   val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)

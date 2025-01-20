@@ -20,7 +20,7 @@ package org.cafienne.actormodel.identity
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.persistence.querydb.record.TenantRecord
 

@@ -20,7 +20,7 @@ package org.cafienne.service.http.tenant.route
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.persistence.querydb.lastmodified.{Headers, LastModifiedHeader}
+import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedHeader}
 import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}

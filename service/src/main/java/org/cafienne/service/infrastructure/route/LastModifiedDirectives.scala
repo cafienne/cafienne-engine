@@ -17,14 +17,14 @@
 
 package org.cafienne.service.infrastructure.route
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.http.scaladsl.marshalling.Marshaller
 import org.apache.pekko.http.scaladsl.model.headers.RawHeader
 import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import org.apache.pekko.http.scaladsl.server.Directives.{complete, optionalHeaderValueByName, respondWithHeader, respondWithHeaders}
 import org.apache.pekko.http.scaladsl.server.{Directive0, Route}
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.response._
-import org.cafienne.persistence.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 
 trait LastModifiedDirectives extends LazyLogging {
   /**

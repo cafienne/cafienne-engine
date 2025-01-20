@@ -11,7 +11,7 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import org.cafienne.actormodel.identity.IdentityProvider
-import org.cafienne.persistence.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike

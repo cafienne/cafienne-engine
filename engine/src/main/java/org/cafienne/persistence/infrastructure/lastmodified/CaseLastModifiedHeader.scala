@@ -1,4 +1,4 @@
-package org.cafienne.persistence.querydb.lastmodified
+package org.cafienne.persistence.infrastructure.lastmodified
 
 import org.cafienne.persistence.querydb.materializer.cases.CaseReader
 

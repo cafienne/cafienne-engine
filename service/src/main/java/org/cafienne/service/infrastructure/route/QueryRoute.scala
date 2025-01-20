@@ -21,7 +21,7 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.json.{CafienneJson, Value}
-import org.cafienne.persistence.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
 
 import scala.concurrent.{ExecutionContext, Future}

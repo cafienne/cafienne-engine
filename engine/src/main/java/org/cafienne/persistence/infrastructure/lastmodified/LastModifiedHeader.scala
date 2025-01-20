@@ -1,4 +1,4 @@
-package org.cafienne.persistence.querydb.lastmodified
+package org.cafienne.persistence.infrastructure.lastmodified
 
 import org.cafienne.actormodel.response.ActorLastModified
 
@@ -12,19 +12,15 @@ trait LastModifiedHeader {
 
   override def toString: String = name + ": " + value
 
-  def available: Future[String] = {
-    if (lastModified.isDefined) {
-      //    println("Awaiting " + this)
-      registration.waitFor(lastModified.get).future
-    } else {
-      Future.successful("No header present")
-    }
-  }
+  def available: Future[String] = if (lastModified.isDefined) {
+    //    println("Awaiting " + this)
+    registration.waitFor(lastModified.get).future
+  } else Future.successful("No header present")
 }
 
 object LastModifiedHeader {
   val NONE: LastModifiedHeader = new LastModifiedHeader {
-    override val name: String = ""
+    override val name = ""
     override val registration: LastModifiedRegistration = null
   }
 

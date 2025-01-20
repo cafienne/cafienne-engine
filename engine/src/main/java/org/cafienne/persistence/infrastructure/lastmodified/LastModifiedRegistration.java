@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.lastmodified;
+package org.cafienne.persistence.infrastructure.lastmodified;
 
 import org.apache.pekko.dispatch.Futures;
 import org.cafienne.actormodel.event.ActorModified;

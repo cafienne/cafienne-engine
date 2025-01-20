@@ -21,7 +21,7 @@ import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.cmmn.actorapi.command._
-import org.cafienne.persistence.querydb.lastmodified.Headers
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
 import org.cafienne.persistence.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
