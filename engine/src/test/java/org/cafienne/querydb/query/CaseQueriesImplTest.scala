@@ -1,15 +1,15 @@
-package org.cafienne.querydb.query
+package org.cafienne.persistence.querydb.query
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.querydb.materializer.slick.SlickQueryDB
-import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.querydb.query.result.CaseList
-import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
-import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
+import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB
+import org.cafienne.persistence.querydb.query.filter.CaseFilter
+import org.cafienne.persistence.querydb.query.result.CaseList
+import org.cafienne.persistence.querydb.record.{CaseRecord, PlanItemRecord}
+import org.cafienne.persistence.querydb.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers

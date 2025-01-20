@@ -4,7 +4,7 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.infrastructure.config.persistence.eventdb.JournalTableNameConfigMigrator
 import org.cafienne.infrastructure.config.util.SystemConfig
-import org.cafienne.querydb.schema.QueryDB
+import org.cafienne.persistence.querydb.schema.QueryDB
 
 object Persistence {
   def initializeDatabaseSchemas(): Unit = {

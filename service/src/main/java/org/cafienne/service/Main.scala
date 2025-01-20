@@ -20,7 +20,7 @@ package org.cafienne.service
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.Persistence
-import org.cafienne.querydb.schema.QueryDB
+import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 

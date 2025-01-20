@@ -24,7 +24,7 @@ import org.apache.pekko.http.scaladsl.server.Directives.{complete, optionalHeade
 import org.apache.pekko.http.scaladsl.server.{Directive0, Route}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.response._
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.querydb.lastmodified.LastModifiedHeader
 
 trait LastModifiedDirectives extends LazyLogging {
   /**

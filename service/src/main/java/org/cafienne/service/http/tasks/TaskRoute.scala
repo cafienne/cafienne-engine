@@ -21,8 +21,8 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.HumanTaskCommand
-import org.cafienne.querydb.query._
-import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.persistence.querydb.query._
+import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
 

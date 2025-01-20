@@ -1,7 +1,7 @@
 package org.cafienne.identity
 
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.querydb.record.{CaseTeamUserRecord, UserRoleRecord}
+import org.cafienne.persistence.querydb.record.{CaseTeamUserRecord, UserRoleRecord}
 
 object TestIdentityFactory {
 

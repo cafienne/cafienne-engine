@@ -18,12 +18,12 @@
     <!--    <logger name="org.cafienne.authentication" level="INFO" />-->
 
     <!-- Show logging for offset of projections -->
-    <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseEventSink" level="DEBUG" />-->
-    <!--    <logger name="org.cafienne.querydb.materializer.tenant.TenantEventSink"    level="DEBUG" />-->
-    <!--    <logger name="org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink"    level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.persistence.querydb.materializer.cases.CaseEventSink" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.persistence.querydb.materializer.tenant.TenantEventSink"    level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink"    level="DEBUG" />-->
 
     <!-- Show all projections logging, including info on event being handled -->
-    <!--    <logger name="org.cafienne.querydb.materializer" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.persistence.querydb.materializer" level="DEBUG" />-->
 
     <!-- Show logging for cases in the engine -->
     <!--    <logger name="org.cafienne.cmmn" level="DEBUG" />-->

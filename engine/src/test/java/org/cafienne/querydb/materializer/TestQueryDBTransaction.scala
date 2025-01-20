@@ -1,4 +1,4 @@
-package org.cafienne.querydb.materializer
+package org.cafienne.persistence.querydb.materializer
 
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 

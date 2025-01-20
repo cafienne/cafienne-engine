@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.restore.response
 
-import org.cafienne.querydb.query.exception.SearchFailure
+import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageFailure
 

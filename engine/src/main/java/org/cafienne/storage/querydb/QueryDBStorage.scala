@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.querydb
 
-import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
+import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDBTransaction
 
 import scala.concurrent.ExecutionContext
 

@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
 import org.cafienne.system.CaseSystem
 

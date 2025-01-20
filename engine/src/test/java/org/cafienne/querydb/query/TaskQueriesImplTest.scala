@@ -1,12 +1,12 @@
-package org.cafienne.querydb.query
+package org.cafienne.persistence.querydb.query
 
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.materializer.slick.SlickQueryDB
-import org.cafienne.querydb.query.exception.TaskSearchFailure
-import org.cafienne.querydb.record.{CaseRecord, TaskRecord}
-import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
+import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB
+import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
+import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
+import org.cafienne.persistence.querydb.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers

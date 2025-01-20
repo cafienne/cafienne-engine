@@ -27,7 +27,7 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.lastmodified.Headers
+import org.cafienne.persistence.querydb.lastmodified.Headers
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.migration.CaseMigrationAPI._
 import org.cafienne.system.CaseSystem

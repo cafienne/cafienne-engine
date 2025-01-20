@@ -30,8 +30,8 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.exception.SearchFailure
+import org.cafienne.persistence.querydb.lastmodified.Headers
+import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.service.http.anonymous.model.AnonymousAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
