@@ -19,18 +19,22 @@ package org.cafienne.persistence.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
+import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
 import org.cafienne.persistence.querydb.record._
+import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseQueryImpl
-  extends CaseTables
+class BaseQueryImpl(val queryDB: QueryDB)
+  extends SlickQueryExtensions
+    with CaseTables
     with TaskTables
     with TenantTables
     with ConsentGroupTables
     with LazyLogging {
 
+  val dbConfig = queryDB.dbConfig
   import dbConfig.profile.api._
 
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?

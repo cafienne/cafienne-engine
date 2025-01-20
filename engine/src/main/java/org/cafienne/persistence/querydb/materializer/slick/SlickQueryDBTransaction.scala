@@ -21,22 +21,18 @@ import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.persistence.querydb.materializer.QueryDBTransaction
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext}
 
-class SlickQueryDBTransaction
+trait SlickQueryDBTransaction
   extends QueryDBTransaction
-    with QueryDBSchema
-    with CaseTables
-    with TaskTables
-    with TenantTables
-    with ConsentGroupTables
     with OffsetStoreTables {
+
+  val writer: QueryDBWriter
+  val dbConfig = writer.queryDB.dbConfig
 
   import dbConfig.profile.api._
 

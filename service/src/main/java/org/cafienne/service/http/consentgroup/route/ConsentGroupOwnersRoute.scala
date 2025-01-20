@@ -34,7 +34,7 @@ import jakarta.ws.rs._
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")
 class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends ConsentGroupRoute {
-  override val userQueries: UserQueries = new TenantQueriesImpl
+  override val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override def routes: Route = concat(replaceGroup, setGroupMember, removeGroupMember)
 

@@ -21,7 +21,7 @@ import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.TenantStorage
 
 trait TenantState extends QueryDBState {
-  override val dbStorage: TenantStorage = new TenantStorage
+  override val dbStorage: TenantStorage = new TenantStorage(actor.caseSystem.queryDB.writer)
 
   override def findCascadingChildren(): Seq[ActorMetadata] = {
     printLogMessage("Running tenant query on cases and groups")

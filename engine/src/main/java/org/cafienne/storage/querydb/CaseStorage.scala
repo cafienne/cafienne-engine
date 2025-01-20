@@ -17,7 +17,10 @@
 
 package org.cafienne.storage.querydb
 
-class CaseStorage extends QueryDBStorage {
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables}
+
+class CaseStorage(val writer: QueryDBWriter) extends QueryDBStorage with CaseTables with TaskTables {
 
   import dbConfig.profile.api._
 

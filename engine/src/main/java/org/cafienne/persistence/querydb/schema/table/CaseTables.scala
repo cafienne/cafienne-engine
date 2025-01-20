@@ -17,14 +17,14 @@
 
 package org.cafienne.persistence.querydb.schema.table
 
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 import org.cafienne.persistence.querydb.record._
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
 import slick.relational.RelationalProfile.ColumnOption.Length
 
 import java.time.Instant
 
-trait CaseTables extends QueryDBSchema {
+trait CaseTables extends SlickTableExtensions {
 
   import dbConfig.profile.api._
 

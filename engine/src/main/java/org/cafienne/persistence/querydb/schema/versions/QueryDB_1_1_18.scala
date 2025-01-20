@@ -17,13 +17,15 @@
 
 package org.cafienne.persistence.querydb.schema.versions
 
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
 import org.cafienne.persistence.querydb.schema.table.TenantTables
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.migration.api.TableMigration
 
-object QueryDB_1_1_18 extends DbSchemaVersion with QueryDBSchema
-  with TenantTables {
+class QueryDB_1_1_18(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion
+    with TenantTables {
 
   val version = "1.1.18"
   val migrations = addUserRoleTenantIndex

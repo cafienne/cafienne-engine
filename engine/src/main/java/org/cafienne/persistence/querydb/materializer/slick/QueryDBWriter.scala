@@ -23,23 +23,21 @@ import org.cafienne.persistence.querydb.materializer.QueryDBStorage
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.persistence.querydb.materializer.tenant.TenantStorageTransaction
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.querydb.schema.QueryDB
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object SlickQueryDB extends QueryDBStorage with QueryDBSchema {
+class QueryDBWriter(val queryDB: QueryDB) extends QueryDBStorage {
 
-  override def createCaseTransaction(caseInstanceId: String): CaseStorageTransaction = new SlickCaseTransaction
+  override def createCaseTransaction(caseInstanceId: String): CaseStorageTransaction = new SlickCaseTransaction(this)
 
-  override def createConsentGroupTransaction(groupId: String): ConsentGroupStorageTransaction = new SlickConsentGroupTransaction
+  override def createConsentGroupTransaction(groupId: String): ConsentGroupStorageTransaction = new SlickConsentGroupTransaction(this)
 
-  override def createTenantTransaction(tenant: String): TenantStorageTransaction = new SlickTenantTransaction
-
-  private val databaseConfig = dbConfig
+  override def createTenantTransaction(tenant: String): TenantStorageTransaction = new SlickTenantTransaction(this)
 
   override def getOffset(offsetName: String): Future[Offset] = new JDBCOffsetStorage {
     override val storageName: String = offsetName
-    override lazy val dbConfig = databaseConfig
+    override lazy val dbConfig = queryDB.dbConfig
     override implicit val ec: ExecutionContext = db.ioExecutionContext
   }.getOffset
 }

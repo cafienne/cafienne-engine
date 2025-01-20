@@ -18,11 +18,13 @@
 package org.cafienne.persistence.querydb.schema.versions
 
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.migration.api.{Migration, SqlMigration}
 
-object QueryDB_1_1_5 extends DbSchemaVersion with QueryDBSchema {
+class QueryDB_1_1_5(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion {
   val version = "1.1.5"
   val migrations: Migration = SqlMigration(s"""DELETE FROM "${Cafienne.config.persistence.tablePrefix}offset_storage" where "name" = 'CaseProjectionsWriter' """)
 }

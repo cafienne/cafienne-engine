@@ -31,7 +31,7 @@ import scala.util.{Failure, Success}
 
 trait CaseTeamValidator extends TenantValidator {
   implicit val ec: ExecutionContext
-  val userQueries: UserQueries = new TenantQueriesImpl
+  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
     val tenant = optionalTenant match {

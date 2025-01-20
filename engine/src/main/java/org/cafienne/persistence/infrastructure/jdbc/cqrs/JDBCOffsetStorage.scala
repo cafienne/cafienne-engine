@@ -19,11 +19,14 @@ package org.cafienne.persistence.infrastructure.jdbc.cqrs
 
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.cqrs.offset.{OffsetRecord, OffsetStorage}
-import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with CafienneJDBCConfig {
+trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with SlickTableExtensions {
+  val dbConfig: DatabaseConfig[JdbcProfile]
 
   val storageName: String
 
@@ -49,7 +52,7 @@ trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with Cafien
   }
 }
 
-trait OffsetStoreTables extends CafienneJDBCConfig {
+trait OffsetStoreTables extends SlickTableExtensions {
   import dbConfig.profile.api._
 
   import java.sql.Timestamp

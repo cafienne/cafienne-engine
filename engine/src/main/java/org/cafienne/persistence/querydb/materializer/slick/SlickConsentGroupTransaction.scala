@@ -19,8 +19,12 @@ package org.cafienne.persistence.querydb.materializer.slick
 
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.persistence.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
+import org.cafienne.persistence.querydb.schema.table.ConsentGroupTables
 
-class SlickConsentGroupTransaction extends SlickQueryDBTransaction with ConsentGroupStorageTransaction {
+class SlickConsentGroupTransaction(val writer: QueryDBWriter)
+  extends SlickQueryDBTransaction
+    with ConsentGroupTables
+    with ConsentGroupStorageTransaction {
 
   import dbConfig.profile.api._
 

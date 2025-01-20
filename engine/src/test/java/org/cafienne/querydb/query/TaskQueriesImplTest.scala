@@ -1,36 +1,40 @@
 package org.cafienne.persistence.querydb.query
 
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
-import org.cafienne.persistence.querydb.schema.{QueryDB, QueryDBSchema}
+import org.cafienne.persistence.querydb.schema.QueryDB
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 
-class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDBSchema {
-
-  val taskQueries = new TaskQueriesImpl
-  val caseUpdater = SlickQueryDB.createCaseTransaction(null)
-  val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
+class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
+  val queryDB: QueryDB = new QueryDB
+  val queryDBWriter: QueryDBWriter = queryDB.writer
+  val taskQueries = new TaskQueriesImpl(queryDB)
 
   val tenant = "tenant"
   val case33 = "33"
   val case44 = "44"
 
-  val testUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
-  val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
-  val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
+  val testUser: PlatformUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
+  val userWithAandB: PlatformUser = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
+  val userWithBandC: PlatformUser = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
 
-  override def beforeAll() = {
-    QueryDB.initializeDatabaseSchema()
+  override def beforeAll(): Unit = {
+
+    val caseUpdater = queryDBWriter.createCaseTransaction(null)
+    val tenantUpdater = queryDBWriter.createTenantTransaction(null)
+
+    queryDB.initializeDatabaseSchema()
 
     println("Writing cases")
     caseUpdater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
@@ -64,7 +68,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   "Create a table" should "succeed the second time as well" in {
-    QueryDB.initializeDatabaseSchema()
+    queryDB.initializeDatabaseSchema()
   }
 
   "A query" should "give a search failure when task not found" in {
@@ -80,7 +84,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "retrieve a caseInstanceId and tenant by taskId" in {
     val res = Await.result({
-      implicit val ec = scala.concurrent.ExecutionContext.global
+      implicit val ec: ExecutionContextExecutor = scala.concurrent.ExecutionContext.global
       taskQueries.getCaseMembership("1", testUser).map(m => (m.caseInstanceId, m.tenant))
     }, 1.second)
     res must be((case33, tenant))
@@ -151,6 +155,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "update a task" in {
     val current = Await.result(taskQueries.getTask("1", testUser), 3.seconds)
     val freshTask = current.copy(taskState = "Assigned")
+    val caseUpdater = queryDBWriter.createCaseTransaction(null)
     caseUpdater.upsert(freshTask)
     caseUpdater.commit()
 

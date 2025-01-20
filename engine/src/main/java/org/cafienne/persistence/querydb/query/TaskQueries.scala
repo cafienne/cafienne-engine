@@ -23,6 +23,7 @@ import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.persistence.querydb.query.filter.TaskFilter
 import org.cafienne.persistence.querydb.record.TaskRecord
+import org.cafienne.persistence.querydb.schema.QueryDB
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
@@ -46,9 +47,9 @@ trait TaskQueries {
   def getCountForUser(user: UserIdentity, tenant: Option[String]): Future[TaskCount] = ???
 }
 
-
-class TaskQueriesImpl extends TaskQueries
-  with BaseQueryImpl {
+class TaskQueriesImpl(queryDB: QueryDB)
+  extends BaseQueryImpl(queryDB)
+    with TaskQueries {
 
   import dbConfig.profile.api._
 

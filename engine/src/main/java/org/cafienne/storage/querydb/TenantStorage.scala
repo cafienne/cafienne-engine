@@ -17,7 +17,14 @@
 
 package org.cafienne.storage.querydb
 
-class TenantStorage extends QueryDBStorage {
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
+
+class TenantStorage(val writer: QueryDBWriter)
+  extends QueryDBStorage
+    with TenantTables
+    with CaseTables
+    with ConsentGroupTables {
 
   import dbConfig.profile.api._
 

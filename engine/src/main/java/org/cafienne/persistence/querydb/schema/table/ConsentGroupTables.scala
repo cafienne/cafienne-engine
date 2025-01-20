@@ -17,10 +17,10 @@
 
 package org.cafienne.persistence.querydb.schema.table
 
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 import org.cafienne.persistence.querydb.record.{ConsentGroupMemberRecord, ConsentGroupRecord}
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
 
-trait ConsentGroupTables extends QueryDBSchema {
+trait ConsentGroupTables extends SlickTableExtensions {
 
   import dbConfig.profile.api._
 

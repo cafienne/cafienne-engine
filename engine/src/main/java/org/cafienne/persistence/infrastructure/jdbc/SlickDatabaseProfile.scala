@@ -15,25 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.schema.versions
+package org.cafienne.persistence.infrastructure.jdbc
 
-import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
-import org.cafienne.persistence.querydb.schema.table.CaseTables
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
-import slick.migration.api.TableMigration
 
-class QueryDB_1_1_10(val dbConfig: DatabaseConfig[JdbcProfile])
-  extends QueryDBSchemaVersion
-    with CaseTables {
+/**
+ * Basic JDBC abstraction on Slick that can be used to hook a database connection
+ * based on config properties.
+ *
+ */
+trait SlickDatabaseProfile {
 
-  val version = "1.1.10"
-  val migrations = (
-    addPlanItemDefinitionIdColumn
-    )
+  val dbConfig: DatabaseConfig[JdbcProfile]
 
-  import dbConfig.profile.api._
+  lazy val db: dbConfig.profile.backend.JdbcDatabaseDef = dbConfig.db
 
-  def addPlanItemDefinitionIdColumn = TableMigration(TableQuery[PlanItemTable]).addColumns(_.definitionId)
-
+  lazy val isSQLServer: Boolean = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
 }

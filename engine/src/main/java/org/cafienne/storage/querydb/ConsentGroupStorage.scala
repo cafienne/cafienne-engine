@@ -17,7 +17,10 @@
 
 package org.cafienne.storage.querydb
 
-class ConsentGroupStorage extends QueryDBStorage {
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.schema.table.ConsentGroupTables
+
+class ConsentGroupStorage(val writer: QueryDBWriter) extends QueryDBStorage with ConsentGroupTables {
 
   import dbConfig.profile.api._
 

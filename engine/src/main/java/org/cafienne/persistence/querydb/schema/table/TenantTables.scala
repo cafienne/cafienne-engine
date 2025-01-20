@@ -17,10 +17,10 @@
 
 package org.cafienne.persistence.querydb.schema.table
 
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 import org.cafienne.persistence.querydb.record.{TenantRecord, UserRoleRecord}
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
 
-trait TenantTables extends QueryDBSchema {
+trait TenantTables extends SlickTableExtensions {
 
   import dbConfig.profile.api._
 

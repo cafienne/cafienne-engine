@@ -30,7 +30,7 @@ import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
+  val caseQueries: CaseQueries = new CaseQueriesImpl(caseSystem.queryDB)
   override val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def caseUser(subRoute: AuthenticatedUser => Route): Route = {

@@ -17,16 +17,18 @@
 
 package org.cafienne.persistence.querydb.schema.versions
 
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
+import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
 import org.cafienne.persistence.querydb.record.PlanItemHistoryRecord
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.migration.api.TableMigration
 
 import java.time.Instant
 
-object QueryDB_1_1_22 extends DbSchemaVersion
-  with QueryDBSchema
-  with CafienneTablesV3 {
+class QueryDB_1_1_22(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion
+    with CafienneTablesV3 {
 
   val version = "1.1.22"
   val migrations = dropPlanItemHistoryTable
@@ -37,7 +39,7 @@ object QueryDB_1_1_22 extends DbSchemaVersion
 
 }
 
-trait CafienneTablesV3 extends QueryDBSchema {
+trait CafienneTablesV3 extends SlickTableExtensions {
 
   import dbConfig.profile.api._
 

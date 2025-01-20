@@ -17,13 +17,13 @@
 
 package org.cafienne.persistence.querydb.schema.table
 
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 import org.cafienne.persistence.querydb.record.TaskRecord
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
 
 import java.time.Instant
 
-trait TaskTables extends QueryDBSchema {
+trait TaskTables extends SlickTableExtensions {
 
   import dbConfig.profile.api._
 

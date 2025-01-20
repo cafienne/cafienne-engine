@@ -19,24 +19,26 @@ package org.cafienne.persistence.querydb.schema
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.infrastructure.jdbc.schema.CafienneDatabaseDefinition
+import org.cafienne.persistence.infrastructure.jdbc.schema.{CustomMigrationInfo, QueryDBSchemaVersion, SlickMigrationExtensions}
 import org.cafienne.persistence.querydb.materializer.cases.CaseEventSink
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink
-import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.materializer.tenant.TenantEventSink
 import org.cafienne.persistence.querydb.schema.versions._
 import org.cafienne.system.CaseSystem
-import org.flywaydb.core.api.output.MigrateResult
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
-object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLogging {
-  def initializeDatabaseSchema(): MigrateResult = {
-    useSchema(Seq(QueryDB_1_0_0, QueryDB_1_1_5, QueryDB_1_1_6, QueryDB_1_1_10, QueryDB_1_1_11, QueryDB_1_1_16, QueryDB_1_1_18, QueryDB_1_1_22))
-  }
+class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config))
+  extends SlickMigrationExtensions
+    with LazyLogging {
+
+  val writer = new QueryDBWriter(this)
 
   def startEventSinks(caseSystem: CaseSystem): Unit = {
-    new CaseEventSink(caseSystem.system, SlickQueryDB).start()
-    new TenantEventSink(caseSystem, SlickQueryDB).start()
-    new ConsentGroupEventSink(caseSystem, SlickQueryDB).start()
+    new CaseEventSink(caseSystem.system, writer).start()
+    new TenantEventSink(caseSystem, writer).start()
+    new ConsentGroupEventSink(caseSystem, writer).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()
@@ -50,5 +52,50 @@ object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLo
       logger.warn("Starting H2 Web Client on port " + port)
       Server.createWebServer("-web", "-webAllowOthers", "-webPort", port).start()
     }
+  }
+
+  import dbConfig.profile.api._
+  import org.flywaydb.core.api.output.MigrateResult
+  import slick.migration.api.Migration
+  import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
+
+  import scala.concurrent.Await
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import scala.concurrent.duration.DurationInt
+  implicit val infoProvider: MigrationInfo.Provider[Migration] = CustomMigrationInfo.provider
+
+  private def useSchema(schemas: QueryDBSchemaVersion*): MigrateResult = {
+    try {
+      val flywayConfiguration = SlickFlyway(db)(schemas.flatMap(schema => schema.getScript))
+        .baselineOnMigrate(true)
+        .table(Cafienne.config.persistence.queryDB.schemaHistoryTable)
+
+      // Create a connection and run migration
+      val flyway = flywayConfiguration.load()
+      flyway.migrate()
+    } catch {
+      case e: Exception => {
+        logger.error("An issue with migration happened", e)
+        val my = sql"""select description from flyway_schema_history""".as[String]
+        val res = db.stream(my)
+        logger.debug(s"Migration contents:")
+        // Wait 5 seconds to print the resulting errors before throwing the exception
+        Await.result(res.foreach { r => logger.debug("Migration: {}", r)}, 5.seconds)
+        throw e
+      }
+    }
+  }
+
+  def initializeDatabaseSchema(): MigrateResult = {
+    useSchema(
+      new QueryDB_1_0_0(dbConfig),
+      new QueryDB_1_1_5(dbConfig),
+      new QueryDB_1_1_6(dbConfig),
+      new QueryDB_1_1_10(dbConfig),
+      new QueryDB_1_1_11(dbConfig),
+      new QueryDB_1_1_16(dbConfig),
+      new QueryDB_1_1_18(dbConfig),
+      new QueryDB_1_1_22(dbConfig),
+    )
   }
 }

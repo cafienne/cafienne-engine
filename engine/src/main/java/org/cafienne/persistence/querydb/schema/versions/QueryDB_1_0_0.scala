@@ -18,14 +18,15 @@
 package org.cafienne.persistence.querydb.schema.versions
 
 import org.cafienne.persistence.infrastructure.jdbc.cqrs.OffsetStoreTables
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.infrastructure.jdbc.schema.{QueryDBSchemaVersion, SlickMigrationExtensions}
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration
 
-trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables with CafienneTablesV2 {
+trait CafienneTablesV1 extends SlickMigrationExtensions with CaseTables with TenantTables with CafienneTablesV2 {
 
   import dbConfig.profile.api._
 
@@ -61,11 +62,13 @@ trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables w
   }
 }
 
-object QueryDB_1_0_0 extends DbSchemaVersion with QueryDBSchema
-  with TaskTables
-  with CafienneTablesV1
-  with TenantTables
-  with OffsetStoreTables {
+class QueryDB_1_0_0(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion
+    with TaskTables
+    with CafienneTablesV1
+    with TenantTables
+    with OffsetStoreTables {
+
   val version = "1.0.0"
   val migrations = (
     createTenantTable

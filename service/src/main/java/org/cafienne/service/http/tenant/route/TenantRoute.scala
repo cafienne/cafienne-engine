@@ -30,7 +30,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
-  val userQueries: UserQueries = new TenantQueriesImpl
+  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 

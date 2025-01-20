@@ -21,7 +21,7 @@ import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.ProcessStorage
 
 trait ProcessState extends QueryDBState {
-  override val dbStorage: ProcessStorage = new ProcessStorage
+  override val dbStorage: ProcessStorage = new ProcessStorage(actor.caseSystem.queryDB.writer)
 
   override def findCascadingChildren(): Seq[ActorMetadata] = Seq()
 

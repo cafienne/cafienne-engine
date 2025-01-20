@@ -18,16 +18,20 @@
 package org.cafienne.persistence.querydb.schema.versions.util
 
 import org.cafienne.persistence.infrastructure.jdbc.cqrs.OffsetStoreTables
+import org.cafienne.persistence.infrastructure.jdbc.schema.SlickMigrationExtensions
 import org.cafienne.persistence.querydb.materializer.cases.CaseEventSink
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.persistence.querydb.materializer.tenant.TenantEventSink
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 /**
   * Helper object to create a script that resets the projection offset, so that it can be rebuild with next db schema version
   */
-object Projections extends QueryDBSchema
-  with OffsetStoreTables {
+class Projections(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends OffsetStoreTables
+  with SlickMigrationExtensions {
+
   import dbConfig.profile.api._
 
   lazy val renameOffsets = {

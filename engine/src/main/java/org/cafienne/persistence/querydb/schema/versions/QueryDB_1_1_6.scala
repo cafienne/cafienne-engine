@@ -18,9 +18,10 @@
 package org.cafienne.persistence.querydb.schema.versions
 
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables}
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.migration.api.{SqlMigration, TableMigration}
 
 trait CafienneTablesV2 extends CafienneTablesV3 {
@@ -28,6 +29,7 @@ trait CafienneTablesV2 extends CafienneTablesV3 {
   import dbConfig.profile.api._
 
   case class TenantOwnerRecord(tenant: String, userId: String, enabled: Boolean = true)
+
   case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
 
   class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
@@ -66,33 +68,34 @@ trait CafienneTablesV2 extends CafienneTablesV3 {
 }
 
 
-object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
-  with CaseTables
-  with TaskTables
-  with CafienneTablesV1 {
+class QueryDB_1_1_6(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion
+    with CaseTables
+    with TaskTables
+    with CafienneTablesV1 {
 
   val version = "1.1.6"
   val migrations = (
     renameCaseTableDefinitionColumn &
 
-    // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
-    dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
+      // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
+      dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
 
-    // Now replace all foreign keys with indexes
-    convertFKtoIndexPlanItemTable &
-    convertFKtoIndexCaseTeamTable &
-    convertFKtoIndexCaseFileTable &
-    convertFKtoIndexCaseRolesTable &
+      // Now replace all foreign keys with indexes
+      convertFKtoIndexPlanItemTable &
+      convertFKtoIndexCaseTeamTable &
+      convertFKtoIndexCaseFileTable &
+      convertFKtoIndexCaseRolesTable &
 
-    // Add various indexes to improve performance of searching tasks
-    addTaskTableIndices &
+      // Add various indexes to improve performance of searching tasks
+      addTaskTableIndices &
 
-    // Add ownership field to user role table for faster and simpler querying
-    addUserRoleOwnerColumn & resetTenantProjection & dropTenantOwnersTable &
+      // Add ownership field to user role table for faster and simpler querying
+      addUserRoleOwnerColumn & resetTenantProjection & dropTenantOwnersTable &
 
-    // Add a new table to store business identifiers
-    addBusinessIdentifierTable
-  )
+      // Add a new table to store business identifiers
+      addBusinessIdentifierTable
+    )
 
   import dbConfig.profile.api._
 
@@ -115,8 +118,11 @@ object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   def addUpdatedCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
 
   def convertFKtoIndexPlanItemTable = TableMigration(TableQuery[PlanItemTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+
   def convertFKtoIndexCaseTeamTable = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+
   def convertFKtoIndexCaseRolesTable = TableMigration(TableQuery[CaseInstanceRoleTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+
   def convertFKtoIndexCaseFileTable = TableMigration(TableQuery[CaseFileTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
 
   def addTaskTableIndices = TableMigration(TableQuery[TaskTable]).addIndexes(_.indexAssignee, _.indexCaseInstanceId, _.indexDueDate, _.indexTaskState, _.indexTenant)

@@ -17,27 +17,29 @@
 
 package org.cafienne.persistence.querydb.schema.versions
 
-import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.persistence.querydb.schema.QueryDBSchema
+import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables}
 import org.cafienne.persistence.querydb.schema.versions.util.Projections
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 import slick.migration.api.TableMigration
 
-object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
-  with CafienneTablesV2
-  with ConsentGroupTables
-  with CaseTables {
+class QueryDB_1_1_16(val dbConfig: DatabaseConfig[JdbcProfile])
+  extends QueryDBSchemaVersion
+    with CafienneTablesV2
+    with ConsentGroupTables
+    with CaseTables {
 
   val version = "1.1.16"
-  val migrations = Projections.renameOffsets
-      .&(createConsentGroupTable)
-      .&(createConsentGroupMemberTable)
-      .&(createCaseTeamUserTable)
-      .&(createCaseTeamTenantRoleTable)
-      .&(fillCaseTeamTenantRoleTable)
-      .&(fillCaseTeamUserTable)
-      .&(dropCaseTeamMemberTable)
-      .&(createCaseTeamGroupTable)
+  val migrations = new Projections(dbConfig).renameOffsets
+    .&(createConsentGroupTable)
+    .&(createConsentGroupMemberTable)
+    .&(createCaseTeamUserTable)
+    .&(createCaseTeamTenantRoleTable)
+    .&(fillCaseTeamTenantRoleTable)
+    .&(fillCaseTeamUserTable)
+    .&(dropCaseTeamMemberTable)
+    .&(createCaseTeamGroupTable)
 
   import dbConfig.profile.api._
 

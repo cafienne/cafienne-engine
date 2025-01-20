@@ -21,6 +21,7 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.json.{CafienneJson, StringValue, Value}
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.filter.IdentifierFilter
+import org.cafienne.persistence.querydb.schema.QueryDB
 
 import scala.concurrent.Future
 
@@ -30,9 +31,9 @@ trait IdentifierQueries {
   def getIdentifierNames(user: UserIdentity, tenant: Option[String]): Future[Seq[IdentifierName]] = ???
 }
 
-class IdentifierQueriesImpl
-  extends IdentifierQueries
-    with BaseQueryImpl {
+class IdentifierQueriesImpl(queryDB: QueryDB)
+  extends BaseQueryImpl(queryDB)
+    with IdentifierQueries {
 
   import dbConfig.profile.api._
 

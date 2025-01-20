@@ -25,6 +25,7 @@ import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, Plan
 import org.cafienne.persistence.querydb.query.filter.CaseFilter
 import org.cafienne.persistence.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
 import org.cafienne.persistence.querydb.record._
+import org.cafienne.persistence.querydb.schema.QueryDB
 
 import scala.concurrent.Future
 
@@ -58,9 +59,9 @@ trait CaseQueries {
   def getCases(user: UserIdentity, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 }
 
-class CaseQueriesImpl
-  extends CaseQueries
-    with BaseQueryImpl {
+class CaseQueriesImpl(queryDB: QueryDB)
+  extends BaseQueryImpl(queryDB)
+    with CaseQueries {
 
   import dbConfig.profile.api._
 

@@ -29,7 +29,7 @@ import org.cafienne.service.infrastructure.route.CaseTeamValidator
 import scala.util.{Failure, Success}
 
 trait TaskRoute extends CasesRoute with CaseTeamValidator {
-  val taskQueries: TaskQueries = new TaskQueriesImpl
+  val taskQueries: TaskQueries = new TaskQueriesImpl(caseSystem.queryDB)
 
   def askTaskWithAssignee(user: UserIdentity, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, user)) {

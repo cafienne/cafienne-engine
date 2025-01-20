@@ -23,8 +23,12 @@ import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.persistence.querydb.record._
+import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables}
 
-class SlickCaseTransaction extends SlickQueryDBTransaction with CaseStorageTransaction {
+class SlickCaseTransaction(val writer: QueryDBWriter) extends SlickQueryDBTransaction
+  with CaseTables
+  with TaskTables
+  with CaseStorageTransaction {
 
   import dbConfig.profile.api._
 

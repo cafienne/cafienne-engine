@@ -17,5 +17,7 @@
 
 package org.cafienne.storage.querydb
 
-class ProcessStorage extends QueryDBStorage {
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+
+class ProcessStorage(val writer: QueryDBWriter) extends QueryDBStorage {
 }
