@@ -18,8 +18,7 @@
 package org.cafienne.persistence.querydb.schema
 
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
-import QueryDBSchema._db
+import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
@@ -43,10 +42,11 @@ import slick.jdbc.JdbcProfile
   */
 
 trait QueryDBSchema extends CafienneJDBCConfig {
+  import QueryDBSchema._db
 
   override lazy val dbConfig: DatabaseConfig[JdbcProfile] = _db
 }
 
 object QueryDBSchema extends QueryDBSchema {
-   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config)
+   private lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config)
 }

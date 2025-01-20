@@ -17,7 +17,7 @@
 
 package org.cafienne.timerservice.persistence.jdbc
 
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
 
 import java.time.Instant
 

@@ -19,7 +19,7 @@ package org.cafienne.persistence.querydb.materializer.slick
 
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
+import org.cafienne.persistence.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.persistence.querydb.materializer.QueryDBTransaction
 import org.cafienne.persistence.querydb.schema.QueryDBSchema
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}

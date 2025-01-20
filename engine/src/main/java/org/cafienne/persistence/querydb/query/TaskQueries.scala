@@ -18,8 +18,8 @@
 package org.cafienne.persistence.querydb.query
 
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.persistence.querydb.query.filter.TaskFilter
 import org.cafienne.persistence.querydb.record.TaskRecord

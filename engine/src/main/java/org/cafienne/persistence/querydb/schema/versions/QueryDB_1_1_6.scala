@@ -18,7 +18,7 @@
 package org.cafienne.persistence.querydb.schema.versions
 
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
+import org.cafienne.persistence.infrastructure.jdbc.schema.DbSchemaVersion
 import org.cafienne.persistence.querydb.schema.QueryDBSchema
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables}
 import slick.migration.api.{SqlMigration, TableMigration}

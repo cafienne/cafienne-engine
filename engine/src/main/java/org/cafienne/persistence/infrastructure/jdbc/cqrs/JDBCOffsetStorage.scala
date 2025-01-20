@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.cqrs
+package org.cafienne.persistence.infrastructure.jdbc.cqrs
 
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.cqrs.offset.{OffsetRecord, OffsetStorage}
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -20,7 +20,7 @@ package org.cafienne.persistence.querydb.query
 import org.cafienne.actormodel.identity.{Origin, UserIdentity}
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.definition.CMMNElementDefinition
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.persistence.querydb.query.filter.CaseFilter
 import org.cafienne.persistence.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}

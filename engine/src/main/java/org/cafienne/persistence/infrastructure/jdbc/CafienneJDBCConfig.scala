@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc
+package org.cafienne.persistence.infrastructure.jdbc
 
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
 import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.lifted.{ColumnOrdered, Index}
-import slick.migration.api.org.cafienne.infrastructure.jdbc.sqlserver.SQLServerDialect
+import slick.migration.api.org.cafienne.persistence.infrastructure.jdbc.sqlserver.SQLServerDialect
 import slick.migration.api.{Dialect, GenericDialect, MigrationSeq, SqlMigration}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlAction

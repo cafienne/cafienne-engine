@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.TaskCount
 import org.cafienne.persistence.querydb.query.filter.TaskFilter

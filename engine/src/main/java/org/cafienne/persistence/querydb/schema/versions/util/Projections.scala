@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.schema.versions.util
 
-import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
+import org.cafienne.persistence.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.persistence.querydb.materializer.cases.CaseEventSink
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.persistence.querydb.materializer.tenant.TenantEventSink

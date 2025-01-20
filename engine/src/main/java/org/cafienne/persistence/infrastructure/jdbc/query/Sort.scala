@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.query
+package org.cafienne.persistence.infrastructure.jdbc.query
 
 case class Sort(on: Option[String], direction: Option[String] = Some("desc")) {
   lazy val ascending = direction.fold(false)(d => if (d matches "(?i)asc")  true else false)

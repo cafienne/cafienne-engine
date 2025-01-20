@@ -21,8 +21,8 @@ import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
-import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
+import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.cqrs.JDBCOffsetStorage
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
 import slick.basic.DatabaseConfig

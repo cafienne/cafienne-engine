@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.jdbc.schema
+package org.cafienne.persistence.infrastructure.jdbc.schema
 
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.CafienneJDBCConfig
 import slick.migration.api.Migration
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
 

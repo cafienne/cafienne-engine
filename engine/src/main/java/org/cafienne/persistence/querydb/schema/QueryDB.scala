@@ -19,7 +19,7 @@ package org.cafienne.persistence.querydb.schema
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.schema.CafienneDatabaseDefinition
+import org.cafienne.persistence.infrastructure.jdbc.schema.CafienneDatabaseDefinition
 import org.cafienne.persistence.querydb.materializer.cases.CaseEventSink
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB

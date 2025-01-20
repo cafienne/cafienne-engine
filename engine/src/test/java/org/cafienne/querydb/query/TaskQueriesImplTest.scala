@@ -2,7 +2,7 @@ package org.cafienne.persistence.querydb.query
 
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}

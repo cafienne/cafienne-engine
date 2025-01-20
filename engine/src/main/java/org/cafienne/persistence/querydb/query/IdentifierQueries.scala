@@ -18,8 +18,8 @@
 package org.cafienne.persistence.querydb.query
 
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.json.{CafienneJson, StringValue, Value}
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.filter.IdentifierFilter
 
 import scala.concurrent.Future

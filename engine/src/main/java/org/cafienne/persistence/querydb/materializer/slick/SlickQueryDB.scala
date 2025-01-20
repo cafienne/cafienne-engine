@@ -18,7 +18,7 @@
 package org.cafienne.persistence.querydb.materializer.slick
 
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
+import org.cafienne.persistence.infrastructure.jdbc.cqrs.JDBCOffsetStorage
 import org.cafienne.persistence.querydb.materializer.QueryDBStorage
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
