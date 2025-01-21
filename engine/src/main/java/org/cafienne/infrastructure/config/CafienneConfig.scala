@@ -29,8 +29,7 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
   *
   * @param systemConfig
   */
-class CafienneConfig extends ConfigReader with LazyLogging {
-  val systemConfig: Config = SystemConfig.load().getConfig
+class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLogging {
   val path = "cafienne"
   override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {
@@ -78,5 +77,25 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     * Returns configuration options for the engine and it's internal services
     */
   val engine: EngineConfig = new EngineConfig(this)
+}
+
+object CafienneConfig {
+
+  var cafienneConfig: CafienneConfig = null
+
+  def apply(classLoader: ClassLoader = this.getClass.getClassLoader): CafienneConfig = {
+    val systemConfig: Config = SystemConfig.load(classLoader = classLoader).getConfig
+    if (cafienneConfig == null) {
+      cafienneConfig = new CafienneConfig(systemConfig)
+    }
+    cafienneConfig
+  }
+
+  def apply(config: Config): CafienneConfig = {
+    if (cafienneConfig == null) {
+      cafienneConfig = new CafienneConfig(config)
+    }
+    cafienneConfig
+  }
 }
 
