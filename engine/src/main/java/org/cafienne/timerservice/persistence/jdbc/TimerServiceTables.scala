@@ -17,7 +17,7 @@
 
 package org.cafienne.timerservice.persistence.jdbc
 
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 
 import java.time.Instant
 
@@ -28,7 +28,7 @@ import java.time.Instant
   * tenant: String,
   * user: String)
   */
-trait TimerServiceTables extends CafienneJDBCConfig {
+trait TimerServiceTables extends SlickTableExtensions {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:

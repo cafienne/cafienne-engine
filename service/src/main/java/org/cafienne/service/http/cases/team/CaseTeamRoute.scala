@@ -29,7 +29,7 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
-import org.cafienne.querydb.lastmodified.Headers
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.team.CaseTeamAPI._
 import org.cafienne.service.infrastructure.route.CaseTeamValidator

@@ -1,14 +1,12 @@
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.persistence.querydb.materializer.cases
 
-import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.TestQueryDBTransaction
-import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
-import org.cafienne.querydb.record._
+import org.cafienne.persistence.querydb.materializer.TestQueryDBTransaction
+import org.cafienne.persistence.querydb.materializer.cases.team.CaseTeamMemberKey
+import org.cafienne.persistence.querydb.record._
 
 import java.time.Instant
-import scala.concurrent.Future
 
 class TestCaseStorageTransaction(caseInstanceId: String) extends TestQueryDBTransaction(caseInstanceId) with CaseStorageTransaction {
   override def upsert(record: CaseRecord): Unit = {
@@ -48,14 +46,14 @@ class TestCaseStorageTransaction(caseInstanceId: String) extends TestQueryDBTran
 
   override def removeCaseRoles(caseInstanceId: String): Unit = {}
 
-  override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = Future.successful(None)
+  override def getPlanItem(planItemId: String): Option[PlanItemRecord] = None
 
-  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
+  override def getCaseFile(caseInstanceId: String): Option[CaseFileRecord] = None
 
-  override def getCaseInstance(id: String): Future[Option[CaseRecord]] = Future.successful(None)
+  override def getCaseInstance(id: String): Option[CaseRecord] = None
 
-  override def getTask(taskId: String): Future[Option[TaskRecord]] = Future.successful(Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
+  override def getTask(taskId: String): Option[TaskRecord] = Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now))
 
-  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
+  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Unit = {}
 
 }

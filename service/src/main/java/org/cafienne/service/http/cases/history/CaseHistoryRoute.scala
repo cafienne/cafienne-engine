@@ -26,7 +26,7 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.json.Value
-import org.cafienne.querydb.lastmodified.Headers
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}

@@ -1,15 +1,17 @@
-package org.cafienne.querydb.query
+package org.cafienne.persistence.querydb.query
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.querydb.materializer.slick.SlickQueryDB
-import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.querydb.query.result.CaseList
-import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
-import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
+import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.materializer.tenant.TenantStorageTransaction
+import org.cafienne.persistence.querydb.query.filter.CaseFilter
+import org.cafienne.persistence.querydb.query.result.CaseList
+import org.cafienne.persistence.querydb.record.{CaseRecord, PlanItemRecord}
+import org.cafienne.persistence.querydb.schema.QueryDB
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers
@@ -19,13 +21,12 @@ import java.util.UUID
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 
-class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll with QueryDBSchema {
-
+class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll {
+  val queryDB: QueryDB = new QueryDB
+  val queryDBWriter: QueryDBWriter = queryDB.writer
+  val caseQueries = new CaseQueriesImpl(queryDB)
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-  val caseQueries = new CaseQueriesImpl
-  val caseUpdater = SlickQueryDB.createCaseTransaction(null)
-  val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
 
   val tenant = "tenant"
 
@@ -58,7 +59,9 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   )
 
   override def beforeAll() = {
-    QueryDB.initializeDatabaseSchema()
+    queryDB.initializeDatabaseSchema()
+    val caseUpdater: CaseStorageTransaction = queryDBWriter.createCaseTransaction(null)
+    val tenantUpdater: TenantStorageTransaction = queryDBWriter.createTenantTransaction(null)
     caseUpdater.upsert(activeCase)
     caseUpdater.upsert(planItem1_1)
     caseUpdater.upsert(terminatedCase)
@@ -66,10 +69,8 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     caseUpdater.upsert(planItem2_1)
     caseTeamMemberRecords.foreach(caseUpdater.upsert)
     TestIdentityFactory.asDatabaseRecords(user).foreach(tenantUpdater.upsert)
-    Await.ready({
-      caseUpdater.commit()
-      tenantUpdater.commit()
-    }, 1.seconds)
+    caseUpdater.commit()
+    tenantUpdater.commit()
   }
 
   // *******************************************************************************************************************
@@ -77,7 +78,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   // *******************************************************************************************************************
 
   "Create a table" should "succeed the second time as well" in {
-    QueryDB.initializeDatabaseSchema()
+    queryDB.initializeDatabaseSchema()
   }
 
   "A query" should "retrieve an existing case" in {

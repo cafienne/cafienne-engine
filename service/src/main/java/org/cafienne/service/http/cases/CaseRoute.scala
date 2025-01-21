@@ -32,9 +32,9 @@ import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.filter.CaseFilter
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.persistence.querydb.query.filter.CaseFilter
 import org.cafienne.service.http.cases.CaseAPIFormat._
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
 import org.cafienne.system.CaseSystem

@@ -21,8 +21,7 @@ import org.apache.pekko.Done
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
-import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
+import org.cafienne.persistence.infrastructure.jdbc.cqrs.JDBCOffsetStorage
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
 import slick.basic.DatabaseConfig
@@ -32,8 +31,10 @@ import java.time.Instant
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBCConfig with TimerServiceTables {
-  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(Cafienne.config.engine.timerService.store)
+class JDBCTimerStore(override val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(Cafienne.config.engine.timerService.store))
+  extends TimerStore
+    with JDBCOffsetStorage
+    with TimerServiceTables {
 
   import dbConfig.profile.api._
 

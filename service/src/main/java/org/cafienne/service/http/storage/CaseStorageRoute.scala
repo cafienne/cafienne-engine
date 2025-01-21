@@ -24,8 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.CaseOwnership
-import org.cafienne.querydb.query.exception.CaseSearchFailure
+import org.cafienne.persistence.querydb.query.CaseOwnership
+import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser

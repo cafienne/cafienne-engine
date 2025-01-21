@@ -20,14 +20,15 @@ package org.cafienne.actormodel.identity
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.lastmodified.LastModifiedHeader
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.querydb.record.TenantRecord
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.record.TenantRecord
+import org.cafienne.system.CaseSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
-  val userQueries: UserQueries = new TenantQueriesImpl
+class IdentityCache(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
+  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.

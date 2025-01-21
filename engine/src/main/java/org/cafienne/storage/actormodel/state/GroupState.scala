@@ -17,16 +17,13 @@
 
 package org.cafienne.storage.actormodel.state
 
-import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.ConsentGroupStorage
 
-import scala.concurrent.Future
-
 trait GroupState extends QueryDBState {
-  override val dbStorage: ConsentGroupStorage = new ConsentGroupStorage
+  override val dbStorage: ConsentGroupStorage = new ConsentGroupStorage(actor.caseSystem.queryDB.writer)
 
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
+  override def findCascadingChildren(): Seq[ActorMetadata] = Seq()
 
-  override def clearQueryData(): Future[Done] = dbStorage.deleteGroup(metadata.actorId)
+  override def clearQueryData(): Unit = dbStorage.deleteGroup(metadata.actorId)
 }

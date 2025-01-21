@@ -17,25 +17,24 @@
 
 package org.cafienne.service.http.identifiers.route
 
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.IdentifierQueriesImpl
-import org.cafienne.querydb.query.filter.IdentifierFilter
+import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.querydb.query.IdentifierQueriesImpl
+import org.cafienne.persistence.querydb.query.filter.IdentifierFilter
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.identifiers.model.BusinessIdentifierFormat
 import org.cafienne.system.CaseSystem
 
-import jakarta.ws.rs._
-
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/identifiers")
 class IdentifiersRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val identifierQueries = new IdentifierQueriesImpl
+  val identifierQueries = new IdentifierQueriesImpl(caseSystem.queryDB)
 
   override def routes: Route = concat(getIdentifiers, getIdentifierNames)
 

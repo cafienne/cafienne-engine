@@ -1,4 +1,4 @@
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.persistence.querydb.materializer.cases
 
 import org.apache.pekko.actor.{ActorContext, ActorRef}
 import org.apache.pekko.persistence.PersistentActor

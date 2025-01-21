@@ -36,7 +36,7 @@ trait ConfigMigrator extends LazyLogging {
   def quoted(path: String, key: String): String = s"""$path.$key"""
   def quotedKeyPath(path: String, key: String): String = quoted(path, s""""$key"""")
 
-  def migrateConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef, showWarningOnDifferentValue: Boolean = true): Config = {
+  def migrateConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef, showWarningOnDifferentValue: Boolean = true, showWarnings: Boolean = true): Config = {
     val keyPath = quoted(path, key)
     if (config.hasPath(keyPath)) {
       val configValue = config.getValue(keyPath)
@@ -44,7 +44,7 @@ trait ConfigMigrator extends LazyLogging {
       val value = configValue.unwrapped()
       if (value != newValue) {
         if (value == oldValue) {
-          printWarning(s"""$location\n\tPlease change deprecated configuration property '$keyPath' to\n\n\t\t$key = "$newValue" """)
+          if (showWarnings) printWarning(s"""$location\n\tPlease change deprecated configuration property '$keyPath' with value '$oldValue' to\n\n\t\t$key = "$newValue" """)
           return config.withValue(keyPath, ConfigValueFactory.fromAnyRef(newValue))
         } else if (showWarningOnDifferentValue) {
           printWarning(s"""$location\n\tConfiguration property '$keyPath' may have the wrong value; consider changing it to \n\n\t\t$key = "$newValue" """)

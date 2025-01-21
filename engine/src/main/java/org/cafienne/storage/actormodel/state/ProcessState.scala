@@ -17,16 +17,13 @@
 
 package org.cafienne.storage.actormodel.state
 
-import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.ProcessStorage
 
-import scala.concurrent.Future
-
 trait ProcessState extends QueryDBState {
-  override val dbStorage: ProcessStorage = new ProcessStorage
+  override val dbStorage: ProcessStorage = new ProcessStorage(actor.caseSystem.queryDB.writer)
 
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
+  override def findCascadingChildren(): Seq[ActorMetadata] = Seq()
 
-  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
+  override def clearQueryData(): Unit = ()// Nothing to delete here, just tell our actor we're done.
 }

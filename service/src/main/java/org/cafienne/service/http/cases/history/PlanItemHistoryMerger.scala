@@ -21,7 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.querydb.record.PlanItemHistoryRecord
+import org.cafienne.persistence.querydb.record.PlanItemHistoryRecord
 
 object PlanItemHistoryMerger extends LazyLogging {
   def mapModelEventEnvelope(evt: ModelEventEnvelope): Option[PlanItemHistoryRecord] = {

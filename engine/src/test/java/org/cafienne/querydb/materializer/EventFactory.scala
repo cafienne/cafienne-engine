@@ -1,4 +1,4 @@
-package org.cafienne.querydb.materializer
+package org.cafienne.persistence.querydb.materializer
 
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.event._

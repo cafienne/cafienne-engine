@@ -30,42 +30,13 @@ trait ReadJournalProvider extends LazyLogging {
   def system: ActorSystem
   implicit def actorSystem: ActorSystem = system
 
-  lazy val configuredJournal: String = system.settings.config.getString("pekko.persistence.journal.plugin")
-  lazy val readJournalSetting: String = findReadJournalSetting()
-
   /**
     * Provides the requested journal
     *
     * @return
     */
   def journal(): ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery = {
-    PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](readJournalSetting)
+    PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](Cafienne.config.persistence.readJournal)
   }
 
-  private def findReadJournalSetting(): String = {
-
-    val explicitReadJournal = Cafienne.config.persistence.readJournal
-    if (explicitReadJournal.nonEmpty) {
-      return explicitReadJournal
-    }
-
-    import io.github.alstanchev.pekko.persistence.inmemory.query.scaladsl.InMemoryReadJournal
-    import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
-    import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
-    import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
-
-    logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
-    if (configuredJournal.contains("jdbc")) {
-      return JdbcReadJournal.Identifier
-    } else if (configuredJournal.contains("cassandra")) {
-      return CassandraReadJournal.Identifier
-    } else if (configuredJournal.contains("level")) {
-      logger.warn("Found Level DB based configurations. This has proven to be unreliable. Do not use it in Production systems.")
-      return LeveldbReadJournal.Identifier
-    } else if (configuredJournal.contains("memory")) {
-      return InMemoryReadJournal.Identifier
-    }
-    throw new RuntimeException(s"Cannot find read journal for $configuredJournal, please use Cassandra or JDBC read journal settings")
-  }
 }
-

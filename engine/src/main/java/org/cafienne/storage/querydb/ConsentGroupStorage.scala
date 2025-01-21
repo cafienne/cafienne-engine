@@ -17,15 +17,14 @@
 
 package org.cafienne.storage.querydb
 
-import org.apache.pekko.Done
+import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.schema.table.ConsentGroupTables
 
-import scala.concurrent.Future
-
-class ConsentGroupStorage extends QueryDBStorage {
+class ConsentGroupStorage(val writer: QueryDBWriter) extends QueryDBStorage with ConsentGroupTables {
 
   import dbConfig.profile.api._
 
-  def deleteGroup(groupId: String): Future[Done] = {
+  def deleteGroup(groupId: String): Unit = {
     addStatement(TableQuery[ConsentGroupTable].filter(_.id === groupId).delete)
     addStatement(TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).delete)
     commit()

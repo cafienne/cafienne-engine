@@ -1,8 +1,8 @@
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.persistence.querydb.materializer.cases
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated
 import org.cafienne.cmmn.instance.PlanItemType
-import org.cafienne.querydb.materializer.TestQueryDB
+import org.cafienne.persistence.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 
@@ -17,7 +17,7 @@ class PlanItemWriterTest extends CaseEventSinkTest {
       sendEvent(planItemCreated)
       sendEvent(eventFactory.createCaseModified(Instant.now))
 
-      import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
+      import org.cafienne.persistence.querydb.record.{CaseRecord, PlanItemRecord}
 
       eventually {
         assert(TestQueryDB.hasTransaction(caseInstanceId))

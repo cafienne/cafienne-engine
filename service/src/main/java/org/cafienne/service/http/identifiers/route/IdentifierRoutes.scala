@@ -18,10 +18,9 @@
 package org.cafienne.service.http.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/identifiers")

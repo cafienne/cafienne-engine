@@ -21,15 +21,15 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.HumanTaskCommand
-import org.cafienne.querydb.query._
-import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.persistence.querydb.query._
+import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
 
 import scala.util.{Failure, Success}
 
 trait TaskRoute extends CasesRoute with CaseTeamValidator {
-  val taskQueries: TaskQueries = new TaskQueriesImpl
+  val taskQueries: TaskQueries = new TaskQueriesImpl(caseSystem.queryDB)
 
   def askTaskWithAssignee(user: UserIdentity, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, user)) {

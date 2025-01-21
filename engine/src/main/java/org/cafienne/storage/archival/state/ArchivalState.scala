@@ -54,10 +54,9 @@ trait ArchivalState extends QueryDBState {
   def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
   override def startStorageProcess(): Unit = {
-    findCascadingChildren().map { children =>
-      printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
-      informOwner(ArchivalStarted(metadata, children))
-    }
+    val children = findCascadingChildren()
+    printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
+    informOwner(ArchivalStarted(metadata, children))
   }
 
   /** The archival process is idempotent (i.e., it can be triggered multiple times without ado).
@@ -76,7 +75,8 @@ trait ArchivalState extends QueryDBState {
         //  However, then we still would also have to keep authorization information, as that is required
         //  per individual case instance. But then ... the case would not really be archived?!
         //  Therefore, it is up to the invoker of the archiving logic to handle such a situation.
-        clearQueryData().map(_ => actor.self ! QueryDataArchived(metadata))
+        clearQueryData()
+        actor.self ! QueryDataArchived(metadata)
       }
     }
     checkArchivingDone()

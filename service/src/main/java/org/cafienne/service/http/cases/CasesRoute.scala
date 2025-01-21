@@ -21,16 +21,16 @@ import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.cmmn.actorapi.command._
-import org.cafienne.querydb.lastmodified.Headers
-import org.cafienne.querydb.query.exception.CaseSearchFailure
-import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
+import org.cafienne.persistence.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
+  val caseQueries: CaseQueries = new CaseQueriesImpl(caseSystem.queryDB)
   override val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def caseUser(subRoute: AuthenticatedUser => Route): Route = {

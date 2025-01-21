@@ -20,8 +20,8 @@ package org.cafienne.service.http.consentgroup.route
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.querydb.query.UserQueries
+import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedHeader}
+import org.cafienne.persistence.querydb.query.UserQueries
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 

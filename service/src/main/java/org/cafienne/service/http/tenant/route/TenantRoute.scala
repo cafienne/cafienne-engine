@@ -20,8 +20,8 @@ package org.cafienne.service.http.tenant.route
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedHeader}
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 import org.cafienne.tenant.actorapi.command.TenantCommand
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
-  val userQueries: UserQueries = new TenantQueriesImpl
+  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 

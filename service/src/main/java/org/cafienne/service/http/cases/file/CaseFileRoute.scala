@@ -29,7 +29,7 @@ import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCa
 import org.cafienne.cmmn.instance
 import org.cafienne.service.infrastructure.payload.HttpJsonReader._
 import org.cafienne.json.Value
-import org.cafienne.querydb.lastmodified.Headers
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.file.CaseFileAPIFormat.CaseFileJsonExampleFormat
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser

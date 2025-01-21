@@ -17,12 +17,11 @@
 
 package org.cafienne.storage.actormodel.state
 
-import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.querydb.QueryDBStorage
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 trait QueryDBState extends StorageActorState {
   def dbStorage: QueryDBStorage
@@ -40,7 +39,7 @@ trait QueryDBState extends StorageActorState {
   /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
     * events of this specific ModelActor.
     */
-  def clearQueryData(): Future[Done] = Future.successful(Done)
+  def clearQueryData(): Unit
 
   /**
     * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
@@ -48,5 +47,5 @@ trait QueryDBState extends StorageActorState {
     *
     * @return
     */
-  def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
+  def findCascadingChildren(): Seq[ActorMetadata] = Seq()
 }

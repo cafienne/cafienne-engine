@@ -19,8 +19,10 @@ package org.cafienne.service
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.persistence.Persistence
-import org.cafienne.querydb.schema.QueryDB
+import org.cafienne.infrastructure.config.persistence.eventdb.JournalTableNameConfigMigrator
+import org.cafienne.infrastructure.config.util.SystemConfig
+import org.cafienne.persistence.eventdb.EventDB
+import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
@@ -29,15 +31,20 @@ import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.util.{Failure, Success}
 
 object Main extends App with LazyLogging {
-  // Initialize the database schema for both query db and the event journal
-  Persistence.initializeDatabaseSchemas()
-
   try {
+    SystemConfig.addMigrators(new JournalTableNameConfigMigrator)
+
+    val queryDB: QueryDB = new QueryDB
+    if (Cafienne.config.persistence.initializeDatabaseSchemas) {
+      queryDB.initializeDatabaseSchema()
+      EventDB.initializeDatabaseSchema()
+    }
+
     // Create the Case System
-    val caseSystem: CaseSystem = new CaseSystem
+    val caseSystem: CaseSystem = new CaseSystem(queryDB = queryDB)
 
     // Start running the Event Sinks
-    QueryDB.startEventSinks(caseSystem)
+    queryDB.startEventSinks(caseSystem)
 
     implicit val ec: ExecutionContextExecutor = caseSystem.system.dispatcher
     // Create and start the http server

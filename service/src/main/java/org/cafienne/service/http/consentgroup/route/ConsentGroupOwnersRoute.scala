@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.consentgroup.actorapi.command._
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI._
 import org.cafienne.system.CaseSystem
 
@@ -34,7 +34,7 @@ import jakarta.ws.rs._
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")
 class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends ConsentGroupRoute {
-  override val userQueries: UserQueries = new TenantQueriesImpl
+  override val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override def routes: Route = concat(replaceGroup, setGroupMember, removeGroupMember)
 

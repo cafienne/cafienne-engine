@@ -23,15 +23,15 @@ import org.cafienne.actormodel.exception.MissingTenantException
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.query.exception.SearchFailure
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.exception.SearchFailure
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 trait CaseTeamValidator extends TenantValidator {
   implicit val ec: ExecutionContext
-  val userQueries: UserQueries = new TenantQueriesImpl
+  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
     val tenant = optionalTenant match {

@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.querydb.query.exception.UserSearchFailure
+import org.cafienne.persistence.querydb.query.exception.UserSearchFailure
 import org.cafienne.service.http.tenant.model.TenantAPI.TenantUserResponseFormat
 import org.cafienne.system.CaseSystem
 

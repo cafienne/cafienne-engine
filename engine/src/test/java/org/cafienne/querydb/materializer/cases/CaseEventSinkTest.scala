@@ -1,4 +1,4 @@
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.persistence.querydb.materializer.cases
 
 import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.event.{Logging, LoggingAdapter}
@@ -9,7 +9,7 @@ import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.test.TestScript.loadCaseDefinition
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.querydb.materializer.{EventFactory, TestQueryDB}
+import org.cafienne.persistence.querydb.materializer.{EventFactory, TestQueryDB}
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 import org.scalatest.BeforeAndAfterAll
