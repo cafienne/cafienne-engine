@@ -26,7 +26,7 @@ class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
   def path = "timer-service"
 
   /**
-    * Returns configuration path for the event store
+    * Returns configuration path for the timer store (defaulting to the event journal database)
     */
   lazy val store: String = {
     if (config.hasPath("store")) {
