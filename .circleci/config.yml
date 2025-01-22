@@ -41,7 +41,7 @@ jobs:
             then
               docker buildx create --use --name multi-arch-builder
               sbt docker:stage
-              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest ./target/docker/stage
+              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest ./service/target/docker/stage
             else
               echo "Not pushing image to docker hub"
             fi
@@ -70,7 +70,7 @@ jobs:
             docker buildx create --use --name multi-arch-builder
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             sbt docker:stage
-            docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$CIRCLE_TAG ./target/docker/stage
+            docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$CIRCLE_TAG ./service/target/docker/stage
 
 commands:
   build-preparation:
