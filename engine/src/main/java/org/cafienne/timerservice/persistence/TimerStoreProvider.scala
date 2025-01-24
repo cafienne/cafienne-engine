@@ -17,6 +17,7 @@
 
 package org.cafienne.timerservice.persistence
 
+import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
 import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
@@ -24,18 +25,23 @@ import org.cafienne.system.CaseSystem
 import org.cafienne.timerservice.persistence.cassandra.CassandraTimerStore
 import org.cafienne.timerservice.persistence.inmemory.InMemoryStore
 import org.cafienne.timerservice.persistence.jdbc.JDBCTimerStore
+import slick.basic.DatabaseConfig
 
 /**
-  * TimerStoreProvider can return a storage object to persist timer events
-  * @param system
-  */
+ * TimerStoreProvider can return a storage object to persist timer events
+ */
 class TimerStoreProvider(val caseSystem: CaseSystem) extends ReadJournalProvider {
-  override val system = caseSystem.system
+  override val system: ActorSystem = caseSystem.system
 
   val store: TimerStore = {
     journal() match {
       case c: CassandraReadJournal => new CassandraTimerStore(c)
-      case _: JdbcReadJournal => new JDBCTimerStore()
+      case _: JdbcReadJournal =>
+        val timerStoreConfigKey: String = caseSystem.config.engine.timerService.store
+        val timerStoreConfig = caseSystem.config.systemConfig.getConfig(timerStoreConfigKey)
+//        val msg = s"""journalConfig = ${journalConfig.root().render(ConfigRenderOptions.concise().setFormatted(true))}"""
+//        logger.info("Using config to start jdbc ts : " + msg)
+        new JDBCTimerStore(DatabaseConfig.forConfig("", timerStoreConfig))
       case _ => new InMemoryStore() // By default return in memory map
     }
   }

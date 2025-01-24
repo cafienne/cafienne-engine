@@ -32,33 +32,25 @@ object SystemConfig extends ConfigMigrator with LazyLogging {
   private var loaded: Boolean = false
   private val initialMigrators = new ListBuffer[ConfigMigrator]()
 
-  def migrate(migrators: ConfigMigrator*): SystemConfig.type = {
-    if (!loaded) {
-      throw new Error("Cannot migrate the configuration because it first must be loaded through the load() method")
-    }
-    migrators.foreach(migrator => {
-      logger.info("Running ConfigMigrator " + migrator.getClass.getName)
-      config = migrator.run(config)
-    })
-    this
-  }
-
   /**
    * Option to set migrators before the SystemConfig is loaded
    */
-  def addMigrators(migrators: ConfigMigrator*): Unit = {
+  def addMigrators(migrators: ConfigMigrator*): SystemConfig.type = {
     if (loaded) {
       throw new Exception("Config has already been loaded. Cannot add migrators anymore")
     }
     migrators.foreach(migrator => initialMigrators += migrator)
+    this
   }
 
   def getConfig: Config = config
 
   def load(fileName: String = "", classLoader: ClassLoader = this.getClass.getClassLoader): SystemConfig.type = {
     if (loaded) {
-      println("loading config again?")
+      logger.warn("Cannot load config again, loading request is ignored")
+      return this
     }
+
     if (fileName.isBlank) {
       config = ConfigFactory.load(classLoader).withFallback(config)
     } else {
