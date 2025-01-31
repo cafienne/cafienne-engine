@@ -26,7 +26,7 @@ val basicSettings = {
      */
     scalaVersion := scala213,
     Compile / doc / sources := List(),
-    //javacOptions ++= Seq("-source", "11", "-target", "11")
+    javacOptions ++= Seq("-source", "21", "-target", "21"),
     scalacOptions := Seq(
       "-encoding", "UTF-8",
       "-unchecked",
