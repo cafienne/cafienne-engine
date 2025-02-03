@@ -27,20 +27,20 @@ class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
   def path = "query-db"
 
   override lazy val config: Config = {
-    if (parent.config.hasPath(path)) {
-      parent.config.getConfig(path)
-    } else {
+    if (parent.parent.config.hasPath(path)) {
       // For compatibility, also try to read from 'cafienne' config itself, if persistence is not available
       //  Note: this was the default up until version 1.1.33
       warn("""QueryDB configuration can be put inside the persistence configuration like:
-          |cafienne {
-          |  persistence {
-          |    query-db = {
-          |      ...
-          |    }
-          |  }
-          |}""".stripMargin)
+             |cafienne {
+             |  persistence {
+             |    query-db = {
+             |      ...
+             |    }
+             |  }
+             |}""".stripMargin)
       parent.parent.config.getConfig(path)
+    } else {
+      parent.config.getConfig(path)
     }
   }
 

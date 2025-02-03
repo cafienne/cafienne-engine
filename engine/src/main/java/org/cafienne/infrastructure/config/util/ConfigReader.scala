@@ -34,8 +34,12 @@ trait ConfigReader extends LazyLogging {
   /**
    * Print the config in a concise manner (i.e., what has been actually found in the configuration, instead of also default values)
    */
-  def printConfig(): Unit = {
-    println(s"""$toString = ${config.root().render(ConfigRenderOptions.concise().setFormatted(true))}""")
+  def printConfig(includeDefaults: Boolean = false): Unit = {
+    if (includeDefaults) {
+      println(s"""$toString = ${config.root().render(ConfigRenderOptions.defaults().setFormatted(true))}""")
+    } else {
+      println(s"""$toString = ${config.root().render(ConfigRenderOptions.concise().setFormatted(true))}""")
+    }
   }
 
   def warn(msg: String): Unit = {
