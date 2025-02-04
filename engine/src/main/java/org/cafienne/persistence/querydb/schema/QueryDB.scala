@@ -68,6 +68,8 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
     try {
       val flywayConfiguration = SlickFlyway(db)(schemas.flatMap(schema => schema.getScript))
         .baselineOnMigrate(true)
+        .baselineDescription("CaseFabric QueryDB")
+        .baselineVersion("0.0.0")
         .table(Cafienne.config.persistence.queryDB.schemaHistoryTable)
 
       // Create a connection and run migration

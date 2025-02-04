@@ -5,7 +5,7 @@ import org.cafienne.infrastructure.config.util.ConfigMigrator
 
 class JournalTableNameConfigMigrator extends ConfigMigrator {
   override def run(config: Config): Config = {
-    val prefixKey = "cafienne.query-db.table-prefix"
+    val prefixKey = "cafienne.persistence.table-prefix"
 
     if (!config.hasPath(prefixKey)) {
       return config
@@ -15,6 +15,8 @@ class JournalTableNameConfigMigrator extends ConfigMigrator {
     if (prefix.isEmpty) {
       return config
     }
+
+    logger.warn(s"Running migration on pekko table names to include prefix $prefix")
 
     // Tagging is configured in the akka persistence journal.
     //  This journal has different configuration keys per type of persistence.
