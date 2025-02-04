@@ -32,6 +32,8 @@ object EventDB extends LazyLogging {
       .configure()
       .dataSource(eventDB.jdbcConfig.url, eventDB.jdbcConfig.user, eventDB.jdbcConfig.password)
       .baselineOnMigrate(true)
+      .baselineVersion("0.0.0")
+      .baselineDescription("CaseFabric EventDB")
       .table(eventDB.schemaHistoryTable)
       .resolvers((_: MigrationResolver.Context) => schema.migrationScripts())
 
