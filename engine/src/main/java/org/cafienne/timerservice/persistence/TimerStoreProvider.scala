@@ -32,6 +32,7 @@ import slick.basic.DatabaseConfig
  */
 class TimerStoreProvider(val caseSystem: CaseSystem) extends ReadJournalProvider {
   override val system: ActorSystem = caseSystem.system
+  override val readJournal: String = caseSystem.config.persistence.readJournal
 
   val store: TimerStore = {
     journal() match {

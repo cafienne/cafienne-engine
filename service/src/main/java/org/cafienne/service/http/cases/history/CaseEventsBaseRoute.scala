@@ -42,6 +42,7 @@ trait CaseEventsBaseRoute extends CasesRoute {
 
   class CaseEvents(val caseInstanceId: String) extends InstanceEventSource {
     override def system: ActorSystem = caseSystem.system
+    override val readJournal: String = caseSystem.config.persistence.readJournal
 
     /**
       * Returns the events as a sequence. Note: do not override this along with overriding the query to make it a livestream,

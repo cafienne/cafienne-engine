@@ -4,6 +4,7 @@ import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.stream.RestartSettings
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import org.apache.pekko.testkit.TestKit
 import org.cafienne.cmmn.actorapi.command.StartCase
@@ -34,7 +35,7 @@ class TestPublicCaseOutputEvents
   implicit val logger: LoggingAdapter = Logging(system, getClass)
   implicit val executor: ExecutionContextExecutor = system.dispatcher
   val caseSystem: TestCaseSystem = new TestCaseSystem(system)
-  val source = new TestPublicEventBatchSource(system)
+  val source = new TestPublicEventBatchSource(caseSystem)
 
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(
@@ -102,8 +103,11 @@ class TestPublicCaseOutputEvents
     }
   }
 
-  class TestPublicEventBatchSource(val system: ActorSystem) extends PublicCaseEventBatchSource {
+  class TestPublicEventBatchSource(val caseSystem: TestCaseSystem) extends PublicCaseEventBatchSource {
     override def getOffset: Future[Offset] = Future.successful(Offset.noOffset)
+    override val system: ActorSystem = caseSystem.actorSystem
+    override val restartSettings: RestartSettings = caseSystem.caseSystem.config.persistence.queryDB.restartSettings
+    override val readJournal: String = caseSystem.caseSystem.config.persistence.readJournal
 
     override def query(offset: Offset): Source[EventEnvelope, NotUsed] = {
       journal().eventsByPersistenceId(caseInstanceId, 0, Long.MaxValue)

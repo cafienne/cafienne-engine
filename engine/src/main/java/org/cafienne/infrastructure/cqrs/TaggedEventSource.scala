@@ -17,11 +17,11 @@
 
 package org.cafienne.infrastructure.cqrs
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.NotUsed
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.stream.RestartSettings
 import org.apache.pekko.stream.scaladsl.{RestartSource, Source}
-import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.Future
@@ -33,6 +33,8 @@ import scala.concurrent.Future
 trait TaggedEventSource extends ReadJournalProvider with ModelEventFilter with LazyLogging  {
 
   import scala.concurrent.ExecutionContext.Implicits.global
+
+  val restartSettings: RestartSettings
 
   /**
     * Provide the offset from which we should start sourcing events
@@ -62,7 +64,7 @@ trait TaggedEventSource extends ReadJournalProvider with ModelEventFilter with L
       .map(ModelEventEnvelope) // Construct a simple wrapper that understands we're dealing with ModelEvents
 
   def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
-    RestartSource.withBackoff(Cafienne.config.persistence.queryDB.restartSettings) { () =>
+    RestartSource.withBackoff(restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
