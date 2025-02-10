@@ -47,6 +47,7 @@ class StorageCoordinator(val caseSystem: CaseSystem)
     with LazyLogging {
 
   override val system: ActorSystem = caseSystem.system
+  override val readJournal: String = caseSystem.config.persistence.readJournal
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
   if (Cafienne.config.engine.storage.recoveryDisabled) {

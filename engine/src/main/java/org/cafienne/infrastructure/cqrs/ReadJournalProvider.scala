@@ -21,13 +21,13 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.PersistenceQuery
 import org.apache.pekko.persistence.query.scaladsl._
-import org.cafienne.infrastructure.Cafienne
 
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
   */
 trait ReadJournalProvider extends LazyLogging {
   def system: ActorSystem
+  val readJournal: String
   implicit def actorSystem: ActorSystem = system
 
   /**
@@ -36,7 +36,6 @@ trait ReadJournalProvider extends LazyLogging {
     * @return
     */
   def journal(): ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery = {
-    PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](Cafienne.config.persistence.readJournal)
+    PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](readJournal)
   }
-
 }

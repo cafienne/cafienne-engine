@@ -27,6 +27,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ModelEventsReader(val caseSystem: CaseSystem) extends InstanceEventSource with LazyLogging {
   override val system: ActorSystem = caseSystem.system
+  override val readJournal: String = caseSystem.config.persistence.readJournal
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
