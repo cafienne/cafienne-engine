@@ -23,7 +23,9 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.DefinitionProvider;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.repository.WriteDefinitionException;
-import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.infrastructure.config.CaseSystemConfig;
+import org.cafienne.infrastructure.config.RepositoryConfig;
+import org.cafienne.infrastructure.config.util.SystemConfig;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +33,33 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
-    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
+    private final Map<String, FileBasedDefinition> cache;
     private String deployDirectory = null;
     private final String EXTENSION = ".xml";
+
+    private final RepositoryConfig config;
+
+    public FileBasedDefinitionProvider(RepositoryConfig config) {
+        this.config = config;
+        this.cache = new SimpleLRUCache<>(config.cacheSize());
+        this.deployDirectory = config.location();
+        File file = new File(deployDirectory);
+        if (!file.exists()) {
+            logger.warn("The deploy directory '" + file.getAbsolutePath() + "' does not exist (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path until the deploy directory is created.");
+        } else if (!file.isDirectory()) {
+            logger.warn("The deploy directory '" + file.getAbsolutePath() + "' exists but is not a directory (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path.. Configured location is '" + deployDirectory + "'");
+        } else {
+            logger.info("Reading case definitions from directory " + file.getAbsolutePath());
+        }
+    }
 
     @Override
     public List<String> list(UserIdentity user, String tenant) {
@@ -49,20 +70,10 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      * Load a definitions document from the specified location. Method internally uses a cache to speed
      * up loading of the document; the cache checks for the file's last modified timestamp; if it differs from
      * what's in the cache, the file will be newly parsed and stored in the cache instead.
-     *
-     *
-     * @param user
-     * @param tenant
-     * @param name
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws InvalidDefinitionException
      */
     @Override
     public DefinitionsDocument read(UserIdentity user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException {
-        if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
+        if (!name.endsWith(EXTENSION)) name = name + EXTENSION;
         try {
             long lastModified = -1; // Note, -1 is the default value for reading files from class path (resourceAsStream)
             InputStream contents = null;
@@ -95,55 +106,27 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
 
     @Override
     public void write(UserIdentity user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
-        if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
+        if (!name.endsWith(EXTENSION)) name = name + EXTENSION;
 
-        String prefix = getDeployDirectory() + File.separator;
+        String prefix = deployDirectory + File.separator;
         String filename = prefix + name;
         File file = new File(filename);
         File prefixFile = new File(prefix);
-        logger.debug("Saving definitions document "+name+" to "+file.getAbsolutePath());
+        logger.debug("Saving definitions document " + name + " to " + file.getAbsolutePath());
         try {
             XMLHelper.persist(definitionsDocument.getDocument(), file.getAbsoluteFile());
         } catch (IOException | TransformerException e) {
             // Make sure deployment directory details do not make it to the outside world.
             String internalMessage = e.getMessage().replace(prefixFile.getAbsolutePath() + File.separator, "");
-            throw new WriteDefinitionException("Failed to deploy definitions to '" + name +"': " + internalMessage, e);
+            throw new WriteDefinitionException("Failed to deploy definitions to '" + name + "': " + internalMessage, e);
         }
     }
 
     /**
      * Returns the absolute file corresponding with the filename from the deploy.dir.
-     *
-     * @param fileName
-     * @return
-     * @throws FileNotFoundException
      */
     private File getFile(String fileName) {
-        return new File(getDeployDirectory() + "/" + fileName).getAbsoluteFile();
-    }
-
-    /**
-     * Returns the directory in which DefinitionDocuments can be found or written to
-     * Writes warnings if the directory does not exist.
-     * The directory can be configured through the Typesafe config setting 'cafienne.definitions.location'
-     * If this setting is not defined, it will take as default value './definitions', i.e. a subfolder
-     * under the directory in which the JVM is started.
-     *
-     * @return
-     */
-    public String getDeployDirectory() {
-        if (deployDirectory == null) {
-            deployDirectory = Cafienne.config().repository().location();
-            File file = new File(deployDirectory);
-            if (!file.exists()) {
-                logger.warn("The deploy directory '" + file.getAbsolutePath() + "' does not exist (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path until the deploy directory is created.");
-            } else if (!file.isDirectory()) {
-                logger.warn("The deploy directory '" + file.getAbsolutePath() + "' exists but is not a directory (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path.. Configured location is '" + deployDirectory + "'");
-            } else {
-                logger.info("Reading case definitions from directory " + file.getAbsolutePath());
-            }
-        }
-        return deployDirectory;
+        return new File(deployDirectory + File.separator + fileName).getAbsoluteFile();
     }
 
     /**
@@ -154,10 +137,12 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     public List<String> listDefinitions() {
         List<String> fileNames = new ArrayList<>();
         try {
-            File[] files = new File(getDeployDirectory()).listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].getAbsolutePath().endsWith(EXTENSION)) {
-                    fileNames.add(files[i].getName());
+            File[] files = new File(deployDirectory).listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getAbsolutePath().endsWith(EXTENSION)) {
+                        fileNames.add(file.getName());
+                    }
                 }
             }
         } catch (NullPointerException ex) {
@@ -170,7 +155,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     }
 
     public static void main(String[] args) throws Exception {
-        FileBasedDefinitionProvider provider = new FileBasedDefinitionProvider();
+        FileBasedDefinitionProvider provider = new FileBasedDefinitionProvider(new CaseSystemConfig(SystemConfig.DEFAULT()).repository());
         Scanner s = new Scanner(System.in);
         System.out.println("Usage: DefinitionsDocument [filename] [num parse]");
         while (s.hasNextLine()) {
