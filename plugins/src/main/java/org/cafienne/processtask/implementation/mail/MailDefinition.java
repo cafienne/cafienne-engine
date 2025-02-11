@@ -19,7 +19,6 @@ package org.cafienne.processtask.implementation.mail;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
 import org.cafienne.processtask.implementation.mail.definition.AttachmentDefinition;
@@ -96,8 +95,8 @@ public class MailDefinition extends SubProcessDefinition {
         return super.getExceptionParameterNames();
     }
 
-    public Properties getMailProperties() {
-        return Cafienne.config().engine().mailService().asProperties();
+    public Properties getMailProperties(ProcessTaskActor processTaskActor) {
+        return processTaskActor.caseSystem.config().engine().mailService().asProperties();
     }
 
     @Override

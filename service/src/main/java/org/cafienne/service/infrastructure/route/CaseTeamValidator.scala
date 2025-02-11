@@ -22,7 +22,6 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.MissingTenantException
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 
@@ -35,8 +34,8 @@ trait CaseTeamValidator extends TenantValidator {
 
   def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
     val tenant = optionalTenant match {
-      case Some(value) => if (value.isBlank) Cafienne.config.platform.defaultTenant else value
-      case None => Cafienne.config.platform.defaultTenant
+      case Some(value) => if (value.isBlank) caseSystem.config.platform.defaultTenant else value
+      case None => caseSystem.config.platform.defaultTenant
     }
     if (tenant.isBlank) {
       throw new MissingTenantException("Tenant field is empty or missing and a default tenant is not configured")

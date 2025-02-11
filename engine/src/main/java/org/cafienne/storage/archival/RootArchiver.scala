@@ -30,7 +30,7 @@ class RootArchiver(caseSystem: CaseSystem, metadata: ActorMetadata) extends Root
 
   override def createOffspringNode(nodeMetadata: ActorMetadata): ArchiveNode = {
     if (nodeMetadata == metadata) {
-      new RootArchiveNode(nodeMetadata, this)
+      new RootArchiveNode(caseSystem, nodeMetadata, this)
     } else {
       new ArchiveNode(nodeMetadata, this)
     }

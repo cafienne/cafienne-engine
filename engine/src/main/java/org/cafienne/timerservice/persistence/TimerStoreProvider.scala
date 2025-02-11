@@ -36,7 +36,7 @@ class TimerStoreProvider(val caseSystem: CaseSystem) extends ReadJournalProvider
 
   val store: TimerStore = {
     journal() match {
-      case c: CassandraReadJournal => new CassandraTimerStore(c)
+      case c: CassandraReadJournal => new CassandraTimerStore(caseSystem, c)
       case _: JdbcReadJournal =>
         val timerStoreConfigKey: String = caseSystem.config.engine.timerService.store
         val timerStoreConfig = caseSystem.config.systemConfig.config.getConfig(timerStoreConfigKey)

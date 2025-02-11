@@ -17,9 +17,8 @@
 
 package org.cafienne.storage.restore
 
-import org.apache.pekko.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
+import org.apache.pekko.actor.Actor
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
 import org.cafienne.storage.archival.Archive
@@ -43,7 +42,7 @@ class RootRestorer(caseSystem: CaseSystem, metadata: ActorMetadata) extends Root
     //  Use the system dispatcher for handling the export success
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-    val storage: Storage = Cafienne.config.engine.storage.archive.plugin
+    val storage: Storage = caseSystem.config.engine.storage.archive.plugin
     val senderRef = sender()
 
     def raiseFailure(throwable: Throwable): Unit = {

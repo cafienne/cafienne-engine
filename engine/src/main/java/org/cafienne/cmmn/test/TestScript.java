@@ -28,10 +28,11 @@ import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
+import org.cafienne.cmmn.repository.DefinitionProvider;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
-import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.infrastructure.config.util.SystemConfig;
 import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
@@ -78,6 +79,8 @@ public class TestScript {
 
     private static final String defaultTenant = "hard-coded-test-tenant";
 
+    public static DefinitionProvider DEFINITIONS = SystemConfig.DEFAULT().cafienne().repository().DefinitionProvider();
+
     /**
      * Listener for CaseInstanceEvent that ought to be published by the actor system
      */
@@ -90,7 +93,7 @@ public class TestScript {
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
-            return Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
+            return DEFINITIONS.read(null, null, fileName);
         } catch (MissingDefinitionException | InvalidDefinitionException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +112,7 @@ public class TestScript {
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
-            Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
+            DEFINITIONS.read(null, null, fileName);
         } catch (MissingDefinitionException e) {
             throw new AssertionError(e);
         }
@@ -199,7 +202,7 @@ public class TestScript {
     }
 
     public static StartCase createCaseCommand(String tenant, TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
-        return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
+        return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, false);
     }
 
     public static PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {

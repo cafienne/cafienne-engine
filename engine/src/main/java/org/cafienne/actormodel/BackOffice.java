@@ -23,8 +23,10 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.*;
-import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.actormodel.response.ActorChokedFailure;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
+import org.cafienne.actormodel.response.SecurityFailure;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -117,7 +119,7 @@ class BackOffice {
     private void enableSelfCleaner() {
         if (actor.hasAutoShutdown()) {
             // Now set the new selfCleaner
-            long idlePeriod = Cafienne.config().actor().idlePeriod();
+            long idlePeriod = actor.caseSystem.config().actor().idlePeriod();
             FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
             selfCleaner = actor.getScheduler().schedule(duration, actor::takeABreak);
         }
