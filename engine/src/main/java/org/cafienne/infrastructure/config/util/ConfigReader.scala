@@ -21,6 +21,7 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.lang.reflect.InvocationTargetException
+import java.util
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 import scala.jdk.CollectionConverters._
@@ -117,9 +118,17 @@ trait ConfigReader extends LazyLogging {
     }
   }
 
-  def readStringList(path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
+  def readStrings(path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
     if (config.hasPath(path)) {
       config.getStringList(path).asScala.toSeq
+    } else {
+      defaultValue
+    }
+  }
+
+  def readStringList(path: String, defaultValue: java.util.List[String] = new util.ArrayList[String]()): java.util.List[String] = {
+    if (config.hasPath(path)) {
+      config.getStringList(path)
     } else {
       defaultValue
     }

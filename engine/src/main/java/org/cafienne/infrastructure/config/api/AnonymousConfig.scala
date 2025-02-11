@@ -21,7 +21,7 @@ import com.typesafe.config.{Config, ConfigObject}
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
 import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.config.RepositoryConfig
 import org.cafienne.infrastructure.config.util.{ChildConfigReader, ConfigReader}
 
 class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
@@ -32,7 +32,7 @@ class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
     }
     val definitionMap = scala.collection.mutable.Map[String, AnonymousCaseDefinition]()
     config.getObjectList("definitions").forEach(definitionConfig => {
-      val definition = new AnonymousCaseDefinition(definitionConfig, anonymousUser)
+      val definition = new AnonymousCaseDefinition(this.parent.parent.repository, definitionConfig, anonymousUser)
       definitionMap.put(definition.url, definition).foreach(alreadyDefined => fail(s"The url '/request/case${definition.url}' --> '${} is already defined for case definition '${alreadyDefined.definition}'"))
     })
     definitionMap.toMap
@@ -47,8 +47,8 @@ class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
   }
 }
 
-class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: AnonymousUserConfig) extends ConfigReader {
-  lazy val definition: CaseDefinition = Cafienne.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definitionFile).getFirstCase
+class AnonymousCaseDefinition(val repositoryConfig: RepositoryConfig, val myConfig: ConfigObject, val userConfig: AnonymousUserConfig) extends ConfigReader {
+  lazy val definition: CaseDefinition = repositoryConfig.DefinitionProvider.read(anonymousPlatformUser, tenant, definitionFile).getFirstCase
   lazy val definitionFile: String = {
     val filename = readString("definition")
     if (filename.isBlank) {
@@ -61,7 +61,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   // Validate url, definition and tenant contents; definition and tenant cannot be blank.
   val url: String = readString("url")
   val tenant: String = {
-    val tenant = readString("tenant", Cafienne.config.platform.defaultTenant)
+    val tenant = readString("tenant", repositoryConfig.parent.platform.defaultTenant)
     if (tenant.isBlank) {
       fail(s"Tenant is missing in anonymous case definition on url '/request/case/$url' --> '$definitionFile'; also default tenant is empty")
     }
@@ -73,7 +73,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
       new CaseTeamUser {
         override val userId: String = reader.readString("userId")
         override val origin: Origin = reader.readEnum("origin", classOf[Origin], Origin.Tenant)
-        override val caseRoles: Set[String] = reader.readStringList("caseRoles").toSet
+        override val caseRoles: Set[String] = reader.readStrings("caseRoles").toSet
         override val isOwner: Boolean = reader.readBoolean("isOwner", default = false)
       }
     })
@@ -103,7 +103,7 @@ class AnonymousUserConfig(val config: Config) extends ConfigReader {
   if (userId.isBlank) {
     fail("Anonymous user configuration must have a valid user id")
   }
-  val roles: Set[String] = readStringList("roles").toSet
+  val roles: Set[String] = readStrings("roles").toSet
   val name: String = readString("name")
   val email: String = readString("email")
 
