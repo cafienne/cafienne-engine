@@ -3,6 +3,9 @@ package org.cafienne.persistence.querydb.query
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
+import org.cafienne.infrastructure.config.TestConfig
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
+import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
@@ -17,7 +20,8 @@ import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 
 class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
-  val queryDB: QueryDB = new QueryDB
+  val persistenceConfig: PersistenceConfig = new SystemConfig(TestConfig.config).cafienne.persistence
+  val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
   val queryDBWriter: QueryDBWriter = queryDB.writer
   val taskQueries = new TaskQueriesImpl(queryDB)
 

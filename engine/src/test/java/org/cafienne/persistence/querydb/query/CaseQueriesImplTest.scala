@@ -5,6 +5,8 @@ import org.apache.pekko.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.config.TestConfig
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
+import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.materializer.tenant.TenantStorageTransaction
@@ -22,7 +24,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 
 class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll {
-  val queryDB: QueryDB = new QueryDB
+  val persistenceConfig: PersistenceConfig = new SystemConfig(TestConfig.config).cafienne.persistence
+  val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
   val queryDBWriter: QueryDBWriter = queryDB.writer
   val caseQueries = new CaseQueriesImpl(queryDB)
   implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
