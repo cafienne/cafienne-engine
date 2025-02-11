@@ -22,7 +22,7 @@ import org.cafienne.cmmn.repository.DefinitionProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.util.MandatoryConfig
 
-class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class RepositoryConfig(val parent: CaseSystemConfig) extends MandatoryConfig {
   def path = "definitions"
   private var _location = config.getString("location")
   override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"

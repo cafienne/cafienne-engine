@@ -18,7 +18,7 @@
 package org.cafienne.infrastructure
 
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.infrastructure.config.CaseSystemConfig
 
 /**
   * JVM wide configurations and settings
@@ -28,7 +28,7 @@ object Cafienne {
   /**
     * Configuration settings of this Cafienne Platform
     */
-  lazy val config: CafienneConfig = CafienneConfig()
+  lazy val config: CaseSystemConfig = CaseSystemConfig()
 
   /**
     * Returns the BuildInfo as a string (containing JSON)

@@ -18,9 +18,9 @@
 package org.cafienne.infrastructure.config.api
 
 import org.cafienne.infrastructure.config.util.MandatoryConfig
-import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.infrastructure.config.CaseSystemConfig
 
-class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class ApiConfig(val parent: CaseSystemConfig) extends MandatoryConfig {
   def path = "api"
 
   lazy val bindHost: String = {

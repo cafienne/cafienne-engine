@@ -21,7 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
 import org.cafienne.actormodel.identity.IdentityCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.infrastructure.config.CaseSystemConfig
 import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContextExecutor
   * In the local scenario, the case system is run in-memory, and messages are forwarded by
   * a simple in-memory router.
   */
-class CaseSystem(val system: ActorSystem = ActorSystem("Cafienne-Case-System", Cafienne.config.systemConfig), val config: CafienneConfig = Cafienne.config, val queryDB: QueryDB = new QueryDB()) extends LazyLogging {
+class CaseSystem(val system: ActorSystem = ActorSystem("Cafienne-Case-System", Cafienne.config.systemConfig), val config: CaseSystemConfig = Cafienne.config, val queryDB: QueryDB = new QueryDB()) extends LazyLogging {
   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
   /**
