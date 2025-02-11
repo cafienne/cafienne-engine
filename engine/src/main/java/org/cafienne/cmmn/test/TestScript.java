@@ -166,7 +166,7 @@ public class TestScript {
      * Create a new {@link TestScript} with the specified name
      */
     public TestScript(String testName) {
-        this(testName, new CaseSystem(ActorSystem.create(testName), Cafienne.config(), null));
+        this(testName, CaseSystem.apply(ActorSystem.create(testName)));
     }
 
     /**

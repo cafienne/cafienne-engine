@@ -14,7 +14,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
 
   val logger: LoggingAdapter = Logging(system, getClass)
 
-  implicit val caseSystem: CaseSystem = new CaseSystem(ActorSystem("RepositoryRouteTest"))
+  implicit val caseSystem: CaseSystem = CaseSystem(ActorSystem("RepositoryRouteTest"))
 
   val repositoryRoute: RepositoryRoute = new RepositoryRoute(caseSystem) {
   }

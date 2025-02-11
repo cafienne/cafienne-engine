@@ -21,6 +21,8 @@ import com.typesafe.config.Config
 import org.apache.pekko.stream.RestartSettings
 import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.MandatoryConfig
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 
 class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
@@ -43,6 +45,8 @@ class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
       parent.config.getConfig(path)
     }
   }
+
+  lazy val jdbcConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", config)
 
   lazy val schemaHistoryTable: String = readString("schema-history-table", "flyway_schema_history")
 
