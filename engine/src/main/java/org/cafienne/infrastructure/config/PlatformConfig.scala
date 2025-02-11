@@ -18,7 +18,7 @@
 package org.cafienne.infrastructure.config
 
 import com.typesafe.config.{ConfigValue, ConfigValueFactory, ConfigValueType}
-import org.cafienne.actormodel.identity.PlatformOwner
+import org.cafienne.actormodel.identity.{PlatformOwner, UserIdentity}
 import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
@@ -66,9 +66,9 @@ class PlatformConfig(val parent: CaseSystemConfig) extends MandatoryConfig {
     }
   }
 
-  def isPlatformOwner(userId: String): Boolean = {
+  def isPlatformOwner(user: UserIdentity): Boolean = {
     // TTP: platformOwners should be taken as Set and "toLowerCase" initially, and then we can do "contains" instead
-    logger.debug("Checking whether user " + userId + " is a platform owner; list of owners: " + platformOwners)
-    platformOwners.exists(o => o.id.equalsIgnoreCase(userId))
+    logger.debug("Checking whether user " + user.id + " is a platform owner; list of owners: " + platformOwners)
+    platformOwners.exists(o => o.id.equalsIgnoreCase(user.id))
   }
 }

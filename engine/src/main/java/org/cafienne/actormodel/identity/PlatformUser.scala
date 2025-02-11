@@ -18,7 +18,6 @@
 package org.cafienne.actormodel.identity
 
 import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
@@ -53,30 +52,29 @@ final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[Co
     *
     * @return
     */
-  def defaultTenant: String = {
+  def defaultTenant(defaultPlatformTenant: String): String = {
     if (tenants.length == 1) {
       tenants.head
     } else {
-      val configuredDefaultTenant = Cafienne.config.platform.defaultTenant
-      if (configuredDefaultTenant.isEmpty) {
+      if (defaultPlatformTenant.isEmpty) {
         throw new MissingTenantException("Tenant property must have a value")
       }
-      if (!tenants.contains(configuredDefaultTenant)) {
+      if (!tenants.contains(defaultPlatformTenant)) {
         if (tenants.isEmpty) {
           // Throws an exception that user does not belong to any tenant
           getTenantUser("")
         }
         throw new MissingTenantException("Tenant property must have a value, because user belongs to multiple tenants")
       }
-      configuredDefaultTenant
+      defaultPlatformTenant
     }
   }
 
-  def resolveTenant(optionalTenant: Option[String]): String = {
+  def resolveTenant(optionalTenant: Option[String], defaultPlatformTenant: String): String = {
     optionalTenant match {
-      case None => defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
+      case None => defaultTenant(defaultPlatformTenant) // This will throw an IllegalArgumentException if the default tenant is not configured
       case Some(tenant) => if (tenant.isBlank) {
-        defaultTenant
+        defaultPlatformTenant
       } else {
         tenant
       }
@@ -90,8 +88,6 @@ final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[Co
   def shouldBelongTo(tenant: String): Unit = if (!isTenantMember(tenant)) throw AuthorizationException("Tenant '" + tenant + "' does not exist, or user '" + id + "' is not registered in it")
 
   def isTenantMember(tenant: String): Boolean = users.find(_.tenant == tenant).fold(false)(_.enabled)
-
-  def isPlatformOwner: Boolean = Cafienne.isPlatformOwner(id)
 
   def getTenantUser(tenant: String): TenantUser = users.find(u => u.tenant == tenant).getOrElse({
     val message = tenants.isEmpty match {
