@@ -23,12 +23,6 @@ import org.cafienne.infrastructure.config.CaseSystemConfig
   * JVM wide configurations and settings
   */
 object Cafienne {
-  /**
-    * Returns the BuildInfo as a string (containing JSON)
-    *
-    * @return
-    */
-  lazy val version = new CafienneVersion
 
   /**
     * Configuration settings of this Cafienne Platform

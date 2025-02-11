@@ -7,9 +7,9 @@ import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitio
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.cmmn.instance.{PlanItemType, State, Transition}
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
+import org.cafienne.system.CaseSystem
 
 import java.time.Instant
 
@@ -19,13 +19,13 @@ import java.time.Instant
   * @param caseDefinition
   * @param user
   */
-class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: TenantUser) {
+class EventFactory(caseSystem: CaseSystem, actorId: String, caseDefinition: CaseDefinition, user: TenantUser) {
 
   def createCaseDefinitionApplied(user: TenantUser = user) : CaseDefinitionApplied = {
     val json = new ValueMap(
       Fields.caseName, caseDefinition.getName
       ,Fields.definition, caseDefinition.toJSON
-      ,Fields.engineVersion, Cafienne.version.json
+      ,Fields.engineVersion, caseSystem.version.json
       ,Fields.parentActorId, ""
       ,Fields.rootActorId, actorId
       ,Fields.createdOn, Instant.now
