@@ -17,7 +17,6 @@
 
 package org.cafienne.persistence.querydb.schema.versions
 
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
 import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables}
 import slick.basic.DatabaseConfig
@@ -68,7 +67,7 @@ trait CafienneTablesV2 extends CafienneTablesV3 {
 }
 
 
-class QueryDB_1_1_6(val dbConfig: DatabaseConfig[JdbcProfile])
+class QueryDB_1_1_6(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends QueryDBSchemaVersion
     with CaseTables
     with TaskTables
@@ -129,7 +128,7 @@ class QueryDB_1_1_6(val dbConfig: DatabaseConfig[JdbcProfile])
 
   def addUserRoleOwnerColumn = TableMigration(TableQuery[UserRoleTable]).addColumns(_.isOwner)
 
-  def resetTenantProjection = SqlMigration(s"""DELETE FROM "${Cafienne.config.persistence.tablePrefix}offset_storage" where "name" = 'TenantProjectionsWriter' """)
+  def resetTenantProjection = SqlMigration(s"""DELETE FROM "${tablePrefix}offset_storage" where "name" = 'TenantProjectionsWriter' """)
 
   def dropTenantOwnersTable = TableMigration(TableQuery[TenantOwnersTable]).drop
 

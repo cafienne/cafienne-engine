@@ -36,6 +36,7 @@ class QueryDBWriter(val queryDB: QueryDB) extends QueryDBStorage {
   override def createTenantTransaction(tenant: String): TenantStorageTransaction = new SlickTenantTransaction(this)
 
   override def getOffset(offsetName: String): Future[Offset] = new JDBCOffsetStorage {
+    override val tablePrefix: String = queryDB.tablePrefix
     override val storageName: String = offsetName
     override lazy val dbConfig = queryDB.dbConfig
     override implicit val ec: ExecutionContext = db.ioExecutionContext

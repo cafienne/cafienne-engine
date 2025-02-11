@@ -30,6 +30,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 class QueryDB(config: PersistenceConfig, val dbConfig: DatabaseConfig[JdbcProfile]) extends SlickMigrationExtensions with LazyLogging {
+  override val tablePrefix: String = config.tablePrefix
   val writer = new QueryDBWriter(this)
 
   def startEventSinks(caseSystem: CaseSystem): Unit = {
@@ -88,14 +89,14 @@ class QueryDB(config: PersistenceConfig, val dbConfig: DatabaseConfig[JdbcProfil
 
   def initializeDatabaseSchema(): MigrateResult = {
     useSchema(
-      new QueryDB_1_0_0(dbConfig),
-      new QueryDB_1_1_5(dbConfig),
-      new QueryDB_1_1_6(dbConfig),
-      new QueryDB_1_1_10(dbConfig),
-      new QueryDB_1_1_11(dbConfig),
-      new QueryDB_1_1_16(dbConfig),
-      new QueryDB_1_1_18(dbConfig),
-      new QueryDB_1_1_22(dbConfig),
+      new QueryDB_1_0_0(dbConfig, tablePrefix),
+      new QueryDB_1_1_5(dbConfig, tablePrefix),
+      new QueryDB_1_1_6(dbConfig, tablePrefix),
+      new QueryDB_1_1_10(dbConfig, tablePrefix),
+      new QueryDB_1_1_11(dbConfig, tablePrefix),
+      new QueryDB_1_1_16(dbConfig, tablePrefix),
+      new QueryDB_1_1_18(dbConfig, tablePrefix),
+      new QueryDB_1_1_22(dbConfig, tablePrefix),
     )
   }
 

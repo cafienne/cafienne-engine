@@ -18,9 +18,7 @@
 package org.cafienne.persistence.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
 import org.cafienne.persistence.querydb.schema.QueryDB
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
 
 import scala.collection.mutable.{Map, Set}
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,13 +32,7 @@ trait PlatformQueries {
   def whereUsedInCases(userIds: Seq[String], tenants: Option[Seq[String]]): Future[Map[(String, String), Set[String]]] = ???
 }
 
-class PlatformQueriesImpl(val queryDB: QueryDB)
-  extends PlatformQueries
-    with TenantTables
-    with CaseTables
-    with TaskTables
-    with SlickQueryExtensions
-    with LazyLogging {
+class PlatformQueriesImpl(val queryDB: QueryDB) extends QueryDBReader with PlatformQueries with LazyLogging {
 
   val dbConfig = queryDB.dbConfig
 

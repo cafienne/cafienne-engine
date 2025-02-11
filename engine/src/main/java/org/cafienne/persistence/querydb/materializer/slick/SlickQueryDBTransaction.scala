@@ -32,6 +32,7 @@ trait SlickQueryDBTransaction
     with OffsetStoreTables {
 
   val writer: QueryDBWriter
+  override val tablePrefix: String = writer.queryDB.tablePrefix
   val dbConfig = writer.queryDB.dbConfig
 
   import dbConfig.profile.api._

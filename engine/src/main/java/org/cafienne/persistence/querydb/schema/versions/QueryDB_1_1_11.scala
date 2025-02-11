@@ -23,7 +23,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.migration.api.TableMigration
 
-class QueryDB_1_1_11(val dbConfig: DatabaseConfig[JdbcProfile])
+class QueryDB_1_1_11(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends QueryDBSchemaVersion
     with CaseTables
     with TaskTables

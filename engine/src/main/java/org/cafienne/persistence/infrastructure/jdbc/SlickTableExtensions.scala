@@ -17,7 +17,6 @@
 
 package org.cafienne.persistence.infrastructure.jdbc
 
-import org.cafienne.infrastructure.Cafienne
 import slick.ast.ColumnOption
 import slick.lifted.{ColumnOrdered, Index}
 import slick.relational.RelationalProfile.ColumnOption.Length
@@ -31,9 +30,9 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
 trait SlickTableExtensions extends SlickDatabaseProfile {
   import dbConfig.profile.api._
 
-  val prefix: String = Cafienne.config.persistence.tablePrefix
+  val tablePrefix: String
 
-  abstract class CafienneTable[T](tag: Tag, name: String) extends Table[T](tag, prefix + name) {
+  abstract class CafienneTable[T](tag: Tag, name: String) extends Table[T](tag, tablePrefix + name) {
 
     /**
      * If queries on the table use the Sort case class, then the table must implement this method
@@ -74,7 +73,7 @@ trait SlickTableExtensions extends SlickDatabaseProfile {
      *
      */
     def oldStyleIxName(column: Rep[_]): String = {
-      if (prefix.isEmpty) {
+      if (tablePrefix.isEmpty) {
         // Old style index generation includes table-name twice. When we also add the prefix it may become too long.
         //  When there is a prefix we make the index name shorter.
         s"ix_${tableName}__$column"

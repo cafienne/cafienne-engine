@@ -26,7 +26,7 @@ import slick.migration.api.TableMigration
 
 import java.time.Instant
 
-class QueryDB_1_1_22(val dbConfig: DatabaseConfig[JdbcProfile])
+class QueryDB_1_1_22(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends QueryDBSchemaVersion
     with CafienneTablesV3 {
 

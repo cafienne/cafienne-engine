@@ -19,20 +19,12 @@ package org.cafienne.persistence.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
-import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
 import org.cafienne.persistence.querydb.record._
 import org.cafienne.persistence.querydb.schema.QueryDB
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BaseQueryImpl(val queryDB: QueryDB)
-  extends SlickQueryExtensions
-    with CaseTables
-    with TaskTables
-    with TenantTables
-    with ConsentGroupTables
-    with LazyLogging {
+class BaseQueryImpl(val queryDB: QueryDB) extends QueryDBReader with LazyLogging {
 
   val dbConfig = queryDB.dbConfig
   import dbConfig.profile.api._

@@ -15,23 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.schema.versions
+package org.cafienne.persistence.querydb.query
 
-import org.cafienne.persistence.infrastructure.jdbc.schema.QueryDBSchemaVersion
-import org.cafienne.persistence.querydb.schema.table.TenantTables
-import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
-import slick.migration.api.TableMigration
+import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
+import org.cafienne.persistence.querydb.schema.QueryDB
+import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
-class QueryDB_1_1_18(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
-  extends QueryDBSchemaVersion
-    with TenantTables {
-
-  val version = "1.1.18"
-  val migrations = addUserRoleTenantIndex
-
-  import dbConfig.profile.api._
-
-  def addUserRoleTenantIndex = TableMigration(TableQuery[UserRoleTable]).addIndexes(_.indexUserRoleTenant)
-
+/**
+ * Expose tables available in the QueryDB
+ */
+trait QueryDBReader extends SlickQueryExtensions
+  with TenantTables
+  with ConsentGroupTables
+  with CaseTables
+  with TaskTables {
+  val queryDB: QueryDB
+  val tablePrefix: String = queryDB.tablePrefix
 }
