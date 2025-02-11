@@ -1,9 +1,9 @@
 package org.cafienne.persistence.infrastructure.jdbc.schema
 
 import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
-import slick.jdbc.{JdbcProfile, SQLServerProfile}
+import slick.jdbc.{HsqldbProfile, JdbcProfile, MySQLProfile, OracleProfile, PostgresProfile, SQLServerProfile}
 import slick.migration.api.org.cafienne.persistence.infrastructure.jdbc.sqlserver.SQLServerDialect
-import slick.migration.api.{Dialect, GenericDialect, MigrationSeq, SqlMigration}
+import slick.migration.api.{Dialect, GenericDialect, HsqldbDialect, MigrationSeq, MySQLDialect, OracleDialect, PostgresDialect, SqlMigration}
 import slick.sql.SqlAction
 
 trait SlickMigrationExtensions extends SlickTableExtensions {
@@ -11,6 +11,10 @@ trait SlickMigrationExtensions extends SlickTableExtensions {
   implicit val dialect: Dialect[_ <: JdbcProfile] = {
     dbConfig.profile match {
       case _: SQLServerProfile => new SQLServerDialect
+      case _: PostgresProfile => new PostgresDialect
+      case _: OracleProfile => new OracleDialect
+      case _: HsqldbProfile => new HsqldbDialect
+      case _: MySQLProfile => new MySQLDialect
       case _ => GenericDialect(dbConfig.profile)
     }
   }

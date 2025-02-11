@@ -5,6 +5,7 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.persistence.eventdb.Profile
 import org.cafienne.persistence.eventdb.schema.EventDBSchema
 import org.cafienne.persistence.eventdb.schema.h2.H2EventDBSchema
+import org.cafienne.persistence.eventdb.schema.hsqldb.HSQLDBEventDBSchema
 import org.cafienne.persistence.eventdb.schema.postgres.PostgresEventDBSchema
 import org.cafienne.persistence.eventdb.schema.sqlserver.SQLServerEventDBSchema
 import org.flywaydb.core.Flyway
@@ -22,10 +23,11 @@ object EventDB extends LazyLogging {
       case Profile.Postgres => PostgresEventDBSchema
       case Profile.SQLServer => SQLServerEventDBSchema
       case Profile.H2 =>  H2EventDBSchema
-      case Profile.Unsupported => throw new IllegalArgumentException("This type of profile is not supported")
+      case Profile.HSQLDB => HSQLDBEventDBSchema
+      case other => throw new IllegalArgumentException(s"Type of profile $other is not supported")
     }
 
-    logger.info("Running event database migrations")
+    logger.info(s"Running event database migrations with schema ${schema.getClass.getSimpleName}")
 
     // Create configuration
     val flywayConfiguration = Flyway
