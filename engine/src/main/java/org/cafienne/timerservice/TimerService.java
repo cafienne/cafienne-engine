@@ -42,7 +42,7 @@ public class TimerService extends ModelActor {
         this.storage = new TimerStoreProvider(caseSystem).store();
         this.monitor = new TimerMonitor(this);
         this.eventSink = new TimerEventSink(this);
-        setEngineVersion(Cafienne.version());
+        setEngineVersion(caseSystem.version());
     }
 
     @Override

@@ -47,7 +47,7 @@ class CaseEventSinkTest
 
   val user: TenantUser = TestIdentityFactory.createTenantUser("test")
   val caseDefinition: CaseDefinition = loadCaseDefinition("testdefinition/helloworld.xml")
-  val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user)
+  val eventFactory = new EventFactory(caseSystem, caseInstanceId, caseDefinition, user)
 
   new CaseEventSink(caseSystem, TestQueryDB).start()
 }

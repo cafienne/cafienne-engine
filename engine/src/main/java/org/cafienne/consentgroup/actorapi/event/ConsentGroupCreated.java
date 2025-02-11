@@ -20,7 +20,6 @@ package org.cafienne.consentgroup.actorapi.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -35,7 +34,7 @@ public class ConsentGroupCreated extends ConsentGroupBaseEvent implements Bootst
 
     public ConsentGroupCreated(ConsentGroupActor group, String tenant) {
         super(group);
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = group.caseSystem.version();
         this.tenant = tenant;
     }
 
