@@ -21,10 +21,10 @@ import org.apache.pekko.http.scaladsl.model.{HttpResponse, StatusCodes}
 import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.service.infrastructure.authentication.{AuthenticatedUser, AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
+import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.ExecutionContext
@@ -37,6 +37,7 @@ trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives 
 
   override val userCache: IdentityProvider = caseSystem.userCache
   override implicit val ex: ExecutionContext = caseSystem.system.dispatcher
+  override val config: OIDCConfiguration = httpService.oidcConfiguration
 
   override def exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: CannotReachIDPException => handleIDPException(e)
@@ -92,7 +93,7 @@ trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives 
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route): Route = {
-    if (Cafienne.config.developerRouteOpen) {
+    if (caseSystem.config.developerRouteOpen) {
       subRoute(null)
     } else {
       validUser(subRoute)

@@ -17,24 +17,23 @@
 
 package org.cafienne.service.http.tasks
 
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.humantask.actorapi.command._
-import org.cafienne.service.infrastructure.payload.HttpJsonReader._
-import org.cafienne.json.ValueMap
-import org.cafienne.service.http.tasks.TaskAPIFormat._
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.humantask.actorapi.command._
+import org.cafienne.json.ValueMap
+import org.cafienne.service.http.CaseEngineHttpServer
+import org.cafienne.service.http.tasks.TaskAPIFormat._
+import org.cafienne.service.infrastructure.payload.HttpJsonReader._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
-class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
+class TaskActionRoutes(override val httpService: CaseEngineHttpServer) extends TaskRoute {
   override def routes: Route = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
 
   @Path("/{taskId}")

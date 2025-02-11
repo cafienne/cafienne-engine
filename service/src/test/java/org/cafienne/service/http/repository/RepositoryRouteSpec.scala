@@ -5,19 +5,20 @@ import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.payload.HttpXmlReader
 import org.cafienne.system.CaseSystem
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
-class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteTest {
+class RepositoryRouteSpec extends AnyFlatSpec with Matchers with ScalatestRouteTest {
 
   val logger: LoggingAdapter = Logging(system, getClass)
+  logger.info("Running RepositoryRouteSpec")
 
   implicit val caseSystem: CaseSystem = CaseSystem(ActorSystem("RepositoryRouteTest"))
 
-  val repositoryRoute: RepositoryRoute = new RepositoryRoute(caseSystem) {
-  }
+  val repositoryRoute: RepositoryRoute = new RepositoryRoute(new CaseEngineHttpServer(caseSystem))
 
   testValidationRoute("fail when an invalid definition is given", "testdefinition/invaliddefinition.xml", "[ \"helloworld.case: Plan item Receive Greeting and Send response refers to a definition named pid_cm_csVQy_167, but that definition is not found\" ]", StatusCodes.BadRequest)
   testValidationRoute("fail when no definition is given", "testdefinition/nodefinition.xml", "[ \"The definitions document does not contain any definitions\" ]", StatusCodes.BadRequest)

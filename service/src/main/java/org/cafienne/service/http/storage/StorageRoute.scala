@@ -17,13 +17,12 @@
 
 package org.cafienne.service.http.storage
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.util.Timeout
-import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.ActorMetadata
@@ -42,6 +41,7 @@ trait StorageRoute extends AuthenticatedRoute {
   //  The coordinator will also open the event stream on current events to recover existing
   //  deletion processes that have not yet finished.
   StorageRoute.startCoordinator(caseSystem)
+  implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
   def initiateDataRemoval(metadata: ActorMetadata): Route = {
     StorageRoute.askStorageCoordinator(RemoveActorData(metadata))
@@ -66,9 +66,8 @@ object StorageRoute extends LazyLogging {
     }
   }
 
-  def askStorageCoordinator(command: StorageCommand): Route = {
+  def askStorageCoordinator(command: StorageCommand)(implicit timeout: Timeout): Route = {
     import org.apache.pekko.pattern.ask
-    implicit val timeout: Timeout = Cafienne.config.actor.askTimout
 
     onComplete(storageCoordinator.ask(command)) {
       case Success(value) =>

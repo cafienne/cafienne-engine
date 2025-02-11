@@ -30,16 +30,16 @@ import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.team.CaseTeamAPI._
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
-import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
+class CaseTeamRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute with CaseTeamValidator {
   override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setGroup, deleteGroup, setTenantRole, deleteTenantRole)
 
   @Path("/{caseInstanceId}/caseteam")

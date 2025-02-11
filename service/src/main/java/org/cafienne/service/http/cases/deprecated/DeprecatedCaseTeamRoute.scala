@@ -20,11 +20,11 @@ package org.cafienne.service.http.cases.deprecated
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
 import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.team.CaseTeamAPI.Compatible._
-import org.cafienne.system.CaseSystem
 
-class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class DeprecatedCaseTeamRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override val addToSwaggerRoutes = false
   override def routes: Route = concat(putCaseTeamMember, deleteCaseTeamMember)
 

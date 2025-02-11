@@ -23,12 +23,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Directives._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.CaseServiceRoute
-import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
 @Path("/")
-class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseServiceRoute {
+class CaseEngineHealthRoute(override val httpService: CaseEngineHttpServer) extends CaseServiceRoute {
 
 
   // For now, directly in the main, and not as child of PlatformRoutes;

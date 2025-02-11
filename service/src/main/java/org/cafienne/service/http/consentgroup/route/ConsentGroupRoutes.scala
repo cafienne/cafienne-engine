@@ -17,15 +17,14 @@
 
 package org.cafienne.service.http.consentgroup.route
 
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 
 @Path("consent-group")
-class ConsentGroupRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class ConsentGroupRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix: String = "consent-group"
 
-  addSubRoute(new ConsentGroupOwnersRoute(caseSystem))
-  addSubRoute(new ConsentGroupMembersRoute(caseSystem))
+  addSubRoute(new ConsentGroupOwnersRoute(httpService))
+  addSubRoute(new ConsentGroupMembersRoute(httpService))
 }
