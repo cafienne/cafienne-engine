@@ -1,9 +1,8 @@
 package org.cafienne.persistence.eventdb.schema.sqlserver
 
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.eventdb.schema.ClassicEventDBSchemaScript
 
-class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
+class V1_1_13__AddTimerService(tablePrefix: String) extends ClassicEventDBSchemaScript {
 
   val version = "1.1.13"
 
@@ -13,8 +12,8 @@ class V1_1_13__AddTimerService extends ClassicEventDBSchemaScript {
 
   override def getChecksum: Integer = 235057769
 
-  val timerTableName = s"${Cafienne.config.persistence.tablePrefix}timer"
-  val offsetTableName = s"${Cafienne.config.persistence.tablePrefix}offset_storage"
+  val timerTableName = s"${tablePrefix}timer"
+  val offsetTableName = s"${tablePrefix}offset_storage"
 
   override def sql: String = {
     s"""IF OBJECT_ID(N'[$timerTableName]', 'U') IS NULL

@@ -20,7 +20,6 @@ package org.cafienne.service
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.config.persistence.eventdb.JournalTableNameConfigMigrator
 import org.cafienne.infrastructure.config.util.SystemConfig
-import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
@@ -34,7 +33,6 @@ object Main extends App with LazyLogging {
 
     // Create the Case System
     val caseSystem: CaseSystem = CaseSystem(config)
-    EventDB.initializeDatabaseSchema(config.cafienne.persistence)
 
     // Start running the Event Sinks
     caseSystem.queryDB.startEventSinks(caseSystem)

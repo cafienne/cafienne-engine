@@ -8,17 +8,15 @@ import org.cafienne.persistence.eventdb.schema.h2.H2EventDBSchema
 import org.cafienne.persistence.eventdb.schema.postgres.PostgresEventDBSchema
 import org.cafienne.persistence.eventdb.schema.sqlserver.SQLServerEventDBSchema
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.output.MigrateResult
 import org.flywaydb.core.api.resolver.MigrationResolver
 
-object EventDB extends LazyLogging {
-  def initializeDatabaseSchema(config: PersistenceConfig): MigrateResult = {
-    val eventDB = config.eventDB
-    if (!eventDB.isJDBC) {
-      return null
-    }
+class EventDB(config: PersistenceConfig) extends LazyLogging {
+  if (config.initializeDatabaseSchemas && config.eventDB.isJDBC) {
+    val jdbcConfig = config.eventDB.jdbcConfig
+    val tablePrefix = config.tablePrefix
+    val flywayTableName = config.eventDB.schemaHistoryTable
 
-    val schema: EventDBSchema = eventDB.jdbcConfig.profile match {
+    val schema: EventDBSchema = jdbcConfig.profile match {
       case Profile.Postgres => PostgresEventDBSchema
       case Profile.SQLServer => SQLServerEventDBSchema
       case Profile.H2 =>  H2EventDBSchema
@@ -30,12 +28,12 @@ object EventDB extends LazyLogging {
     // Create configuration
     val flywayConfiguration = Flyway
       .configure()
-      .dataSource(eventDB.jdbcConfig.url, eventDB.jdbcConfig.user, eventDB.jdbcConfig.password)
+      .dataSource(jdbcConfig.url, jdbcConfig.user, jdbcConfig.password)
       .baselineOnMigrate(true)
       .baselineVersion("0.0.0")
       .baselineDescription("CaseFabric EventDB")
-      .table(eventDB.schemaHistoryTable)
-      .resolvers((_: MigrationResolver.Context) => schema.migrationScripts())
+      .table(flywayTableName)
+      .resolvers((_: MigrationResolver.Context) => schema.migrationScripts(tablePrefix))
 
     // Create a connection and run migration
     val flyway = flywayConfiguration.load()

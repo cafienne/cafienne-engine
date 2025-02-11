@@ -23,6 +23,7 @@ import org.cafienne.actormodel.identity.IdentityCache
 import org.cafienne.infrastructure.CafienneVersion
 import org.cafienne.infrastructure.config.CaseSystemConfig
 import org.cafienne.infrastructure.config.util.SystemConfig
+import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
@@ -38,7 +39,7 @@ import scala.concurrent.ExecutionContextExecutor
   * In the local scenario, the case system is run in-memory, and messages are forwarded by
   * a simple in-memory router.
   */
-class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val queryDB: QueryDB) extends LazyLogging {
+class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val queryDB: QueryDB, val eventDB: EventDB) extends LazyLogging {
   lazy val config: CaseSystemConfig = systemConfig.cafienne
 
   /**
@@ -67,12 +68,14 @@ object CaseSystem {
 
   def apply(systemConfig: SystemConfig): CaseSystem = {
     val queryDB = new QueryDB(systemConfig.cafienne.persistence, systemConfig.cafienne.persistence.queryDB.jdbcConfig)
-    new CaseSystem(systemConfig, ActorSystem("Cafienne-Case-System", systemConfig.config), queryDB)
+    val eventDB = new EventDB(systemConfig.cafienne.persistence)//, config.eventDB.jdbcConfig)
+    new CaseSystem(systemConfig, ActorSystem("Cafienne-Case-System", systemConfig.config), queryDB, eventDB)
   }
 
   def apply(actorSystem: ActorSystem): CaseSystem = {
     val systemConfig = new SystemConfig(actorSystem.settings.config)
     val queryDB = new QueryDB(systemConfig.cafienne.persistence, systemConfig.cafienne.persistence.queryDB.jdbcConfig)
-    new CaseSystem(systemConfig, actorSystem, queryDB)
+    val eventDB = new EventDB(systemConfig.cafienne.persistence)
+    new CaseSystem(systemConfig, actorSystem, queryDB, eventDB)
   }
 }
