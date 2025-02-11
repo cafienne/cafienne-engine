@@ -27,6 +27,8 @@ case class PlatformOwner(id: String) extends UserIdentity {
 }
 
 object PlatformOwner {
+  def apply(user: UserIdentity): PlatformOwner = PlatformOwner(user.id)
+
   def deserialize(json: ValueMap): PlatformOwner = {
     val userId: String = json.readString(Fields.userId)
     PlatformOwner(userId)

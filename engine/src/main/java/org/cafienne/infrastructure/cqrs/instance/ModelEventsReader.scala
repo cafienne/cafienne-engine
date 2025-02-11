@@ -35,7 +35,7 @@ class ModelEventsReader(val caseSystem: CaseSystem) extends InstanceEventSource 
     val eventList = new ListBuffer[PublicModelEvent]
     events(actorId, from, to).runForeach(envelope => {
       val event = envelope.event
-      if (user == null || user.tenants.contains(event.tenant) || user.isPlatformOwner) {
+      if (user == null || user.tenants.contains(event.tenant) || caseSystem.config.platform.isPlatformOwner(user)) {
         eventList += new PublicModelEvent(envelope.sequenceNr, envelope.offset, event)
       }
     }).map(_ => eventList.toSeq)

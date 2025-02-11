@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.PlatformOwner;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
@@ -44,7 +43,7 @@ public abstract class PlatformTenantCommand extends TenantCommand {
 
     @Override
     public void validate(TenantActor modelActor) throws InvalidCommandException {
-        if (! Cafienne.isPlatformOwner(getUser())) {
+        if (! modelActor.caseSystem.config().platform().isPlatformOwner(getUser())) {
             throw new AuthorizationException("Only platform owners can invoke platform commands");
         }
     }
