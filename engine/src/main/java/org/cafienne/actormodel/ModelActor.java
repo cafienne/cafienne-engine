@@ -34,7 +34,6 @@ import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.cafienne.system.CaseSystem;
@@ -72,7 +71,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    private boolean debugMode = Cafienne.config().actor().debugEnabled();
+    private boolean debugMode;
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -108,6 +107,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     protected ModelActor(CaseSystem caseSystem) {
         this.caseSystem = caseSystem;
+        this.debugMode = caseSystem.config().actor().debugEnabled();
         this.id = self().path().name();
         this.scheduler = new CaseScheduler(this);
     }
@@ -236,7 +236,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     }
 
     void takeABreak() {
-        takeABreak("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (Cafienne.config().actor().idlePeriod() / 1000) + " seconds");
+        takeABreak("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (caseSystem.config().actor().idlePeriod() / 1000) + " seconds");
     }
 
     void takeABreak(String msg) {
@@ -292,7 +292,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         synchronized (responseListeners) {
             responseListeners.put(command.getMessageId(), new Responder(command, left, right));
         }
-        addDebugInfo(() -> "----------" + this + " sends command " + command.getCommandDescription() , command.rawJson());
+        addDebugInfo(() -> "----------" + this + " sends command " + command.getCommandDescription(), command.rawJson());
 
         caseSystem.gateway().inform(command, self());
     }
@@ -387,7 +387,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
      * then the appender's debugInfo method will be invoked to store a string in the log.
      *
-     * @param appender Producer of the log info
+     * @param appender       Producer of the log info
      * @param additionalInfo Additional parameters such as Throwable or json Value will be printed in a special manner
      */
     public void addDebugInfo(DebugInfoAppender appender, Object... additionalInfo) {
@@ -399,10 +399,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
      * then the appender's debugInfo method will be invoked to store a string in the log.
      *
-     * @param logger The slf4j logger instance to check whether debug logging is enabled
-     * @param appender A functional interface returning "an" object, holding the main info to be logged.
-     *                 Note: the interface is only invoked if logging is enabled. This appender typically
-     *                 returns a String that is only created upon demand (in order to speed up a bit)
+     * @param logger         The slf4j logger instance to check whether debug logging is enabled
+     * @param appender       A functional interface returning "an" object, holding the main info to be logged.
+     *                       Note: the interface is only invoked if logging is enabled. This appender typically
+     *                       returns a String that is only created upon demand (in order to speed up a bit)
      * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
     public void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {

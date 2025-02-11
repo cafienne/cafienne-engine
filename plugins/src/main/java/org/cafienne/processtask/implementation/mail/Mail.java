@@ -88,7 +88,7 @@ public class Mail extends SubProcess<MailDefinition> {
         processTaskActor.addDebugInfo(() -> "Connecting to mail server");
         long now = System.currentTimeMillis();
 
-        Properties mailServerProperties = getDefinition().getMailProperties();
+        Properties mailServerProperties = getDefinition().getMailProperties(processTaskActor);
         String userName = mailServerProperties.get("authentication.user").toString();
         String password = mailServerProperties.get("authentication.password").toString();
         mailSession = Session.getInstance(mailServerProperties, new Authenticator() {

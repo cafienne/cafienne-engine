@@ -20,6 +20,7 @@ package org.cafienne.processtask.implementation.smtp;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.mail.MailDefinition;
+import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -41,10 +42,10 @@ public class SMTPCallDefinition extends MailDefinition {
         this.smtpPort = parseString("smtp-port", false);
     }
 
-    public Properties getMailProperties() {
+    public Properties getMailProperties(ProcessTaskActor processTaskActor) {
         logger.warn("Using deprecated class to send emails. Please use org.cafienne.processtask.implementation.mail.MailDefinition");
 
-        Properties defaultProperties = super.getMailProperties();
+        Properties defaultProperties = super.getMailProperties(processTaskActor);
         Properties properties = new Properties();
         properties.putAll(defaultProperties);
         if (this.smtpServer != null) {

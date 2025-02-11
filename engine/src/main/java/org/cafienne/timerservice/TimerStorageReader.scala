@@ -18,7 +18,6 @@
 package org.cafienne.timerservice
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.health.HealthMonitor
 import org.cafienne.timerservice.persistence.TimerStore
 
@@ -29,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TimerStorageReader(schedule: TimerMonitor) extends Runnable with LazyLogging {
   implicit val dispatcher: ExecutionContext = schedule.timerService.caseSystem.system.dispatcher
   private val storage: TimerStore = schedule.timerService.storage
-  private val window: FiniteDuration = Cafienne.config.engine.timerService.window
+  private val window: FiniteDuration = schedule.timerService.caseSystem.config.engine.timerService.window
   private var activeWindow: Long = -1
 
   override def run(): Unit = loadNextWindow

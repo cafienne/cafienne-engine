@@ -22,7 +22,6 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.*;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
-    private final static boolean usePureCHMMFaultHandling = Cafienne.config().engine().interpreter().usePureCMMNFaultHandling();
+    private final boolean usePureCMMNFaultHandling;
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
@@ -42,6 +41,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance, StateMachine stateMachine) {
         super(id, index, itemDefinition, definition, caseInstance, parent, stateMachine);
+        this.usePureCMMNFaultHandling = caseInstance.caseSystem.config().engine().interpreter().usePureCMMNFaultHandling();
     }
 
     void register(PlanItem<?> child) {
@@ -175,7 +175,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     protected void childTransitioned(PlanItem<?> child, PlanItemTransitioned event) {
-        if (usePureCHMMFaultHandling) {
+        if (usePureCMMNFaultHandling) {
             if (child.getState().isSemiTerminal()) {
                 // Check stage completion (only done when the child transitioned into semi terminal state)
                 // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
