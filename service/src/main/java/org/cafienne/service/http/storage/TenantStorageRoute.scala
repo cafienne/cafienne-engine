@@ -17,24 +17,24 @@
 
 package org.cafienne.service.http.storage
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import jakarta.ws.rs.{DELETE, Path, Produces}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
-import org.cafienne.system.CaseSystem
 
-import jakarta.ws.rs.{DELETE, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage/tenant/{tenant}")
-class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRoute with StorageRoute {
+class TenantStorageRoute(override val httpService: CaseEngineHttpServer) extends TenantRoute with StorageRoute {
   override val prefix = "tenant"
   override def routes: Route = concat(deleteTenant)
 

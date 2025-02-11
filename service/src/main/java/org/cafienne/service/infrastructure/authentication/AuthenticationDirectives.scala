@@ -21,6 +21,7 @@ import org.apache.pekko.http.scaladsl.server.directives.Credentials
 import org.apache.pekko.http.scaladsl.server.{Directive1, Directives}
 import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
+import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,11 +32,11 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   */
 trait AuthenticationDirectives extends Directives {
-
+  val config: OIDCConfiguration
   implicit val ex: ExecutionContext
 
   //TODO make the token verifier initialize with the list of tuple (issuer, keysource) as defined in AuthenticatedRoute
-  lazy private val jwtTokenVerifier = new JwtTokenVerifier()
+  lazy private val jwtTokenVerifier = new JwtTokenVerifier(config)
 
   //IdentityProvider to get the user
   protected val userCache: IdentityProvider

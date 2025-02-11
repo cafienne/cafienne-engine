@@ -24,25 +24,25 @@
  */
 package org.cafienne.service.http.tenant.route
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.persistence.querydb.query.exception.UserSearchFailure
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tenant.model.TenantAPI.TenantUserResponseFormat
-import org.cafienne.system.CaseSystem
 
-import jakarta.ws.rs._
 import scala.util.{Failure, Success}
 
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tenant")
-class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
+class TenantUsersRoute(override val httpService: CaseEngineHttpServer) extends TenantRoute {
   override def routes: Route = concat(getTenantUsers, getTenantUser)
 
   @Path("/{tenant}/users")

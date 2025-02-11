@@ -17,13 +17,12 @@
 
 package org.cafienne.storage
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.Done
 import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
 import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Sink
-import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.event.StorageRequestReceived
 import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageCommand, StorageEvent}
@@ -50,7 +49,7 @@ class StorageCoordinator(val caseSystem: CaseSystem)
   override val readJournal: String = caseSystem.config.persistence.readJournal
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-  if (Cafienne.config.engine.storage.recoveryDisabled) {
+  if (caseSystem.config.engine.storage.recoveryDisabled) {
     logger.warn("WARNING: Storage Coordination Service does not recover any existing unfinished storage processes; set 'engine.storage-service.auto-start = true' to enable recovery ")
   } else {
     logger.warn("Launching Storage Coordination Service")

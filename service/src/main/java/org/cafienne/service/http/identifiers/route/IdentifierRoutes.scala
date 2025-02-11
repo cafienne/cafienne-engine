@@ -19,13 +19,13 @@ package org.cafienne.service.http.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifierRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class IdentifierRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix = "identifiers"
 
-  addSubRoute(new IdentifiersRoute(caseSystem))
+  addSubRoute(new IdentifiersRoute(httpService))
 }

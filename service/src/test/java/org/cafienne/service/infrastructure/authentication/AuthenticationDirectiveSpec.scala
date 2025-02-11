@@ -6,12 +6,15 @@ import com.nimbusds.jose.jwk.{JWKSet, RSAKey}
 import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
+import com.typesafe.scalalogging.LazyLogging
 import net.minidev.json.JSONArray
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import org.cafienne.actormodel.identity.IdentityProvider
+import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
+import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -22,11 +25,13 @@ import java.util.Date
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.jdk.CollectionConverters._
 
-class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with ScalatestRouteTest {
+class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with ScalatestRouteTest with LazyLogging {
   //TODO add a test with a non UUID subject
   final val tokenWithRole    = generateTokenAndSource("subject1", List("USER", "ADMIN"))
   final val tokenWithoutRole = generateTokenAndSource("subject2", List.empty[String])
   final val tokenWithoutUUID = generateTokenAndSource("nouuidsubject", List("A_ROLE"))
+
+  logger.info("Running AuthenticationDirectiveSpec")
 
   implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
@@ -37,6 +42,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   //Route setup that uses the token with a role included
   object IncludeAuthDirectives extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }
 
@@ -54,6 +60,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   //Route setup without roles included
   object AuthDirectivesWithoutRoles extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }
 
@@ -71,6 +78,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   //Route with a non - uuid subject
   object AuthDirectivesNoUUID extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }
 

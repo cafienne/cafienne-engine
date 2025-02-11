@@ -27,13 +27,13 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.IdentifierQueriesImpl
 import org.cafienne.persistence.querydb.query.filter.IdentifierFilter
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.identifiers.model.BusinessIdentifierFormat
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifiersRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class IdentifiersRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   val identifierQueries = new IdentifierQueriesImpl(caseSystem.queryDB)
 
   override def routes: Route = concat(getIdentifiers, getIdentifierNames)

@@ -26,15 +26,14 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.migration.CaseMigrationAPI._
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class CaseMigrationRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override def routes: Route = {
       startMigration
     }
@@ -60,7 +59,7 @@ class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("migrate-definition") {
         entity(as[MigrationDefinitionFormat]) { migrateDefinition =>
-          val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
+          val definitionsDocument = caseSystem.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
           val newDefinition = definitionsDocument.getFirstCase
           val newCaseTeam = migrateDefinition.newTeam.map(_.asTeam).orNull
           askCase(user, caseInstanceId, caseMember => new MigrateDefinition(caseMember, caseInstanceId, newDefinition, newCaseTeam))

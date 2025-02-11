@@ -17,21 +17,20 @@
 
 package org.cafienne.service.http.consentgroup.route
 
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.service.http.CaseEngineHttpServer
+import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")
-class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends ConsentGroupRoute {
+class ConsentGroupMembersRoute(override val httpService: CaseEngineHttpServer) extends ConsentGroupRoute {
   override val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override def routes: Route = concat(getGroup, getMember)

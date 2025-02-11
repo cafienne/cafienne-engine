@@ -22,6 +22,7 @@ import com.nimbusds.jose.proc.{BadJOSEException, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 import org.cafienne.system.health.HealthMonitor
 
 import java.text.ParseException
@@ -31,7 +32,7 @@ trait TokenVerifier[T] {
   def verifyToken(token: String): Future[T]
 }
 
-class JwtTokenVerifier()(implicit ec: ExecutionContext) extends TokenVerifier[AuthenticatedUser] with LazyLogging {
+class JwtTokenVerifier(val config: OIDCConfiguration)(implicit ec: ExecutionContext) extends TokenVerifier[AuthenticatedUser] with LazyLogging {
   import java.util
 
   val jwtProcessor: ConfigurableJWTProcessor[SecurityContext] = new DefaultJWTProcessor()
@@ -40,7 +41,7 @@ class JwtTokenVerifier()(implicit ec: ExecutionContext) extends TokenVerifier[Au
   // Connect2id server, may not be set by other servers
   //jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier[_](new JOSEObjectType("at+jwt")))
 
-  jwtProcessor.setJWTClaimsSetAwareJWSKeySelector(new MultiIssuerJWSKeySelector)
+  jwtProcessor.setJWTClaimsSetAwareJWSKeySelector(new MultiIssuerJWSKeySelector(config))
 
   // Check for the required claims inside the token.
   // "sub", "iat", "exp", "scp", "cid", "jti"

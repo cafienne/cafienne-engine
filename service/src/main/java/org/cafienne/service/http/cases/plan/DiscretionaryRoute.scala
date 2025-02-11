@@ -17,23 +17,22 @@
 
 package org.cafienne.service.http.cases.plan
 
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.plan.DiscretionaryAPIFormat._
-import org.cafienne.system.CaseSystem
-
-import jakarta.ws.rs._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class DiscretionaryRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override def routes: Route = concat(retrieveDiscretionaryItem, planDiscretionaryItem)
 
   @Path("/{caseInstanceId}/discretionaryitems")

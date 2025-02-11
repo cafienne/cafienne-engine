@@ -27,14 +27,14 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.PlatformOwner
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tenant.model.TenantAPI._
 import org.cafienne.service.infrastructure.route.CommandRoute
-import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
+class PlatformRoute(override val httpService: CaseEngineHttpServer) extends CommandRoute {
 
   override def routes: Route = concat(createTenant, disableTenant, enableTenant, getUserInformation)
 

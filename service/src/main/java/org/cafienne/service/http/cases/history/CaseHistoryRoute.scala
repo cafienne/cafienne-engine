@@ -27,13 +27,13 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.json.Value
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
-import org.cafienne.system.CaseSystem
+import org.cafienne.service.http.CaseEngineHttpServer
 
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBaseRoute {
+class CaseHistoryRoute(override val httpService: CaseEngineHttpServer) extends CaseEventsBaseRoute {
   override def routes: Route = concat(getCaseEvents, getPlanHistory, getPlanItemHistory)
 
   @Path("/{caseInstanceId}/history/events")

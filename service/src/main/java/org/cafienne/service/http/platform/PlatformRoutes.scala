@@ -18,15 +18,14 @@
 package org.cafienne.service.http.platform
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class PlatformRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix: String = "platform"
 
-  addSubRoute(new PlatformRoute(caseSystem))
+  addSubRoute(new PlatformRoute(httpService))
 }

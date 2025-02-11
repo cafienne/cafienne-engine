@@ -18,12 +18,12 @@
 package org.cafienne.service.http.cases.deprecated
 
 import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.history.CaseEventsBaseRoute
-import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
-class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBaseRoute {
+class DeprecatedPlanItemHistoryRoute(override val httpService: CaseEngineHttpServer) extends CaseEventsBaseRoute {
   override val addToSwaggerRoutes = false
   override def routes: Route = concat(deprecatedPlanItemHistory)
 

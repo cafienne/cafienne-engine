@@ -17,35 +17,34 @@
 
 package org.cafienne.service.http.anonymous
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.anonymous.model.AnonymousAPI._
-import org.cafienne.system.CaseSystem
+import org.cafienne.service.infrastructure.route.{CaseTeamValidator, LastModifiedDirectives}
 import org.cafienne.util.Guid
 
-import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.{CaseTeamValidator, LastModifiedDirectives}
 import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator with LastModifiedDirectives {
+class CaseRequestRoute(override val httpService: CaseEngineHttpServer) extends AnonymousRoute with CaseTeamValidator with LastModifiedDirectives {
 
   // Reading the definitions executes certain validations immediately
-  val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = Cafienne.config.api.anonymousConfig.definitions
+  val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = caseSystem.config.api.anonymousConfig.definitions
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   override def routes: Route = {
@@ -74,7 +73,7 @@ class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRou
             case Some(definitionConfig) => {
               val newCaseId = payload.caseInstanceId.getOrElse(new Guid().toString)
                 validateTenantAndTeam(definitionConfig.team, definitionConfig.tenant, team => {
-                  val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                  val debugMode = payload.debug.getOrElse(caseSystem.config.actor.debugEnabled)
                   val command = new StartCase(definitionConfig.tenant, definitionConfig.user, newCaseId, definitionConfig.definition, payload.inputs, team, debugMode)
                   sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
                     writeLastModifiedHeader(response, Headers.CASE_LAST_MODIFIED) {

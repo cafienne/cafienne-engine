@@ -28,13 +28,13 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.plan.PlanItemAPIFormat.PlanItemResponseFormat
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class PlanItemRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override def routes: Route = concat(getPlanItems, getPlanItem, makePlanItemTransition)
 
   @Path("/{caseInstanceId}/planitems")

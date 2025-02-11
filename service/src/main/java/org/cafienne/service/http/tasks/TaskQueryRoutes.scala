@@ -28,12 +28,12 @@ import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.TaskCount
 import org.cafienne.persistence.querydb.query.filter.TaskFilter
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tasks.TaskAPIFormat.TaskResponseFormat
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
-class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
+class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends TaskRoute {
   override def routes: Route = concat(getAllTasks, getCaseTasks, getTaskCount, getTask)
 
   @GET

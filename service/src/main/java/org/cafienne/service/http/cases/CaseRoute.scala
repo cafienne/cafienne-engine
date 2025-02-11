@@ -31,20 +31,19 @@ import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.filter.CaseFilter
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CaseAPIFormat._
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
-import org.cafienne.system.CaseSystem
 
 import java.util.UUID
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
+class CaseRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute with CaseTeamValidator {
   override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
@@ -183,13 +182,13 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
           entity(as[StartCaseFormat]) { payload =>
             caseStarter(user, payload.tenant) { (user, tenant) =>
               try {
-                val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
+                val definitionsDocument = caseSystem.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
                 val caseDefinition = definitionsDocument.getFirstCase
 
                 val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
                 val inputParameters = payload.inputs
                 val caseTeam: CaseTeam = payload.caseTeam.asTeam
-                val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                val debugMode = payload.debug.getOrElse(caseSystem.config.actor.debugEnabled)
                 validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, user, newCaseId, caseDefinition, inputParameters, team, debugMode)))
               } catch {
                 case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

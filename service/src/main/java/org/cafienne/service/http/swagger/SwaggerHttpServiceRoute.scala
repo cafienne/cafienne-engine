@@ -20,19 +20,20 @@ package org.cafienne.service.http.swagger
 import com.github.swagger.pekko._
 import com.github.swagger.pekko.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.infrastructure.authentication.OIDCConfiguration
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.service.http.CaseEngineHttpServer
+import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
-class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
+class SwaggerHttpServiceRoute(val httpService: CaseEngineHttpServer, val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
 
    //override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint
-  override val host = s"${Cafienne.config.api.bindHost}:${Cafienne.config.api.bindPort}"
+  override val host = s"${httpService.caseSystem.config.api.bindHost}:${httpService.caseSystem.config.api.bindPort}"
   override val basePath = "/" //the basePath for the API you are exposing
   override val apiDocsPath = "api-docs" //where you want the swagger-json endpoint exposed
-  override val info = Info(description =
-    """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = "1.0.0")
+  override val info: Info = Info(description =
+    """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = httpService.caseSystem.version.json.get("version").toString)
 
-  val oidc = OIDCConfiguration.config.issuers.head
+  private val oidc = new OIDCConfiguration(httpService.caseSystem.config.api.security).issuers.head
 
   /* https://stackoverflow.com/questions/41918845/keycloak-integration-in-swagger
     "securityDefinitions": {
@@ -47,7 +48,7 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
       }
     }
    */
-  val oauth2ForOpenIdConnectHack = new SecurityScheme()
+  private val oauth2ForOpenIdConnectHack = new SecurityScheme()
     .`type`(SecurityScheme.Type.OAUTH2)
     .flows(
       new OAuthFlows().`implicit`(
@@ -64,7 +65,7 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
   override def securitySchemes: Map[String, SecurityScheme] = Map(SecurityScheme.Type.OAUTH2.toString -> oauth2ForOpenIdConnectHack)
 
   //override def security: List[SecurityRequirement] = List(new SecurityRequirement().addList("openId"))
-  def route = get {
+  def route: Route = get {
     routes ~
         pathPrefix("") {
         pathEndOrSingleSlash {

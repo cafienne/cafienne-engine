@@ -18,15 +18,14 @@
 package org.cafienne.service.http.tasks
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs.Path
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
-class TaskRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class TaskRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix = "tasks"
-  addSubRoute(new TaskQueryRoutes(caseSystem))
-  addSubRoute(new TaskActionRoutes(caseSystem))
+  addSubRoute(new TaskQueryRoutes(httpService))
+  addSubRoute(new TaskActionRoutes(httpService))
 }

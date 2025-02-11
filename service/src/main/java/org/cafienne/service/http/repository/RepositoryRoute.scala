@@ -30,20 +30,19 @@ import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantE
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.json.ValueMap
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CaseAPIFormat.CaseDefinitionFormat
 import org.cafienne.service.http.repository.RepositoryAPIFormat.ModelListResponseFormat
 import org.cafienne.service.infrastructure.payload.HttpXmlReader._
 import org.cafienne.service.infrastructure.route.{AuthenticatedRoute, TenantValidator}
-import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
 
 import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute(override val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
+class RepositoryRoute(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute with TenantValidator {
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
@@ -71,7 +70,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
       userWithTenant { (platformUser, tenant) => {
         try {
           logger.debug(s"Loading definitions '$modelName' from tenant '$tenant'")
-          val model = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
+          val model = caseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
           completeXML(model.getDocument)
         }
         catch {
@@ -110,10 +109,10 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
 
         val models = new ValueMap()
         models.withArray("models") // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
-        for (file <- Cafienne.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
+        for (file <- caseSystem.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
           var description = "Description"
           try {
-            val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, file)
+            val definitionsDocument = caseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, file)
             description = definitionsDocument.getFirstCase.documentation.text
           } catch {
             case i: InvalidDefinitionException => description = i.toString
@@ -188,7 +187,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
 
             val tenantUser = platformUser.getTenantUser(tenant)
             if (tenantUser.isOwner) {
-              Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
+              caseSystem.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
               complete(StatusCodes.NoContent)
             } else {
               complete(StatusCodes.Unauthorized, "User '" + platformUser.id + "' does not have the privileges to deploy a definition")

@@ -17,14 +17,13 @@
 
 package org.cafienne.service.http.tenant.route
 
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 
 @Path("/tenant")
-class TenantRoutes(override val caseSystem: CaseSystem) extends TenantRoute {
+class TenantRoutes(override val httpService: CaseEngineHttpServer) extends TenantRoute {
   override val prefix: String = "tenant"
 
-  addSubRoute(new TenantOwnersRoute(caseSystem))
-  addSubRoute(new TenantUsersRoute(caseSystem))
+  addSubRoute(new TenantOwnersRoute(httpService))
+  addSubRoute(new TenantUsersRoute(httpService))
 }
