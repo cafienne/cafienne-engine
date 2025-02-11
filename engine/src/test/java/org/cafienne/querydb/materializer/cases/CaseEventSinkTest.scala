@@ -49,5 +49,5 @@ class CaseEventSinkTest
   val caseDefinition: CaseDefinition = loadCaseDefinition("testdefinition/helloworld.xml")
   val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user)
 
-  new CaseEventSink(new CaseSystem(system).system, TestQueryDB).start()
+  new CaseEventSink(new CaseSystem(system), TestQueryDB).start()
 }

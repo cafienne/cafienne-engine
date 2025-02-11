@@ -36,7 +36,7 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
   val writer = new QueryDBWriter(this)
 
   def startEventSinks(caseSystem: CaseSystem): Unit = {
-    new CaseEventSink(caseSystem.system, writer).start()
+    new CaseEventSink(caseSystem, writer).start()
     new TenantEventSink(caseSystem, writer).start()
     new ConsentGroupEventSink(caseSystem, writer).start()
 

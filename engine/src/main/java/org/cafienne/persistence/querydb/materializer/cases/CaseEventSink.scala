@@ -22,10 +22,12 @@ import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.persistence.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
+import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class CaseEventSink(override val system: ActorSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
+class CaseEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
+  override val system: ActorSystem = caseSystem.system
   override val tag: String = CaseEvent.TAG
 
   override def getOffset: Future[Offset] = storage.getOffset(CaseEventSink.offsetName)
