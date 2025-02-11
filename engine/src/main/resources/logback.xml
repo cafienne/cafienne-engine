@@ -7,6 +7,9 @@
 
     <logger name="org.cafienne" level="WARN"/>
 
+    <!-- Show configuration settings (before and after migrations are applied) when starting the engine -->
+    <!--    <logger name="org.cafienne.infrastructure.config" level="DEBUG"/>-->
+
     <!-- Show Storage Service logging INFO is light, DEBUG is full logging -->
     <!--    <logger name="org.cafienne.storage" level="INFO"/>-->
     <!--    <logger name="org.cafienne.storage" level="DEBUG"/>-->

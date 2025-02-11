@@ -19,6 +19,7 @@ package org.cafienne.infrastructure.config
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.api.ApiConfig
 import org.cafienne.infrastructure.config.engine.EngineConfig
 import org.cafienne.infrastructure.config.persistence.PersistenceConfig
@@ -29,11 +30,14 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
   *
   * @param systemConfig
   */
-class CaseSystemConfig(val systemConfig: Config) extends ConfigReader with LazyLogging {
+class CaseSystemConfig(val systemConfig: SystemConfig) extends ConfigReader with LazyLogging {
+  Cafienne.setConfig(this)
+
   val path = "cafienne"
+
   override lazy val config: Config = {
-    if (systemConfig.hasPath(path)) {
-      systemConfig.getConfig(path)
+    if (systemConfig.config.hasPath(path)) {
+      systemConfig.config.getConfig(path)
     } else {
       fail("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
     }
@@ -46,7 +50,7 @@ class CaseSystemConfig(val systemConfig: Config) extends ConfigReader with LazyL
     val debugRouteOpenOption = "api.security.debug.events.open"
     val open = readBoolean(debugRouteOpenOption, default = false)
     if (open) {
-      SystemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
+      systemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
     }
     open
   }
@@ -56,7 +60,7 @@ class CaseSystemConfig(val systemConfig: Config) extends ConfigReader with LazyL
     */
   val platform: PlatformConfig = new PlatformConfig(this)
 
-  lazy val persistence = new PersistenceConfig(this, systemConfig)
+  lazy val persistence = new PersistenceConfig(this)
 
   /**
     * Returns configuration options for Model Actors
@@ -78,24 +82,3 @@ class CaseSystemConfig(val systemConfig: Config) extends ConfigReader with LazyL
     */
   val engine: EngineConfig = new EngineConfig(this)
 }
-
-object CaseSystemConfig {
-
-  var cafienneConfig: CaseSystemConfig = null
-
-  def apply(classLoader: ClassLoader = this.getClass.getClassLoader): CaseSystemConfig = {
-    val systemConfig: Config = SystemConfig.load(classLoader = classLoader).getConfig
-    if (cafienneConfig == null) {
-      cafienneConfig = new CaseSystemConfig(systemConfig)
-    }
-    cafienneConfig
-  }
-
-  def apply(config: Config): CaseSystemConfig = {
-    if (cafienneConfig == null) {
-      cafienneConfig = new CaseSystemConfig(config)
-    }
-    cafienneConfig
-  }
-}
-

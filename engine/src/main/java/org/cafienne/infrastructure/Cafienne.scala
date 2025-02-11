@@ -24,12 +24,6 @@ import org.cafienne.infrastructure.config.CaseSystemConfig
   * JVM wide configurations and settings
   */
 object Cafienne {
-
-  /**
-    * Configuration settings of this Cafienne Platform
-    */
-  lazy val config: CaseSystemConfig = CaseSystemConfig()
-
   /**
     * Returns the BuildInfo as a string (containing JSON)
     *
@@ -39,7 +33,18 @@ object Cafienne {
 
   def isPlatformOwner(user: UserIdentity): Boolean = isPlatformOwner(user.id)
 
-  def isPlatformOwner(userId: String): Boolean = {
-    config.platform.isPlatformOwner(userId)
+  def isPlatformOwner(userId: String): Boolean = config.platform.isPlatformOwner(userId)
+
+  /**
+    * Configuration settings of this Cafienne Platform
+    */
+  lazy val config: CaseSystemConfig = {
+    conf.getOrElse(throw new Exception("Cannot read Cafienne.config because a CaseSystem instance has not yet been created"))
+  }
+
+  private var conf: Option[CaseSystemConfig] = None
+
+  def setConfig(caseSystemConfig: CaseSystemConfig): Unit = {
+    conf = Some(caseSystemConfig)
   }
 }

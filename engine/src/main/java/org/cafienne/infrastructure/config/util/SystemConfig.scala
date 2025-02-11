@@ -17,51 +17,44 @@
 
 package org.cafienne.infrastructure.config.util
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import com.typesafe.scalalogging.LazyLogging
-
-import scala.collection.mutable.ListBuffer
+import org.cafienne.infrastructure.config.CaseSystemConfig
 
 /**
-  * Static helper to load config settings for this JVM
-  * Also migrates deprecated property values if found
-  */
-object SystemConfig extends ConfigMigrator with LazyLogging {
-
-  private var config: Config = ConfigFactory.defaultReference()
-  private var loaded: Boolean = false
-  private val initialMigrators = new ListBuffer[ConfigMigrator]()
-
-  /**
-   * Option to set migrators before the SystemConfig is loaded
-   */
-  def addMigrators(migrators: ConfigMigrator*): SystemConfig.type = {
-    if (loaded) {
-      throw new Exception("Config has already been loaded. Cannot add migrators anymore")
-    }
-    migrators.foreach(migrator => initialMigrators += migrator)
-    this
-  }
-
-  def getConfig: Config = config
-
-  def load(fileName: String = "", classLoader: ClassLoader = this.getClass.getClassLoader): SystemConfig.type = {
-    if (loaded) {
-      logger.warn("Cannot load config again, loading request is ignored")
-      return this
-    }
-
-    if (fileName.isBlank) {
-      config = ConfigFactory.load(classLoader).withFallback(config)
-    } else {
-      config = ConfigFactory.load(classLoader, fileName).withFallback(config)
-    }
-    initialMigrators.foreach(migrator => {
+ * Static helper to load config settings for this JVM
+ * Also migrates deprecated property values if found
+ */
+class SystemConfig(loader: => Config, migrators: ConfigMigrator*) extends ConfigMigrator with ConfigReader with LazyLogging {
+  private lazy val nativeConfig = {
+    var config = loader
+    logger.whenDebugEnabled(logger.debug("Creating SystemConfig object based on the following underlying configuration"))
+    logger.whenDebugEnabled(logger.debug(s"Configuration: ${config.root().render(ConfigRenderOptions.defaults().setFormatted(true))}"))
+    migrators.foreach(migrator => {
       logger.info("Running ConfigMigrator " + migrator.getClass.getName)
       config = migrator.run(config)
     })
+    logger.whenDebugEnabled(logger.debug("Resulting configuration after running migrators"))
+    logger.whenDebugEnabled(logger.debug(s"Configuration: ${config.root().render(ConfigRenderOptions.concise().setFormatted(true))}"))
+    config
+  }
 
-    loaded = true
-    this
+  def config: Config = nativeConfig
+
+  lazy val cafienne: CaseSystemConfig = new CaseSystemConfig(this)
+
+  def getConfig: Config = config
+
+}
+
+object SystemConfig {
+  lazy val DEFAULT: SystemConfig = new SystemConfig(load())
+
+  def load(fileName: String = "", classLoader: ClassLoader = this.getClass.getClassLoader): Config = {
+    if (fileName.isBlank) {
+      ConfigFactory.load(classLoader).withFallback(ConfigFactory.defaultReference())
+    } else {
+      ConfigFactory.load(classLoader, fileName).withFallback(ConfigFactory.defaultReference())
+    }
   }
 }

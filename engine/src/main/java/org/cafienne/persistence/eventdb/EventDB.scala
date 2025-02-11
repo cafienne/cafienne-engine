@@ -1,7 +1,7 @@
 package org.cafienne.persistence.eventdb
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.persistence.eventdb.Profile
 import org.cafienne.persistence.eventdb.schema.EventDBSchema
 import org.cafienne.persistence.eventdb.schema.h2.H2EventDBSchema
@@ -12,8 +12,8 @@ import org.flywaydb.core.api.output.MigrateResult
 import org.flywaydb.core.api.resolver.MigrationResolver
 
 object EventDB extends LazyLogging {
-  def initializeDatabaseSchema(): MigrateResult = {
-    val eventDB = Cafienne.config.persistence.eventDB
+  def initializeDatabaseSchema(config: PersistenceConfig): MigrateResult = {
+    val eventDB = config.eventDB
     if (!eventDB.isJDBC) {
       return null
     }

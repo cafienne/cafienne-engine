@@ -18,7 +18,7 @@
 package org.cafienne.persistence.querydb.schema
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.persistence.infrastructure.jdbc.schema.{CustomMigrationInfo, QueryDBSchemaVersion, SlickMigrationExtensions}
 import org.cafienne.persistence.querydb.materializer.cases.CaseEventSink
 import org.cafienne.persistence.querydb.materializer.consentgroup.ConsentGroupEventSink
@@ -29,10 +29,7 @@ import org.cafienne.system.CaseSystem
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
-class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config))
-  extends SlickMigrationExtensions
-    with LazyLogging {
-
+class QueryDB(config: PersistenceConfig, val dbConfig: DatabaseConfig[JdbcProfile]) extends SlickMigrationExtensions with LazyLogging {
   val writer = new QueryDBWriter(this)
 
   def startEventSinks(caseSystem: CaseSystem): Unit = {
@@ -47,7 +44,7 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
   private def checkH2InDebugMode(): Unit = {
     import org.h2.tools.Server
 
-    if (Cafienne.config.persistence.queryDB.debug) {
+    if (config.queryDB.debug) {
       val port = "8082"
       logger.warn("Starting H2 Web Client on port " + port)
       Server.createWebServer("-web", "-webAllowOthers", "-webPort", port).start()
@@ -62,6 +59,7 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
   import scala.concurrent.Await
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration.DurationInt
+
   implicit val infoProvider: MigrationInfo.Provider[Migration] = CustomMigrationInfo.provider
 
   private def useSchema(schemas: QueryDBSchemaVersion*): MigrateResult = {
@@ -70,7 +68,7 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
         .baselineOnMigrate(true)
         .baselineDescription("CaseFabric QueryDB")
         .baselineVersion("0.0.0")
-        .table(Cafienne.config.persistence.queryDB.schemaHistoryTable)
+        .table(config.queryDB.schemaHistoryTable)
 
       // Create a connection and run migration
       val flyway = flywayConfiguration.load()
@@ -82,7 +80,7 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
         val res = db.stream(my)
         logger.debug(s"Migration contents:")
         // Wait 5 seconds to print the resulting errors before throwing the exception
-        Await.result(res.foreach { r => logger.debug("Migration: {}", r)}, 5.seconds)
+        Await.result(res.foreach { r => logger.debug("Migration: {}", r) }, 5.seconds)
         throw e
       }
     }
@@ -99,5 +97,9 @@ class QueryDB(val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConf
       new QueryDB_1_1_18(dbConfig),
       new QueryDB_1_1_22(dbConfig),
     )
+  }
+
+  if (config.initializeDatabaseSchemas) {
+    initializeDatabaseSchema()
   }
 }

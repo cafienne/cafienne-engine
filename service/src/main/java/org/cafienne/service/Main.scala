@@ -18,11 +18,9 @@
 package org.cafienne.service
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.persistence.eventdb.JournalTableNameConfigMigrator
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.eventdb.EventDB
-import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
@@ -32,25 +30,20 @@ import scala.util.{Failure, Success}
 
 object Main extends App with LazyLogging {
   try {
-    SystemConfig.addMigrators(new JournalTableNameConfigMigrator)
-
-    val queryDB: QueryDB = new QueryDB
-    if (Cafienne.config.persistence.initializeDatabaseSchemas) {
-      queryDB.initializeDatabaseSchema()
-      EventDB.initializeDatabaseSchema()
-    }
+    val config = new SystemConfig(SystemConfig.load(), new JournalTableNameConfigMigrator)
 
     // Create the Case System
-    val caseSystem: CaseSystem = new CaseSystem(queryDB = queryDB)
+    val caseSystem: CaseSystem = CaseSystem(config)
+    EventDB.initializeDatabaseSchema(config.cafienne.persistence)
 
     // Start running the Event Sinks
-    queryDB.startEventSinks(caseSystem)
+    caseSystem.queryDB.startEventSinks(caseSystem)
 
     implicit val ec: ExecutionContextExecutor = caseSystem.system.dispatcher
     // Create and start the http server
     new CafienneHttpServer(caseSystem).start().onComplete {
       case Success(answer) =>
-        logger.warn(s"Running Cafienne version: ${Cafienne.version}")
+        logger.warn(s"Running Cafienne version: ${caseSystem.version}")
         logger.warn(s"Cafienne HTTP Server available at $answer")
       case Failure(msg) =>
         logger.error(s"Starting Cafienne HTTP Server failed: $msg")
