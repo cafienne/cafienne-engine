@@ -1,9 +1,8 @@
 package org.cafienne.persistence.eventdb.schema.sqlserver
 
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.eventdb.schema.ClassicEventDBSchemaScript
 
-class V1_1_16__CreateAkkaSchema extends ClassicEventDBSchemaScript {
+class V1_1_16__CreateAkkaSchema(tablePrefix: String) extends ClassicEventDBSchemaScript {
   val version = "1.1.16"
 
   val scriptName = "V1_1_16__CreateAkkaSchema.sql"
@@ -13,7 +12,7 @@ class V1_1_16__CreateAkkaSchema extends ClassicEventDBSchemaScript {
   override def getChecksum: Integer = -2024270051
 
   override def sql: String = {
-    s"""CREATE TABLE ${Cafienne.config.persistence.tablePrefix}event_journal(
+    s"""CREATE TABLE ${tablePrefix}event_journal(
        |    "ordering" BIGINT IDENTITY(1,1) NOT NULL,
        |    "deleted" BIT DEFAULT 0 NOT NULL,
        |    "persistence_id" VARCHAR(255) NOT NULL,
@@ -30,19 +29,19 @@ class V1_1_16__CreateAkkaSchema extends ClassicEventDBSchemaScript {
        |    PRIMARY KEY ("persistence_id", "sequence_number")
        |);
        |
-       |CREATE UNIQUE INDEX ${Cafienne.config.persistence.tablePrefix}event_journal_ordering_idx ON ${Cafienne.config.persistence.tablePrefix}event_journal(ordering);
+       |CREATE UNIQUE INDEX ${tablePrefix}event_journal_ordering_idx ON ${tablePrefix}event_journal(ordering);
        |
-       |CREATE TABLE ${Cafienne.config.persistence.tablePrefix}event_tag (
+       |CREATE TABLE ${tablePrefix}event_tag (
        |    "event_id" BIGINT NOT NULL,
        |    "tag" VARCHAR(255) NOT NULL
        |    PRIMARY KEY ("event_id","tag")
        |    constraint "fk_event_journal"
        |        foreign key("event_id")
-       |        references "dbo"."${Cafienne.config.persistence.tablePrefix}event_journal"("ordering")
+       |        references "dbo"."${tablePrefix}event_journal"("ordering")
        |        on delete CASCADE
        |);
        |
-       |CREATE TABLE "${Cafienne.config.persistence.tablePrefix}snapshot" (
+       |CREATE TABLE "${tablePrefix}snapshot" (
        |    "persistence_id" VARCHAR(255) NOT NULL,
        |    "sequence_number" NUMERIC(10,0) NOT NULL,
        |    "created" BIGINT NOT NULL,

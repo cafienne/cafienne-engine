@@ -6,7 +6,7 @@ import java.util
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
 trait DBSchema {
-  def scripts(): Seq[ResolvedMigration]
+  def scripts(tablePrefix: String): Seq[ResolvedMigration]
 
-  def migrationScripts(): util.Collection[ResolvedMigration] = scripts().asJava.asInstanceOf[java.util.Collection[ResolvedMigration]]
+  def migrationScripts(tablePrefix: String): util.Collection[ResolvedMigration] = scripts(tablePrefix).asJava.asInstanceOf[java.util.Collection[ResolvedMigration]]
 }
