@@ -62,7 +62,7 @@ trait CafienneTablesV1 extends SlickMigrationExtensions with CaseTables with Ten
   }
 }
 
-class QueryDB_1_0_0(val dbConfig: DatabaseConfig[JdbcProfile])
+class QueryDB_1_0_0(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends QueryDBSchemaVersion
     with TaskTables
     with CafienneTablesV1

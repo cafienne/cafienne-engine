@@ -28,7 +28,7 @@ import slick.jdbc.JdbcProfile
 /**
   * Helper object to create a script that resets the projection offset, so that it can be rebuild with next db schema version
   */
-class Projections(val dbConfig: DatabaseConfig[JdbcProfile])
+class Projections(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends OffsetStoreTables
   with SlickMigrationExtensions {
 

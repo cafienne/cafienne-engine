@@ -24,14 +24,14 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.migration.api.TableMigration
 
-class QueryDB_1_1_16(val dbConfig: DatabaseConfig[JdbcProfile])
+class QueryDB_1_1_16(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends QueryDBSchemaVersion
     with CafienneTablesV2
     with ConsentGroupTables
     with CaseTables {
 
   val version = "1.1.16"
-  val migrations = new Projections(dbConfig).renameOffsets
+  val migrations = new Projections(dbConfig, tablePrefix).renameOffsets
     .&(createConsentGroupTable)
     .&(createConsentGroupMemberTable)
     .&(createCaseTeamUserTable)

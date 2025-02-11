@@ -23,7 +23,6 @@ import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 import org.cafienne.persistence.querydb.query.exception._
 import org.cafienne.persistence.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
 import org.cafienne.persistence.querydb.schema.QueryDB
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -55,17 +54,11 @@ trait UserQueries {
   def getTenantGroupsUsage(user: TenantUser, tenant: String): Future[Map[String, mutable.HashMap[String, ListBuffer[String]]]] = ???
 }
 
-class TenantQueriesImpl(val queryDB: QueryDB) extends UserQueries with LazyLogging
-  with TenantTables
-  with ConsentGroupTables
-  with CaseTables {
-
+class TenantQueriesImpl(val queryDB: QueryDB) extends QueryDBReader with UserQueries with LazyLogging {
   val dbConfig = queryDB.dbConfig
   import dbConfig.profile.api._
 
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
-
-  val rolesQuery = TableQuery[UserRoleTable]
 
   override def getTenant(tenantId: String): Future[TenantRecord] = {
     db.run(TableQuery[TenantTable].filter(_.name === tenantId).filter(_.enabled).result.headOption).map {
