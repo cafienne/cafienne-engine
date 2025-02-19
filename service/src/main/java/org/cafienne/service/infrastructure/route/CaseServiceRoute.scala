@@ -26,6 +26,7 @@ import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server._
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Node
@@ -34,7 +35,8 @@ import org.w3c.dom.Node
   * Base class for Case Service APIs. All cors enabled
   */
 trait CaseServiceRoute extends LazyLogging {
-  val caseSystem: CaseSystem
+  val httpService: CaseEngineHttpServer
+  val caseSystem: CaseSystem = httpService.caseSystem
 
   import org.apache.pekko.http.cors.scaladsl.CorsDirectives._
 

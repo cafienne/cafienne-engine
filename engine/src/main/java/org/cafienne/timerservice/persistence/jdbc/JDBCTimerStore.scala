@@ -30,7 +30,7 @@ import java.time.Instant
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class JDBCTimerStore(val dbConfig: DatabaseConfig[JdbcProfile])
+class JDBCTimerStore(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix: String)
   extends TimerStore
     with JDBCOffsetStorage
     with TimerServiceTables {

@@ -19,14 +19,24 @@ package org.cafienne.persistence.querydb.materializer
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.Done
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.RestartSettings
 import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.infrastructure.cqrs.batch.EventBatchSource
+import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait QueryDBEventSink extends EventBatchSource[QueryDBEventBatch] with LazyLogging {
+  val caseSystem: CaseSystem // Need to provide a CaseSystem
+
+  override def system: ActorSystem = caseSystem.system
+  override val readJournal: String = caseSystem.config.persistence.readJournal
+  override val restartSettings: RestartSettings = caseSystem.config.persistence.queryDB.restartSettings
+
+
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**

@@ -20,18 +20,19 @@ package org.cafienne.timerservice
 import org.apache.pekko.Done
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.persistence.query.Offset
+import org.apache.pekko.stream.RestartSettings
 import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
-import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class TimerEventSink(val timerService: TimerService) extends TaggedEventSource {
-  val caseSystem: CaseSystem = timerService.caseSystem
-  override val system: ActorSystem = caseSystem.system
+  override val system: ActorSystem = timerService.caseSystem.system
+  override val readJournal: String = timerService.caseSystem.config.persistence.readJournal
+  override val restartSettings: RestartSettings = timerService.caseSystem.config.persistence.queryDB.restartSettings
 
   override def getOffset: Future[Offset] = timerService.storage.getOffset
   override val tag: String = TimerBaseEvent.TAG

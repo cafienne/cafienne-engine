@@ -21,7 +21,6 @@ import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.processtask.actorapi.command.ProcessCommand
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.TenantCommand
@@ -40,7 +39,7 @@ class CafienneGateway(caseSystem: CaseSystem) {
 
   def request(message: Any): Future[Any] = {
     import org.apache.pekko.pattern.ask
-    implicit val timeout: Timeout = Cafienne.config.actor.askTimout
+    implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
     getRouter(message).ask(message)
   }

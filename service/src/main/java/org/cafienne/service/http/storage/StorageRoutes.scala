@@ -18,16 +18,15 @@
 package org.cafienne.service.http.storage
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs.Path
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage")
-class StorageRoutes(val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class StorageRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix = "storage"
 
-  addSubRoute(new CaseStorageRoute(caseSystem))
-  addSubRoute(new TenantStorageRoute(caseSystem))
+  addSubRoute(new CaseStorageRoute(httpService))
+  addSubRoute(new TenantStorageRoute(httpService))
 }

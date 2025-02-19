@@ -32,16 +32,17 @@ import slick.basic.DatabaseConfig
  */
 class TimerStoreProvider(val caseSystem: CaseSystem) extends ReadJournalProvider {
   override val system: ActorSystem = caseSystem.system
+  override val readJournal: String = caseSystem.config.persistence.readJournal
 
   val store: TimerStore = {
     journal() match {
-      case c: CassandraReadJournal => new CassandraTimerStore(c)
+      case c: CassandraReadJournal => new CassandraTimerStore(caseSystem, c)
       case _: JdbcReadJournal =>
         val timerStoreConfigKey: String = caseSystem.config.engine.timerService.store
-        val timerStoreConfig = caseSystem.config.systemConfig.getConfig(timerStoreConfigKey)
+        val timerStoreConfig = caseSystem.config.systemConfig.config.getConfig(timerStoreConfigKey)
 //        val msg = s"""journalConfig = ${journalConfig.root().render(ConfigRenderOptions.concise().setFormatted(true))}"""
 //        logger.info("Using config to start jdbc ts : " + msg)
-        new JDBCTimerStore(DatabaseConfig.forConfig("", timerStoreConfig))
+        new JDBCTimerStore(DatabaseConfig.forConfig("", timerStoreConfig), caseSystem.config.persistence.tablePrefix)
       case _ => new InMemoryStore() // By default return in memory map
     }
   }

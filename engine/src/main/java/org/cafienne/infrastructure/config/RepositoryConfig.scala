@@ -17,14 +17,11 @@
 
 package org.cafienne.infrastructure.config
 
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.repository.DefinitionProvider
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.util.MandatoryConfig
 
-class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class RepositoryConfig(val parent: CaseSystemConfig) extends MandatoryConfig {
   def path = "definitions"
-  private var _location = config.getString("location")
   override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"
 
   /**
@@ -32,25 +29,13 @@ class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
     */
   lazy val DefinitionProvider: DefinitionProvider = {
     val providerClassName = config.getString("provider")
-    Class.forName(providerClassName).getDeclaredConstructor().newInstance().asInstanceOf[DefinitionProvider]
+    Class.forName(providerClassName).getDeclaredConstructor(classOf[RepositoryConfig]).newInstance(this).asInstanceOf[DefinitionProvider]
   }
 
-  def location: String = _location
-
-  def setLocation(location: String): Unit = {
-    logger.info(s"Changing repository location from ${_location} to $location")
-    this._location = location
-  }
+  val location: String = config.getString("location")
 
   lazy val cacheSize: Int = {
     if (config.hasPath("cache.size")) config.getInt("cache.size")
     100
   }
-}
-
-/** Small runtime test */
-object RepositoryConfig extends App with LazyLogging {
-  println("Current location: " + Cafienne.config.repository.location)
-  Cafienne.config.repository.setLocation("./NewLocation")
-  println("New location: " + Cafienne.config.repository.location)
 }

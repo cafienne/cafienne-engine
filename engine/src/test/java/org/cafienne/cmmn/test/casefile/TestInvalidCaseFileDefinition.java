@@ -10,7 +10,6 @@ package org.cafienne.cmmn.test.casefile;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.infrastructure.Cafienne;
 import org.junit.Test;
 
 public class TestInvalidCaseFileDefinition {
@@ -40,7 +39,7 @@ public class TestInvalidCaseFileDefinition {
     public void testMissingDefinition() {
         // First, test with an invalid Definitions document
         try {
-            Cafienne.config().repository().DefinitionProvider().read(null, null, "a file that does not exist");
+            TestScript.DEFINITIONS.read(null, null, "a file that does not exist");
             // Did not go to the catch block
             throw new AssertionError("Test failed, as the case definition is not invalid");
         } catch (MissingDefinitionException e) {

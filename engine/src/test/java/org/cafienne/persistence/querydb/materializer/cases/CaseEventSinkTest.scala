@@ -28,7 +28,7 @@ class CaseEventSinkTest
     with Eventually {
 
   implicit val logger: LoggingAdapter = Logging(system, getClass)
-
+  val caseSystem: CaseSystem = CaseSystem(system)
   val caseInstanceId: String = new Guid().toString
 
   lazy val storeEventsActor: ActorRef = system.actorOf(Props(classOf[CreateEventsInStoreActor]), caseInstanceId)
@@ -47,7 +47,7 @@ class CaseEventSinkTest
 
   val user: TenantUser = TestIdentityFactory.createTenantUser("test")
   val caseDefinition: CaseDefinition = loadCaseDefinition("testdefinition/helloworld.xml")
-  val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user)
+  val eventFactory = new EventFactory(caseSystem, caseInstanceId, caseDefinition, user)
 
-  new CaseEventSink(new CaseSystem(system).system, TestQueryDB).start()
+  new CaseEventSink(caseSystem, TestQueryDB).start()
 }

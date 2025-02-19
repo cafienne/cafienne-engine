@@ -15,25 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.api
+package org.cafienne.persistence.querydb.query
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
-import org.cafienne.infrastructure.config.CaseSystemConfig
+import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
+import org.cafienne.persistence.querydb.schema.QueryDB
+import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
-class ApiConfig(val parent: CaseSystemConfig) extends MandatoryConfig {
-  def path = "api"
-
-  lazy val bindHost: String = {
-    config.getString("bindhost")
-  }
-
-  lazy val bindPort: Int = {
-    config.getInt("bindport")
-  }
-
-  val anonymousConfig: AnonymousConfig = {
-    new AnonymousConfig(this)
-  }
-
-  lazy val security: SecurityConfig = new SecurityConfig(this)
+/**
+ * Expose tables available in the QueryDB
+ */
+trait QueryDBReader extends SlickQueryExtensions
+  with TenantTables
+  with ConsentGroupTables
+  with CaseTables
+  with TaskTables {
+  val queryDB: QueryDB
+  val tablePrefix: String = queryDB.tablePrefix
 }

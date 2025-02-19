@@ -25,13 +25,13 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.documentation.DocumentationAPIFormat.{CaseFileDocumentationFormat, DocumentationResponseFormat}
-import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class CaseDocumentationRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override def routes: Route = concat(getPlanItemDocumentation, getCaseFileDocumentation)
 
   @Path("/{caseInstanceId}/documentation/planitems/{planItemId}")

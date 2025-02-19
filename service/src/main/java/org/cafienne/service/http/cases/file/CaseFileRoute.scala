@@ -27,17 +27,17 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.cmmn.instance
-import org.cafienne.service.infrastructure.payload.HttpJsonReader._
 import org.cafienne.json.Value
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.file.CaseFileAPIFormat.CaseFileJsonExampleFormat
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
-import org.cafienne.system.CaseSystem
+import org.cafienne.service.infrastructure.payload.HttpJsonReader._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute {
   override def routes: Route = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
 
   @Path("/{caseInstanceId}/casefile")

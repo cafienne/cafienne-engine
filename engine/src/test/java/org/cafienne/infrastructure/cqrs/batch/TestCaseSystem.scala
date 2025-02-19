@@ -3,14 +3,13 @@ package org.cafienne.infrastructure.cqrs.batch
 import org.apache.pekko.actor.ActorSystem
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.ModelResponse
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.CaseSystem
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class TestCaseSystem(val actorSystem: ActorSystem = ActorSystem("Test-Case-System", Cafienne.config.systemConfig)) {
-  val caseSystem = new CaseSystem(actorSystem)
+class TestCaseSystem(val actorSystem: ActorSystem) {
+  val caseSystem: CaseSystem = CaseSystem(actorSystem)
   implicit val dispatcher: ExecutionContextExecutor = actorSystem.dispatcher
 
   // TODO: This code now directly accesses the Cafienne Gateway; it is intended to be replaced with going through the actual HTTP Routes

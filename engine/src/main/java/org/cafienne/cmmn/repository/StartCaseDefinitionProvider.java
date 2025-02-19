@@ -17,13 +17,12 @@
 
 package org.cafienne.cmmn.repository;
 
-import com.typesafe.config.Config;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.file.SimpleLRUCache;
-import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.infrastructure.config.RepositoryConfig;
 import org.cafienne.util.XMLHelper;
 import org.xml.sax.SAXException;
 
@@ -34,26 +33,18 @@ import java.util.List;
 import java.util.Map;
 
 public class StartCaseDefinitionProvider implements DefinitionProvider {
-    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
+    private final Map<String, DefinitionsDocument> cache;
     private final static String AUTHORIZED_TENANT_ROLES = "authorized-tenant-roles";
     private final List<String> authorizedTenantRoles;
+
+    public StartCaseDefinitionProvider(RepositoryConfig config) {
+        this.cache = new SimpleLRUCache<>(config.cacheSize());
+        this.authorizedTenantRoles = config.readStringList(AUTHORIZED_TENANT_ROLES, new ArrayList<>());;
+    }
 
     @Override
     public List<String> list(UserIdentity user, String tenant) {
         return new ArrayList<>();
-    }
-
-    public StartCaseDefinitionProvider() {
-        this.authorizedTenantRoles = readTenantRoles();
-    }
-
-    private List<String> readTenantRoles() {
-        Config config = Cafienne.config().repository().config();
-        if (config.hasPath(AUTHORIZED_TENANT_ROLES)) {
-            return config.getStringList(AUTHORIZED_TENANT_ROLES);
-        } else {
-            return new ArrayList<>();
-        }
     }
 
     private void checkAccess(UserIdentity user, String tenant) {

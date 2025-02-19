@@ -17,20 +17,18 @@
 
 package org.cafienne.service.http.platform
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.CaseSystem
+import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.cafienne.service.http.CaseEngineHttpServer
+import org.cafienne.service.infrastructure.route.CaseServiceRoute
 import org.cafienne.system.health.HealthMonitor
 
-import jakarta.ws.rs._
-import org.cafienne.service.infrastructure.route.CaseServiceRoute
-
 @Path("/")
-class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseServiceRoute {
+class CaseEngineHealthRoute(override val httpService: CaseEngineHttpServer) extends CaseServiceRoute {
 
 
   // For now, directly in the main, and not as child of PlatformRoutes;
@@ -96,7 +94,7 @@ class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseSer
   @Produces(Array("application/json"))
   def version = get {
     path("version") {
-      completeJson(Cafienne.version.json)
+      completeJson(caseSystem.version.json)
     }
   }
 }

@@ -17,26 +17,24 @@
 
 package org.cafienne.service.http.platform
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.PlatformOwner
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.http.tenant.model.TenantAPI._
-import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
-
 import jakarta.ws.rs._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.actormodel.identity.PlatformOwner
+import org.cafienne.service.http.CaseEngineHttpServer
+import org.cafienne.service.http.tenant.model.TenantAPI._
 import org.cafienne.service.infrastructure.route.CommandRoute
+import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
+class PlatformRoute(override val httpService: CaseEngineHttpServer) extends CommandRoute {
 
   override def routes: Route = concat(createTenant, disableTenant, enableTenant, getUserInformation)
 
@@ -134,8 +132,8 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 
   def platformOwner(subRoute: PlatformOwner => Route): Route = {
     authenticatedUser { user =>
-      if (Cafienne.isPlatformOwner(user.id)) {
-        subRoute(PlatformOwner(user.id))
+      if (caseSystem.config.platform.isPlatformOwner(user)) {
+        subRoute(PlatformOwner(user))
       } else {
         complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
       }

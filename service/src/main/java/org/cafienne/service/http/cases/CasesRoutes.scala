@@ -18,6 +18,8 @@
 package org.cafienne.service.http.cases
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
 import org.cafienne.service.http.cases.documentation.CaseDocumentationRoute
 import org.cafienne.service.http.cases.file.CaseFileRoute
@@ -25,24 +27,21 @@ import org.cafienne.service.http.cases.history.CaseHistoryRoute
 import org.cafienne.service.http.cases.migration.CaseMigrationRoute
 import org.cafienne.service.http.cases.plan.{DiscretionaryRoute, PlanItemRoute}
 import org.cafienne.service.http.cases.team.CaseTeamRoute
-import org.cafienne.system.CaseSystem
-
-import jakarta.ws.rs._
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
-class CasesRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class CasesRoutes(override val httpService: CaseEngineHttpServer) extends AuthenticatedRoute {
   override val prefix = "cases"
 
-  addSubRoute(new CaseRoute(caseSystem))
-  addSubRoute(new CaseFileRoute(caseSystem))
-  addSubRoute(new CaseTeamRoute(caseSystem))
-  addSubRoute(new PlanItemRoute(caseSystem))
-  addSubRoute(new DiscretionaryRoute(caseSystem))
-  addSubRoute(new CaseDocumentationRoute(caseSystem))
-  addSubRoute(new CaseHistoryRoute(caseSystem))
-  addSubRoute(new CaseMigrationRoute(caseSystem))
-  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseSystem))
-  addSubRoute(new DeprecatedCaseTeamRoute(caseSystem))
+  addSubRoute(new CaseRoute(httpService))
+  addSubRoute(new CaseFileRoute(httpService))
+  addSubRoute(new CaseTeamRoute(httpService))
+  addSubRoute(new PlanItemRoute(httpService))
+  addSubRoute(new DiscretionaryRoute(httpService))
+  addSubRoute(new CaseDocumentationRoute(httpService))
+  addSubRoute(new CaseHistoryRoute(httpService))
+  addSubRoute(new CaseMigrationRoute(httpService))
+  addSubRoute(new DeprecatedPlanItemHistoryRoute(httpService))
+  addSubRoute(new DeprecatedCaseTeamRoute(httpService))
 }

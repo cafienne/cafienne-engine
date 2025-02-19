@@ -17,12 +17,11 @@
 
 package org.cafienne.timerservice
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.Done
 import org.apache.pekko.actor.Scheduler
 import org.apache.pekko.persistence.query.Offset
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.health.HealthMonitor
 
 import scala.collection.mutable
@@ -41,7 +40,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
     reader.loadNextWindow
 
     // ... and then schedule the reader to repeat itself at the configured interval
-    val interval: FiniteDuration = Cafienne.config.engine.timerService.interval
+    val interval: FiniteDuration = timerService.caseSystem.config.engine.timerService.interval
     scheduler.scheduleWithFixedDelay(interval, interval)(reader)
   }
 

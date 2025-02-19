@@ -18,16 +18,15 @@
 package org.cafienne.service.http.anonymous
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.system.CaseSystem
-
 import jakarta.ws.rs._
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.CaseServiceRoute
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/request")
-class AnonymousRequestRoutes(override val caseSystem: CaseSystem) extends CaseServiceRoute {
+class AnonymousRequestRoutes(override val httpService: CaseEngineHttpServer) extends CaseServiceRoute {
 
   override val prefix: String = "request"
 
-  addSubRoute(new CaseRequestRoute(caseSystem))
+  addSubRoute(new CaseRequestRoute(httpService))
 }

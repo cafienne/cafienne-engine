@@ -22,7 +22,6 @@ import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -49,7 +48,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent implements Bootst
         //  So, at that moment we also store the engine version.
         //  TODO: perhaps better to distinguish CaseStarted or CaseCreated from CaseDefinitionApplied
         //   If so, then we can also suffice with storing root id and so in the CaseCreated, rather than in case definition applied. Same for engine version.
-        this.engineVersion = Cafienne.version();
+        this.engineVersion = caseInstance.caseSystem.version();
     }
 
     public CaseDefinitionApplied(ValueMap json) {

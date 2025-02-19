@@ -19,7 +19,6 @@ package org.cafienne.actormodel.identity
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.persistence.querydb.record.TenantRecord
@@ -32,8 +31,8 @@ class IdentityCache(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) e
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
-  private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
-  private val tenantCache = new SimpleLRUCache[String, TenantRecord](Cafienne.config.api.security.identityCacheSize)
+  private val cache = new SimpleLRUCache[String, PlatformUser](caseSystem.config.api.security.identityCacheSize)
+  private val tenantCache = new SimpleLRUCache[String, TenantRecord](caseSystem.config.api.security.identityCacheSize)
 
   override def getPlatformUser(user: UserIdentity, tenantLastModified: LastModifiedHeader): Future[PlatformUser] = {
     tenantLastModified.available.flatMap(_ => executeUserQuery(user))

@@ -17,27 +17,27 @@
 
 package org.cafienne.service.http.storage
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.{Directive, Route}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import jakarta.ws.rs.{DELETE, PUT, Path, Produces}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.{Directive, Route}
 import org.cafienne.persistence.querydb.query.CaseOwnership
 import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
-import org.cafienne.system.CaseSystem
 
-import jakarta.ws.rs.{DELETE, PUT, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage/case/{caseInstanceId}")
-class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with TenantRoute with StorageRoute {
+class CaseStorageRoute(override val httpService: CaseEngineHttpServer) extends CasesRoute with TenantRoute with StorageRoute {
   override val prefix = "case"
   override def routes: Route = concat(archiveCaseInstance, restoreCaseInstance, deleteCaseInstance)
 

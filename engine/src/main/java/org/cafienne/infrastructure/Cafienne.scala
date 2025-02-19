@@ -17,8 +17,7 @@
 
 package org.cafienne.infrastructure
 
-import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.infrastructure.config.CaseSystemConfig
 
 /**
   * JVM wide configurations and settings
@@ -28,18 +27,13 @@ object Cafienne {
   /**
     * Configuration settings of this Cafienne Platform
     */
-  lazy val config: CafienneConfig = CafienneConfig()
+  lazy val config: CaseSystemConfig = {
+    conf.getOrElse(throw new Exception("Cannot read Cafienne.config because a CaseSystem instance has not yet been created"))
+  }
 
-  /**
-    * Returns the BuildInfo as a string (containing JSON)
-    *
-    * @return
-    */
-  lazy val version = new CafienneVersion
+  private var conf: Option[CaseSystemConfig] = None
 
-  def isPlatformOwner(user: UserIdentity): Boolean = isPlatformOwner(user.id)
-
-  def isPlatformOwner(userId: String): Boolean = {
-    config.platform.isPlatformOwner(userId)
+  def setConfig(caseSystemConfig: CaseSystemConfig): Unit = {
+    conf = Some(caseSystemConfig)
   }
 }

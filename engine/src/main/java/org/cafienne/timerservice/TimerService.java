@@ -20,7 +20,6 @@ package org.cafienne.timerservice;
 import org.apache.pekko.persistence.SnapshotOffer;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.timerservice.persistence.TimerStore;
 import org.cafienne.timerservice.persistence.TimerStoreProvider;
@@ -42,7 +41,7 @@ public class TimerService extends ModelActor {
         this.storage = new TimerStoreProvider(caseSystem).store();
         this.monitor = new TimerMonitor(this);
         this.eventSink = new TimerEventSink(this);
-        setEngineVersion(Cafienne.version());
+        setEngineVersion(caseSystem.version());
     }
 
     @Override
@@ -67,7 +66,7 @@ public class TimerService extends ModelActor {
 
     @Override
     protected void recoveryCompleted() {
-        logger.warn("Starting Timer Service - loading timers every " + Cafienne.config().engine().timerService().interval() + " for a window of " + Cafienne.config().engine().timerService().window() + " ahead");
+        logger.warn("Starting Timer Service - loading timers every " + caseSystem.config().engine().timerService().interval() + " for a window of " + caseSystem.config().engine().timerService().window() + " ahead");
         monitor.start();
         eventSink.start();
     }

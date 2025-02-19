@@ -26,16 +26,15 @@ import jakarta.ws.rs.{GET, PATCH, Path, Produces}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.command.TerminateModelActor
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.instance.ModelEventsReader
+import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.CommandRoute
-import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
+class DebugRoute(override val httpService: CaseEngineHttpServer) extends CommandRoute {
 
   private val modelEventsReader = new ModelEventsReader(caseSystem)
 
@@ -96,7 +95,7 @@ class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
   def forceRecovery: Route = patch {
     path("force-recovery" / Segment) { modelId =>
       validUser { user =>
-        if (!Cafienne.config.developerRouteOpen) {
+        if (!caseSystem.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
           onComplete(caseSystem.gateway.request(TerminateModelActor(modelId))) {

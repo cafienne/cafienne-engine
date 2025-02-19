@@ -31,7 +31,7 @@ public class SimpleLRUCache<K, T> extends LinkedHashMap<K, T> {
     private final int maxSize;
 
     public SimpleLRUCache(int maxSize) {
-        super(maxSize >= 0 ? maxSize : 0, 0.75f, true);
+        super(Math.max(maxSize, 0), 0.75f, true);
         this.maxSize = maxSize;
     }
 
