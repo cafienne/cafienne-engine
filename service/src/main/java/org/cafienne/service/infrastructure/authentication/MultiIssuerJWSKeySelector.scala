@@ -40,7 +40,7 @@ class MultiIssuerJWSKeySelector(config: OIDCConfiguration) extends JWTClaimsSetA
   }
 
   private def readIssuersConfiguration(config: OIDCConfiguration): Map[String, JWSKeySelector[SecurityContext]] = {
-    val issuers = config.issuers.map(metadata => {
+    val issuers = config.issuers.map(_.metadata.get).map(metadata => {
       val keySource: JWKSource[SecurityContext] = JWKSourceBuilder.create(metadata.getJWKSetURI.toURL).build()
       val issuer: String = metadata.getIssuer.getValue
       val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)

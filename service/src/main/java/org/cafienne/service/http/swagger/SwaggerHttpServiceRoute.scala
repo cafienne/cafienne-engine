@@ -32,7 +32,7 @@ class SwaggerHttpServiceRoute(val httpService: CaseEngineHttpServer, val apiClas
   override val info: Info = Info(description =
     """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = httpService.caseSystem.version.json.get("version").toString)
 
-  private val oidc = httpService.oidcConfiguration.issuers.head
+  private val oidc = httpService.oidcConfiguration.issuers.map(_.metadata.get).head
 
   /* https://stackoverflow.com/questions/41918845/keycloak-integration-in-swagger
     "securityDefinitions": {

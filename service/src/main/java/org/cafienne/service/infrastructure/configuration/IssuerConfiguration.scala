@@ -29,7 +29,7 @@ import java.net.URI
 import java.util
 import java.util.Collections
 
-class OIDCProviderMetadataConfiguration(override val config: Config) extends ConfigReader {
+class IssuerConfiguration(override val config: Config) extends ConfigReader {
   val issuer: String = readString("issuer")
   val metadata: Option[OIDCProviderMetadata] = {
     if (config.hasPath("key-url")) {

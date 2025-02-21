@@ -46,27 +46,17 @@ trait AuthenticationDirectives extends Directives {
   }
 
   def platformUser(tlm: LastModifiedHeader): Directive1[PlatformUser] = {
-    authenticateOAuth2Async("service", c => {
-      jwtToPlatformUser(c, tlm)
-    })
+    authenticateOAuth2Async("service", credentials => jwtToPlatformUser(credentials, tlm))
   }
 
   private def verifyJWTToken(credentials: Credentials): Future[Option[AuthenticatedUser]] = {
     credentials match {
-      case Credentials.Provided(token) => jwtTokenVerifier.verifyToken(token).map(ctx => Some(ctx))
+      case Credentials.Provided(token) => jwtTokenVerifier.verifyToken(token).map(user => Some(user))
       case Credentials.Missing => Future.failed(MissingTokenException)
     }
   }
 
   private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[Option[PlatformUser]] = {
-    credentials match {
-      case Credentials.Provided(token) => {
-        for {
-          authenticatedUser <- jwtTokenVerifier.verifyToken(token)
-          cachedUser <- userCache.getPlatformUser(authenticatedUser, tlm)
-        } yield Some(cachedUser)
-      }
-      case Credentials.Missing => Future.failed(MissingTokenException)
-    }
+    verifyJWTToken(credentials).flatMap(user => userCache.getPlatformUser(user.get, tlm).map(user => Some(user)))
   }
 }

@@ -91,7 +91,7 @@ trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives 
   }
 
   // TODO: this is a temporary switch to enable IDE's debugger to show events
-  @Deprecated // but no alternative yet...
+  @deprecated("optionalUser is a temporary switch to enable un-authenticated access for reading events in the debug route", "1.1.0") // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route): Route = {
     if (caseSystem.config.developerRouteOpen) {
       subRoute(null)
