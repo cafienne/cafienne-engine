@@ -35,28 +35,27 @@ trait AuthenticationDirectives extends Directives {
   val config: OIDCConfiguration
   implicit val ex: ExecutionContext
 
-  //TODO make the token verifier initialize with the list of tuple (issuer, keysource) as defined in AuthenticatedRoute
-  lazy private val jwtTokenVerifier = new JwtTokenVerifier(config)
+  lazy private val jwtTokenVerifier = new TokenVerifier(config)
 
   //IdentityProvider to get the user
   protected val userCache: IdentityProvider
 
   def authenticatedUser(): Directive1[AuthenticatedUser] = {
-    authenticateOAuth2Async("service", verifyJWTToken)
+    authenticateOAuth2Async("service", verifyJWTToken(_).map(Some(_)))
   }
 
   def platformUser(tlm: LastModifiedHeader): Directive1[PlatformUser] = {
-    authenticateOAuth2Async("service", credentials => jwtToPlatformUser(credentials, tlm))
+    authenticateOAuth2Async("service", jwtToPlatformUser(_, tlm).map(Some(_)))
   }
 
-  private def verifyJWTToken(credentials: Credentials): Future[Option[AuthenticatedUser]] = {
+  private def verifyJWTToken(credentials: Credentials): Future[AuthenticatedUser] = {
     credentials match {
-      case Credentials.Provided(token) => jwtTokenVerifier.verifyToken(token).map(user => Some(user))
+      case Credentials.Provided(token) => jwtTokenVerifier.convertToAuthenticatedUser(token)
       case Credentials.Missing => Future.failed(MissingTokenException)
     }
   }
 
-  private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[Option[PlatformUser]] = {
-    verifyJWTToken(credentials).flatMap(user => userCache.getPlatformUser(user.get, tlm).map(user => Some(user)))
+  private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[PlatformUser] = {
+    verifyJWTToken(credentials).flatMap(user => userCache.getPlatformUser(user, tlm))
   }
 }

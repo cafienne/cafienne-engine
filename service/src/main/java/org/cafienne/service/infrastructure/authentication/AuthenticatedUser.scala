@@ -22,8 +22,7 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{Value, ValueMap}
 
-class AuthenticatedUser(override val token: String, claims: JWTClaimsSet) extends UserIdentity {
-  val id: String = claims.getSubject
+class AuthenticatedUser(override val id: String, override val token: String, claims: JWTClaimsSet) extends UserIdentity {
   UserIdentity.cacheUserToken(this.id, this.token)
 
   override def toValue: Value[_] = new ValueMap(Fields.userId, id)
