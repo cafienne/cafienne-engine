@@ -22,7 +22,11 @@ import org.cafienne.persistence.querydb.record.TenantRecord
 
 import scala.concurrent.Future
 
-trait IdentityProvider {
+trait IdentityRegistration {
+  def cacheUserToken(user: UserIdentity, token: String): Unit = ???
+
+  def getUserToken(user: UserIdentity): String = ???
+
   def getTenant(tenant: String): Future[TenantRecord] = ???
 
   def getPlatformUser(user: UserIdentity, tlm: LastModifiedHeader): Future[PlatformUser] = ???

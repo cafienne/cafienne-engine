@@ -20,7 +20,7 @@ package org.cafienne.consentgroup.actorapi.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -29,7 +29,7 @@ import java.io.IOException;
 
 @Manifest
 public class ConsentGroupCreated extends ConsentGroupBaseEvent implements BootstrapMessage {
-    public final CafienneVersion engineVersion;
+    public final EngineVersion engineVersion;
     public final String tenant;
 
     public ConsentGroupCreated(ConsentGroupActor group, String tenant) {
@@ -41,7 +41,7 @@ public class ConsentGroupCreated extends ConsentGroupBaseEvent implements Bootst
     public ConsentGroupCreated(ValueMap json) {
         super(json);
         this.tenant = json.readString(Fields.tenant);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, EngineVersion::new);
     }
 
     @Override

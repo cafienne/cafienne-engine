@@ -29,7 +29,7 @@ public class UserContext extends APIObject<ModelActor> {
     public UserContext(ModelActor actor, UserIdentity user) {
         super(actor);
         addPropertyReader("id", user::id);
-        addPropertyReader("token", user::token);
+        addPropertyReader("token", () -> actor.caseSystem.identityRegistration().getUserToken(user));
         addDeprecatedReader("roles", ArrayList<String>::new);
         addDeprecatedReader("name", () -> "");
         addDeprecatedReader("email", () -> "");

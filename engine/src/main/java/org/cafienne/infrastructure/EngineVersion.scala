@@ -17,23 +17,15 @@
 
 package org.cafienne.infrastructure
 
-import org.cafienne.infrastructure.config.CaseSystemConfig
+import org.cafienne.BuildInfo
+import org.cafienne.json.{JSONReader, Value, ValueMap}
 
-/**
-  * JVM wide configurations and settings
-  */
-object Cafienne {
-
+// Note: json creation is somewhat cumbersome, but it is required in order to have the comparison mechanism work properly.
+class EngineVersion(val json: ValueMap = JSONReader.parse(Value.convert(BuildInfo.toMap).asMap.toString).asInstanceOf[ValueMap]) {
   /**
-    * Configuration settings of this Cafienne Platform
+    * Returns true if the two versions differ, false if they are the same.
     */
-  lazy val config: CaseSystemConfig = {
-    conf.getOrElse(throw new Exception("Cannot read Cafienne.config because a CaseSystem instance has not yet been created"))
-  }
+  def differs(otherVersionInstance: EngineVersion): Boolean = !json.equals(otherVersionInstance.json)
 
-  private var conf: Option[CaseSystemConfig] = None
-
-  def setConfig(caseSystemConfig: CaseSystemConfig): Unit = {
-    conf = Some(caseSystemConfig)
-  }
+  override def toString: String = json.toString
 }

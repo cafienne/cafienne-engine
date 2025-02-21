@@ -19,7 +19,7 @@ package org.cafienne.service.infrastructure.authentication
 
 import org.apache.pekko.http.scaladsl.server.directives.Credentials
 import org.apache.pekko.http.scaladsl.server.{Directive1, Directives}
-import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
+import org.cafienne.actormodel.identity.{IdentityRegistration, PlatformUser}
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
@@ -33,40 +33,27 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 trait AuthenticationDirectives extends Directives {
   val config: OIDCConfiguration
+  protected val userCache: IdentityRegistration
   implicit val ex: ExecutionContext
 
-  //TODO make the token verifier initialize with the list of tuple (issuer, keysource) as defined in AuthenticatedRoute
-  lazy private val jwtTokenVerifier = new JwtTokenVerifier(config)
-
-  //IdentityProvider to get the user
-  protected val userCache: IdentityProvider
+  lazy private val jwtTokenVerifier = new TokenVerifier(userCache, config)
 
   def authenticatedUser(): Directive1[AuthenticatedUser] = {
-    authenticateOAuth2Async("service", verifyJWTToken)
+    authenticateOAuth2Async("service", verifyJWTToken(_).map(Some(_)))
   }
 
   def platformUser(tlm: LastModifiedHeader): Directive1[PlatformUser] = {
-    authenticateOAuth2Async("service", c => {
-      jwtToPlatformUser(c, tlm)
-    })
+    authenticateOAuth2Async("service", jwtToPlatformUser(_, tlm).map(Some(_)))
   }
 
-  private def verifyJWTToken(credentials: Credentials): Future[Option[AuthenticatedUser]] = {
+  private def verifyJWTToken(credentials: Credentials): Future[AuthenticatedUser] = {
     credentials match {
-      case Credentials.Provided(token) => jwtTokenVerifier.verifyToken(token).map(ctx => Some(ctx))
+      case Credentials.Provided(token) => jwtTokenVerifier.convertToAuthenticatedUser(token)
       case Credentials.Missing => Future.failed(MissingTokenException)
     }
   }
 
-  private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[Option[PlatformUser]] = {
-    credentials match {
-      case Credentials.Provided(token) => {
-        for {
-          authenticatedUser <- jwtTokenVerifier.verifyToken(token)
-          cachedUser <- userCache.getPlatformUser(authenticatedUser, tlm)
-        } yield Some(cachedUser)
-      }
-      case Credentials.Missing => Future.failed(MissingTokenException)
-    }
+  private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[PlatformUser] = {
+    verifyJWTToken(credentials).flatMap(user => userCache.getPlatformUser(user, tlm))
   }
 }

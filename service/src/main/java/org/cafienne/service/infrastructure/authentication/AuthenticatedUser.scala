@@ -17,15 +17,11 @@
 
 package org.cafienne.service.infrastructure.authentication
 
-import com.nimbusds.jwt.JWTClaimsSet
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{Value, ValueMap}
 
-class AuthenticatedUser(override val token: String, claims: JWTClaimsSet) extends UserIdentity {
-  val id: String = claims.getSubject
-  UserIdentity.cacheUserToken(this.id, this.token)
-
+class AuthenticatedUser(override val id: String) extends UserIdentity {
   override def toValue: Value[_] = new ValueMap(Fields.userId, id)
 }
 

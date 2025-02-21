@@ -17,7 +17,6 @@
 
 package org.cafienne.service.infrastructure.configuration
 
-import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata
 import com.typesafe.config.{Config, ConfigValueType}
 import org.cafienne.infrastructure.config.api.SecurityConfig
 import org.cafienne.infrastructure.config.util.MandatoryConfig
@@ -28,7 +27,11 @@ class OIDCConfiguration(val parent: SecurityConfig) extends MandatoryConfig {
   def path = "oidc"
   override lazy val config: Config = parent.config
 
-  lazy val issuers: Seq[OIDCProviderMetadata] = {
+  def getIssuer(key: String): IssuerConfiguration = {
+    issuers.find(_.issuer == key).orNull
+  }
+
+  lazy val issuers: Seq[IssuerConfiguration] = {
     val list = if (config.hasPath(path)) {
       val configType = config.getValue(path).valueType()
       if (configType == ConfigValueType.LIST) {
@@ -49,10 +52,10 @@ class OIDCConfiguration(val parent: SecurityConfig) extends MandatoryConfig {
     list
   }
 
-  private def readConfigurations(configs: Seq[Config]): Seq[OIDCProviderMetadata] = {
-    val issuers = configs.map(new OIDCProviderMetadataConfiguration(_)).filter(_.metadata.nonEmpty).map(_.metadata.get)
+  private def readConfigurations(configs: Seq[Config]): Seq[IssuerConfiguration] = {
+    val issuers = configs.map(new IssuerConfiguration(_)).filter(_.hasMetadata)
     // Check that we have actual values in the list
-    logger.warn(s"Cafienne HTTP Server is configured with ${issuers.size} identity providers: ${issuers.map(_.getIssuer.toString).mkString("\n- ", "\n- ", "")}")
+    logger.warn(s"Cafienne HTTP Server is configured with ${issuers.size} identity providers: ${issuers.map(_.issuer).mkString("\n- ", "\n- ", "")}")
     issuers
   }
 }

@@ -30,6 +30,10 @@ public class CurrentMemberAPI extends MemberAPI {
      */
     public CurrentMemberAPI(Case caseInstance) {
         super(caseInstance.getCaseTeam(), caseInstance.getCurrentTeamMember());
-        addPropertyReader("token", caseInstance.getCurrentUser()::token);
+        addPropertyReader("token", this::getToken);
+    }
+
+    private String getToken() {
+        return actor.caseSystem.identityRegistration().getUserToken(actor.getCurrentUser());
     }
 }

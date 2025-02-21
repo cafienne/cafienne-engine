@@ -18,42 +18,31 @@
 package org.cafienne.service.infrastructure.authentication
 
 import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.jwk.source.{JWKSource, JWKSourceBuilder}
-import com.nimbusds.jose.proc.{JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
 import java.security.Key
 
-class MultiIssuerJWSKeySelector(config: OIDCConfiguration) extends JWTClaimsSetAwareJWSKeySelector[SecurityContext] with LazyLogging {
+/**
+ * This class can select the right keys for the issuer that is indicated in the token
+ */
+class MultiIssuerJWSKeySelector(config: OIDCConfiguration) extends JWTClaimsSetAwareJWSKeySelector[TokenContext] {
   // The code below is built based upon this sample: https://jomatt.io/how-to-build-a-multi-tenant-saas-solution-with-spring
-  val issuers: Map[String, JWSKeySelector[SecurityContext]] = readIssuersConfiguration(config)
-
-
-  override def selectKeys(header: JWSHeader, claimsSet: JWTClaimsSet, context: SecurityContext): java.util.List[_ <: Key] = {
-    val issuer = claimsSet.getIssuer
-    // Exception if we cannot find the expected idp
-    def unknownIDP = throw new InvalidIssuerException(s"JWT token has invalid issuer '$issuer', please use another identity provider")
-    issuers.get(issuer).fold(unknownIDP)(_.selectJWSKeys(header, context))
-  }
-
-  private def readIssuersConfiguration(config: OIDCConfiguration): Map[String, JWSKeySelector[SecurityContext]] = {
-    val issuers = config.issuers.map(metadata => {
-      val keySource: JWKSource[SecurityContext] = JWKSourceBuilder.create(metadata.getJWKSetURI.toURL).build()
-      val issuer: String = metadata.getIssuer.getValue
-      val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
-      // Configure the JWT processor with a key selector to feed matching public
-      // RSA keys sourced from the JWK set URL
-      val keySelector: JWSKeySelector[SecurityContext] = new JWSVerificationKeySelector(algorithms, keySource)
-      (issuer, keySelector)
-    })
-
-    if (issuers.isEmpty) {
-      logger.error("ERROR: Missing valid OIDC configuration")
+  override def selectKeys(header: JWSHeader, claimsSet: JWTClaimsSet, context: TokenContext): java.util.List[_ <: Key] = {
+    // First read the issuer from the token
+    val issuerInToken = claimsSet.getIssuer
+    if (issuerInToken == null || issuerInToken.isBlank) {
+      throw MissingIssuerException
     }
 
-    issuers.toMap[String, JWSKeySelector[SecurityContext]]
+    // Check whether the issuer from the token has been configured
+    val configuredIssuer = config.issuers.find(_.issuer == issuerInToken).getOrElse(throw new InvalidIssuerException(s"JWT token has invalid issuer '$issuerInToken', please use another identity provider"))
+
+    // Provide the issuer configuration to the context
+    context.setIssuer(configuredIssuer) // This can be used to figure out the name of the user-id claim (defaults to "sub", but some IDPs are configured differently)
+
+    // Return the JWS keys
+    configuredIssuer.keySelector.selectJWSKeys(header, context)
   }
 }

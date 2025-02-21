@@ -22,7 +22,7 @@ import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -32,7 +32,7 @@ import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionApplied extends CaseDefinitionEvent implements BootstrapMessage {
-    public final CafienneVersion engineVersion;
+    public final EngineVersion engineVersion;
     private final String parentCaseId;
     private final String rootCaseId;
     public final Instant createdOn;
@@ -57,7 +57,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent implements Bootst
         this.createdBy = json.readString(Fields.createdBy);
         this.rootCaseId = json.readString(Fields.rootActorId);
         this.parentCaseId = json.readString(Fields.parentActorId);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, EngineVersion::new);
     }
 
     /**

@@ -35,6 +35,7 @@ object TokenVerificationException {
 }
 
 object MissingTokenException extends TokenVerificationException("Authorization token is missing")
+object MissingIssuerException extends TokenVerificationException("Authorization token has no issuer and cannot be verified")
 class MissingClaimsException(msg: String) extends TokenVerificationException(msg)
 class InvalidIssuerException(msg: String) extends TokenVerificationException(msg)
 class CannotReachIDPException(msg: String, cause: Throwable) extends TokenVerificationException(msg, cause)
