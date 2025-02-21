@@ -18,6 +18,8 @@
 package org.cafienne.service.infrastructure.configuration
 
 import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.source.{JWKSource, JWKSourceBuilder}
+import com.nimbusds.jose.proc.{JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
 import com.nimbusds.oauth2.sdk.id.Issuer
 import com.nimbusds.openid.connect.sdk.SubjectType
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata
@@ -31,10 +33,19 @@ import java.util.Collections
 
 class IssuerConfiguration(override val config: Config) extends ConfigReader {
   val issuer: String = readString("issuer")
+  val userIdClaim: String = readString("user-id-claim", "sub")
 
   def hasMetadata: Boolean = _metadata.nonEmpty
 
   def metadata: OIDCProviderMetadata = _metadata.get
+
+  lazy val keySelector: JWSKeySelector[SecurityContext] = {
+      val keySource: JWKSource[SecurityContext] = JWKSourceBuilder.create(metadata.getJWKSetURI.toURL).build()
+      val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
+      // Configure the JWT processor with a key selector to feed matching public
+      // RSA keys sourced from the JWK set URL
+      new JWSVerificationKeySelector[SecurityContext](algorithms, keySource)
+  }
 
   private val _metadata: Option[OIDCProviderMetadata] = {
     if (config.hasPath("key-url")) {

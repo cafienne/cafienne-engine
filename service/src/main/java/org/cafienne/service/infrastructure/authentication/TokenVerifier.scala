@@ -97,9 +97,9 @@ class JwtTokenVerifier(val config: OIDCConfiguration)(implicit ec: ExecutionCont
             throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
           case e: ParseException =>
             throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
-          case i: InvalidIssuerException =>
+          case t: TokenVerificationException =>
             // This is an exception of our self. Just throw it further
-            throw i
+            throw t
           case e: Throwable =>
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
             throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)
