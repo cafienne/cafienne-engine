@@ -31,7 +31,12 @@ import java.util.Collections
 
 class IssuerConfiguration(override val config: Config) extends ConfigReader {
   val issuer: String = readString("issuer")
-  val metadata: Option[OIDCProviderMetadata] = {
+
+  def hasMetadata: Boolean = _metadata.nonEmpty
+
+  def metadata: OIDCProviderMetadata = _metadata.get
+
+  private val _metadata: Option[OIDCProviderMetadata] = {
     if (config.hasPath("key-url")) {
       // static configuration
       logger.info(s"Reading static info for IDP $issuer")

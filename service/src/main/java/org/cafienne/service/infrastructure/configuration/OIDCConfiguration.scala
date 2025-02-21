@@ -53,7 +53,7 @@ class OIDCConfiguration(val parent: SecurityConfig) extends MandatoryConfig {
   }
 
   private def readConfigurations(configs: Seq[Config]): Seq[IssuerConfiguration] = {
-    val issuers = configs.map(new IssuerConfiguration(_)).filter(_.metadata.nonEmpty)
+    val issuers = configs.map(new IssuerConfiguration(_)).filter(_.hasMetadata)
     // Check that we have actual values in the list
     logger.warn(s"Cafienne HTTP Server is configured with ${issuers.size} identity providers: ${issuers.map(_.issuer).mkString("\n- ", "\n- ", "")}")
     issuers

@@ -35,12 +35,12 @@ class MultiIssuerJWSKeySelector(config: OIDCConfiguration) extends JWTClaimsSetA
   override def selectKeys(header: JWSHeader, claimsSet: JWTClaimsSet, context: SecurityContext): java.util.List[_ <: Key] = {
     val issuer = claimsSet.getIssuer
     // Exception if we cannot find the expected idp
-    def unknownIDP = throw new InvalidIssuerException(s"JWT token has invalid issuer '$issuer', please use another identity provider")
+    def unknownIDP: Nothing = throw new InvalidIssuerException(s"JWT token has invalid issuer '$issuer', please use another identity provider")
     issuers.get(issuer).fold(unknownIDP)(_.selectJWSKeys(header, context))
   }
 
   private def readIssuersConfiguration(config: OIDCConfiguration): Map[String, JWSKeySelector[SecurityContext]] = {
-    val issuers = config.issuers.map(_.metadata.get).map(metadata => {
+    val issuers = config.issuers.map(_.metadata).map(metadata => {
       val keySource: JWKSource[SecurityContext] = JWKSourceBuilder.create(metadata.getJWKSetURI.toURL).build()
       val issuer: String = metadata.getIssuer.getValue
       val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
