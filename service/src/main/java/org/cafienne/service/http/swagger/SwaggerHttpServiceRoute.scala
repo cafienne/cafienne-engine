@@ -22,7 +22,6 @@ import com.github.swagger.pekko.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.service.http.CaseEngineHttpServer
-import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
 class SwaggerHttpServiceRoute(val httpService: CaseEngineHttpServer, val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
 
@@ -33,7 +32,7 @@ class SwaggerHttpServiceRoute(val httpService: CaseEngineHttpServer, val apiClas
   override val info: Info = Info(description =
     """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = httpService.caseSystem.version.json.get("version").toString)
 
-  private val oidc = new OIDCConfiguration(httpService.caseSystem.config.api.security).issuers.head
+  private val oidc = httpService.oidcConfiguration.issuers.head
 
   /* https://stackoverflow.com/questions/41918845/keycloak-integration-in-swagger
     "securityDefinitions": {
