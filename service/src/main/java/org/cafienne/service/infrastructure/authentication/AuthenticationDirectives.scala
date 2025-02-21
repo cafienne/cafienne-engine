@@ -19,7 +19,7 @@ package org.cafienne.service.infrastructure.authentication
 
 import org.apache.pekko.http.scaladsl.server.directives.Credentials
 import org.apache.pekko.http.scaladsl.server.{Directive1, Directives}
-import org.cafienne.actormodel.identity.{IdentityProvider, PlatformUser}
+import org.cafienne.actormodel.identity.{IdentityRegistration, PlatformUser}
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 
@@ -33,12 +33,10 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 trait AuthenticationDirectives extends Directives {
   val config: OIDCConfiguration
+  protected val userCache: IdentityRegistration
   implicit val ex: ExecutionContext
 
-  lazy private val jwtTokenVerifier = new TokenVerifier(config)
-
-  //IdentityProvider to get the user
-  protected val userCache: IdentityProvider
+  lazy private val jwtTokenVerifier = new TokenVerifier(userCache, config)
 
   def authenticatedUser(): Directive1[AuthenticatedUser] = {
     authenticateOAuth2Async("service", verifyJWTToken(_).map(Some(_)))

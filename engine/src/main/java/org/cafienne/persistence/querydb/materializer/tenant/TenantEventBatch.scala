@@ -66,7 +66,7 @@ class TenantEventBatch(val sink: TenantEventSink, override val persistenceId: St
     // Commit and then inform the last modified registration
     dBTransaction.commit()
     // Clear the user cache for those user ids that have been updated
-    userProjection.affectedUserIds.foreach(sink.caseSystem.userCache.clear)
+    userProjection.affectedUserIds.foreach(sink.caseSystem.identityRegistration.clear)
     TenantReader.lastModifiedRegistration.handle(tenantModified)
   }
 

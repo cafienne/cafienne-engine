@@ -23,7 +23,7 @@ class TokenContext(val token: String) extends SecurityContext {
   /**
    * This method is invoked from the ClaimsVerifier
    */
-  def createUser(id: String, claims: JWTClaimsSet): Unit = this._user = Some(new AuthenticatedUser(id, token, claims))
+  def createUser(id: String, claims: JWTClaimsSet): Unit = this._user = Some(new AuthenticatedUser(id))
 
   /**
    * Returns the authenticatedUser object that is converted from the token

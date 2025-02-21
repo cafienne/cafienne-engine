@@ -28,7 +28,7 @@ import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.EngineChokedFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.cafienne.json.Value;
 import org.cafienne.system.health.HealthMonitor;
@@ -60,8 +60,8 @@ public class StagingArea {
 
     private void checkEngineVersion() {
         // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
-        CafienneVersion actorVersion = actor.getEngineVersion();
-        CafienneVersion currentEngineVersion = actor.caseSystem.version();
+        EngineVersion actorVersion = actor.getEngineVersion();
+        EngineVersion currentEngineVersion = actor.caseSystem.version();
         if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
             actor.getLogger().info(actor + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
             addEvent(new EngineVersionChanged(actor, currentEngineVersion));

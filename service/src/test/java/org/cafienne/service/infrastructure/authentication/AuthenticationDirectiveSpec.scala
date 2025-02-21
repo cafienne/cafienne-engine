@@ -11,7 +11,7 @@ import net.minidev.json.JSONArray
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
-import org.cafienne.actormodel.identity.IdentityProvider
+import org.cafienne.actormodel.identity.IdentityRegistration
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
@@ -41,7 +41,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
 
   //Route setup that uses the token with a role included
   object IncludeAuthDirectives extends AuthenticationDirectives {
-    override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override protected val userCache: IdentityRegistration = new IdentityRegistration{}
     override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }
@@ -59,7 +59,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
 
   //Route setup without roles included
   object AuthDirectivesWithoutRoles extends AuthenticationDirectives {
-    override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override protected val userCache: IdentityRegistration = new IdentityRegistration{}
     override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }
@@ -77,7 +77,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
 
   //Route with a non - uuid subject
   object AuthDirectivesNoUUID extends AuthenticationDirectives {
-    override protected val userCache: IdentityProvider = new IdentityProvider{}
+    override protected val userCache: IdentityRegistration = new IdentityRegistration{}
     override val config: OIDCConfiguration = new OIDCConfiguration(SystemConfig.DEFAULT.cafienne.api.security)
     override implicit val ex: ExecutionContext = executionContext
   }

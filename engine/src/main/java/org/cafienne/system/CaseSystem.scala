@@ -19,8 +19,8 @@ package org.cafienne.system
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
-import org.cafienne.actormodel.identity.IdentityCache
-import org.cafienne.infrastructure.CafienneVersion
+import org.cafienne.actormodel.identity.{IdentityRegistration, CaseSystemIdentityRegistration}
+import org.cafienne.infrastructure.EngineVersion
 import org.cafienne.infrastructure.config.CaseSystemConfig
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.eventdb.EventDB
@@ -45,7 +45,7 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   /**
    * Returns the BuildInfo as a string (containing JSON)
    */
-  lazy val version = new CafienneVersion
+  lazy val version = new EngineVersion
 
   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
@@ -57,7 +57,7 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   // Create singleton actors
   val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
 
-  lazy val userCache: IdentityCache = new IdentityCache(this)
+  lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)
 
   // First, start platform bootstrap configuration
   BootstrapPlatformConfiguration.run(this)

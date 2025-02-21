@@ -19,7 +19,6 @@ package org.cafienne.infrastructure.config
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.api.ApiConfig
 import org.cafienne.infrastructure.config.engine.EngineConfig
 import org.cafienne.infrastructure.config.persistence.PersistenceConfig
@@ -31,8 +30,6 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
   * @param systemConfig
   */
 class CaseSystemConfig(val systemConfig: SystemConfig) extends ConfigReader with LazyLogging {
-  Cafienne.setConfig(this)
-
   val path = "cafienne"
 
   override lazy val config: Config = {

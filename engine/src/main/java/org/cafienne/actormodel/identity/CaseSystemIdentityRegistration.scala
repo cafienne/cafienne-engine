@@ -26,25 +26,39 @@ import org.cafienne.system.CaseSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentityCache(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
+class CaseSystemIdentityRegistration(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) extends IdentityRegistration with LazyLogging {
   val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
-  private val cache = new SimpleLRUCache[String, PlatformUser](caseSystem.config.api.security.identityCacheSize)
+  private val platformUserCache = new SimpleLRUCache[String, PlatformUser](caseSystem.config.api.security.identityCacheSize)
   private val tenantCache = new SimpleLRUCache[String, TenantRecord](caseSystem.config.api.security.identityCacheSize)
+  private val tokens = new SimpleLRUCache[String, String](caseSystem.config.api.security.tokenCacheSize)
 
   override def getPlatformUser(user: UserIdentity, tenantLastModified: LastModifiedHeader): Future[PlatformUser] = {
     tenantLastModified.available.flatMap(_ => executeUserQuery(user))
   }
 
+  override def cacheUserToken(user: UserIdentity, token: String): Unit = {
+    tokens.put(user.id, token)
+  }
+
+  override def getUserToken(user: UserIdentity): String = {
+    val token = tokens.get(user.id)
+    if (token != null) {
+      token
+    } else {
+      "" // Just return an empty string
+    }
+  }
+
   private def cacheUser(user: PlatformUser) = {
-    cache.put(user.id, user)
+    platformUserCache.put(user.id, user)
     user
   }
 
   private def executeUserQuery(user: UserIdentity): Future[PlatformUser] = {
-    cache.get(user.id) match {
+    platformUserCache.get(user.id) match {
       case user: PlatformUser => Future(user)
       case null => userQueries.getPlatformUser(user.id).map(cacheUser)
     }
@@ -62,7 +76,6 @@ class IdentityCache(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) e
 
   override def clear(userId: String): Unit = {
     // NOTE: We can also extend this to update the cache information, instead of removing keys.
-    cache.remove(userId)
+    platformUserCache.remove(userId)
   }
-
 }

@@ -34,7 +34,7 @@ import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.system.health.HealthMonitor;
@@ -93,12 +93,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
-     * If a ModelActor is recovered by the actor system, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
+     * If a ModelActor is recovered by the actor system, then the version will be overwritten in {@link ModelActor#setEngineVersion(EngineVersion)}.
      * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
      * the actor will insert a new event EngineVersionChanged.
      * For new Cases, the CaseDefinitionApplied event will generate the current version
      */
-    private CafienneVersion engineVersion;
+    private EngineVersion engineVersion;
 
     /**
      * The CaseSystem in which this ModelActor runs
@@ -120,11 +120,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return true;
     }
 
-    public CafienneVersion getEngineVersion() {
+    public EngineVersion getEngineVersion() {
         return this.engineVersion;
     }
 
-    public void setEngineVersion(CafienneVersion version) {
+    public void setEngineVersion(EngineVersion version) {
         this.engineVersion = version;
     }
 

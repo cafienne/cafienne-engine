@@ -19,7 +19,7 @@ package org.cafienne.processtask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -37,7 +37,7 @@ public class ProcessStarted extends BaseProcessEvent implements BootstrapMessage
     public final ValueMap inputParameters;
     public transient ProcessDefinition definition;
     public final boolean debugMode;
-    public final CafienneVersion engineVersion;
+    public final EngineVersion engineVersion;
 
     public ProcessStarted(ProcessTaskActor actor, StartProcess command) {
         super(actor);
@@ -52,7 +52,7 @@ public class ProcessStarted extends BaseProcessEvent implements BootstrapMessage
 
     public ProcessStarted(ValueMap json) {
         super(json);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.engineVersion = json.readObject(Fields.engineVersion, EngineVersion::new);
         this.name = json.readString(Fields.name);
         this.parentActorId = json.readString(Fields.parentActorId);
         this.rootActorId = json.readString(Fields.rootActorId);

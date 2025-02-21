@@ -21,13 +21,14 @@ import com.nimbusds.jose.RemoteKeySourceException
 import com.nimbusds.jose.proc.BadJOSEException
 import com.nimbusds.jwt.proc.BadJWTException
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.identity.IdentityRegistration
 import org.cafienne.service.infrastructure.configuration.OIDCConfiguration
 import org.cafienne.system.health.HealthMonitor
 
 import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}
 
-class TokenVerifier(val config: OIDCConfiguration)(implicit ec: ExecutionContext) extends LazyLogging {
+class TokenVerifier(val userRegistration: IdentityRegistration, val config: OIDCConfiguration)(implicit ec: ExecutionContext) extends LazyLogging {
 
   private val userReader = new AuthenticatedUserReader(this)
 
@@ -38,6 +39,7 @@ class TokenVerifier(val config: OIDCConfiguration)(implicit ec: ExecutionContext
       userReader.process(token, context)
       // Reaching this point means no exceptions happened on contacting the IDP
       HealthMonitor.idp.isOK()
+      userRegistration.cacheUserToken(context.authenticatedUser, token)
       // Return the authenticated user that was created based on the token
       context.authenticatedUser
     } catch {
