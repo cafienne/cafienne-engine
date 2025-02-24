@@ -21,19 +21,15 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.json.ValueMap;
 
 public interface ModelCommand extends IncomingActorMessage {
     /**
      * Returns the user context for this command.
-     *
-     * @return
      */
     UserIdentity getUser();
 
     /**
      * Returns a string with the identifier of the actor towards this command must be sent.
-     * @return
      */
     String getActorId();
 
@@ -57,7 +53,9 @@ public interface ModelCommand extends IncomingActorMessage {
 
     ModelResponse getResponse();
 
-    String getCommandDescription();
+    default String getCommandDescription() {
+        return getDescription();
+    }
 
     @Override
     default boolean isCommand() {

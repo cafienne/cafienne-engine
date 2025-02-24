@@ -292,7 +292,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         synchronized (responseListeners) {
             responseListeners.put(command.getMessageId(), new Responder(command, left, right));
         }
-        addDebugInfo(() -> "----------" + this + " sends command " + command.getCommandDescription(), command.rawJson());
+        addDebugInfo(() -> "----------" + this + " sends command " + command.getDescription(), command.rawJson());
 
         caseSystem.gateway().inform(command, self());
     }

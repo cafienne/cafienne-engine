@@ -41,7 +41,5 @@ public interface ModelEvent extends UserMessage {
 
     Instant getTimestamp();
 
-    String getDescription();
-
     ValueMap rawJson();
 }

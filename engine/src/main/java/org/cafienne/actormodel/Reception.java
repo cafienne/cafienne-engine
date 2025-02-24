@@ -61,19 +61,23 @@ class Reception {
     }
 
     void handleMessage(Object message) {
-        if (message instanceof IncomingActorMessage) {
-            IncomingActorMessage visitor = (IncomingActorMessage) message;
-            // Responses are always allowed, as they come only when we have requested something
-            if (visitor.isResponse() || canPass(visitor.asCommand())) {
-                backoffice.handleVisitor(visitor);
+        switch (message) {
+            case IncomingActorMessage visitor -> {
+                // Responses are always allowed, as they come only when we have requested something
+                if (visitor.isResponse() || canPass(visitor.asCommand())) {
+                    backOffice.handleVisitor(visitor);
+                }
             }
-        } else if (message instanceof SnapshotProtocol.Message) {
-            // Weirdly enough snapshotting takes a different route than event persistence...
-            actor.handleSnapshotProtocolMessage((SnapshotProtocol.Message) message);
-        } else if (message instanceof JournalProtocol.Message) {
-            actor.handleJournalProtocolMessage((JournalProtocol.Message) message);
-        } else {
-            actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
+            case DeserializationFailure failure -> {
+                actor.getLogger().error("%s encountered a system error in deserializing a message".formatted(actor), failure);
+                // These exceptions mean basically a bug while developing new commands/events/responses.
+                // Therefore also log to console.
+                failure.exception.printStackTrace(System.out);
+            }
+            case SnapshotProtocol.Message snapshotMsg -> actor.handleSnapshotProtocolMessage(snapshotMsg); // Weirdly enough snapshotting takes a different route than event persistence...
+            case JournalProtocol.Message journalMsg -> actor.handleJournalProtocolMessage(journalMsg);
+            case null -> actor.getLogger().warn("{} received a null message from {}", actor, actor.sender());
+            default -> actor.getLogger().warn("{} received a message it cannot handle, of type {}", actor, message.getClass().getName());
         }
     }
 
@@ -97,13 +101,13 @@ class Reception {
             } else {
                 // Cannot run e.g. CompleteHumanTask if the Case is not yet created.
                 //  Pretty weird if we get to this stage, as the Routes should not let it come here ...
-                fail(visitor, "Expected bootstrap command in " + actor + " instead of " + visitor.getClass().getSimpleName());
+                fail(visitor, "Expected bootstrap command in " + actor + " instead of " + visitor.getDescription());
                 return false;
             }
         }
 
         if (!actor.supportsCommand(visitor)) {
-            fail(visitor, actor + " does not support commands of type " + visitor.getClass().getSimpleName());
+            fail(visitor, actor + " does not support commands of type " + visitor.getDescription());
             return false;
         }
 
@@ -124,7 +128,7 @@ class Reception {
     }
 
     private boolean informAboutRecoveryFailure(IncomingActorMessage msg) {
-        actor.getLogger().warn("Aborting recovery of " + actor + " upon request of type "+msg.getClass().getSimpleName() + " from user " + msg.getUser().id() + ". " + recoveryFailureInformation);
+        actor.getLogger().warn("Aborting recovery of " + actor + " upon request of type " + msg.getClass().getSimpleName() + " from user " + msg.getUser().id() + ". " + recoveryFailureInformation);
         if (msg.isCommand()) {
             if (msg.isBootstrapMessage()) {
                 // Trying to do e.g. StartCase in e.g. a TenantActor
@@ -135,7 +139,7 @@ class Reception {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
                 actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
             }
-            actor.takeABreak("Removing ModelActor["+actor.getId()+"] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
+            actor.takeABreak("Removing ModelActor[" + actor.getId() + "] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
         }
         return false;
     }
@@ -157,12 +161,12 @@ class Reception {
     void reportInvalidRecoveryEvent(ModelEvent event) {
         if (event.isBootstrapMessage()) {
             // Wrong type of ModelActor. Probably someone tries to re-use the same actor id for another type of ModelActor.
-            hideFrontdoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
-        } else if (event instanceof StorageEvent) {
+            hideFrontDoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
+        } else if (event instanceof StorageEvent storageEvent) {
             // Someone is archiving or deleting this actor
             hideFrontdoor("Actor is in storage processing");
             isInStorageProcess = true;
-            actorType = ((StorageEvent) event).metadata().actorType();
+            actorType = storageEvent.metadata().actorType();
         } else {
             // Pretty weird if it happens ...
             hideFrontdoor("Received unexpected recovery event of type " + event.getClass().getName());

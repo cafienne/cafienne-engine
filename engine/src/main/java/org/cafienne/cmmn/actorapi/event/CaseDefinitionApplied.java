@@ -87,14 +87,6 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent implements Bootst
         return "Case definition " + getCaseName();
     }
 
-    /**
-     * Returns the case definition that was applied to the case instance
-     * @return
-     */
-    public CaseDefinition getDefinition() {
-        return this.definition;
-    }
-
     public void updateState(Case caseInstance) {
         caseInstance.updateState(this);
     }

@@ -66,7 +66,7 @@ public class TimerService extends ModelActor {
 
     @Override
     protected void recoveryCompleted() {
-        logger.warn("Starting Timer Service - loading timers every " + caseSystem.config().engine().timerService().interval() + " for a window of " + caseSystem.config().engine().timerService().window() + " ahead");
+        logger.info("Starting Timer Service - loading timers every " + caseSystem.config().engine().timerService().interval() + " for a window of " + caseSystem.config().engine().timerService().window() + " ahead");
         monitor.start();
         eventSink.start();
     }
