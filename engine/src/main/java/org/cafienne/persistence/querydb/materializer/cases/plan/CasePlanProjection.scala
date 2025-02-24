@@ -92,41 +92,40 @@ class CasePlanProjection(override val batch: CaseEventBatch) extends CaseEventMa
     this.tasks.put(evt.getTaskId, updatedTask)
   }
 
-  private def deprecatedCreateTask(evt: HumanTaskCreated): Unit= {
+  private def deprecatedCreateTask(evt: HumanTaskCreated): Unit = {
     this.tasks.put(evt.getTaskId, TaskMerger.create(evt))
   }
 
   private def handleHumanTaskEvent(event: HumanTaskEvent): Unit = {
     event match {
-      case dropped: HumanTaskDropped =>
-        dBTransaction.deleteTaskRecord(dropped.getTaskId)
-      case _ => ()
-    }
-
-    val fTask: Option[TaskRecord] = {
-      event match {
-        case evt: HumanTaskInputSaved => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
-        case evt: HumanTaskOutputSaved => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
-        case evt: HumanTaskOwnerChanged => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
-        case evt: HumanTaskDueDateFilled => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
-        case evt: HumanTaskTransitioned => fetchTask(event.getTaskId).map(task => {
-          val copy = TaskMerger(evt, task)
-          evt match {
-            case evt: HumanTaskAssigned => TaskMerger(evt, copy)
-            case evt: HumanTaskActivated => TaskMerger(evt, copy)
-            case evt: HumanTaskCompleted => TaskMerger(evt, copy)
-            case evt: HumanTaskTerminated => TaskMerger(evt, copy)
-            case other => copy // No need to do any further updates to the task record
+      case dropped: HumanTaskDropped => dBTransaction.deleteTaskRecord(dropped.getTaskId) // No need trying to fetch
+      case _ =>
+        // Fetch the task
+        val fTask: Option[TaskRecord] = {
+          event match {
+            case evt: HumanTaskInputSaved => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
+            case evt: HumanTaskOutputSaved => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
+            case evt: HumanTaskOwnerChanged => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
+            case evt: HumanTaskDueDateFilled => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
+            case evt: HumanTaskTransitioned => fetchTask(event.getTaskId).map(task => {
+              val copy = TaskMerger(evt, task)
+              evt match {
+                case evt: HumanTaskAssigned => TaskMerger(evt, copy)
+                case evt: HumanTaskActivated => TaskMerger(evt, copy)
+                case evt: HumanTaskCompleted => TaskMerger(evt, copy)
+                case evt: HumanTaskTerminated => TaskMerger(evt, copy)
+                case other => copy // No need to do any further updates to the task record
+              }
+            })
+            case evt: HumanTaskMigrated => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
+            case _ => None // Ignore and error on other events
           }
-        })
-        case evt: HumanTaskMigrated => fetchTask(event.getTaskId).map(task => TaskMerger(evt, task))
-        case _ => None // Ignore and error on other events
-      }
-    }
+        }
 
-    fTask match {
-      case Some(task) => this.tasks.put(task.id, task)
-      case None => logger.error(s"Could not find task '${event.getTaskName}' with id ${event.getTaskId} in the current database. This may lead to problems. Ignoring event of type ${event.getClass.getName}")
+        fTask match {
+          case Some(task) => this.tasks.put(task.id, task)
+          case None => logger.error(s"Could not find task '${event.getTaskName}' with id ${event.getTaskId} in the current database. This may lead to problems. Ignoring event of type ${event.getClass.getName}")
+        }
     }
   }
 

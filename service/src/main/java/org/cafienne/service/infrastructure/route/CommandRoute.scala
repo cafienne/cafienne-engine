@@ -58,7 +58,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
           case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
           case value: ConsentGroupResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
           case other => // Unknown new type of response that is not handled
-            logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
+            logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getDescription}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.OK)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)

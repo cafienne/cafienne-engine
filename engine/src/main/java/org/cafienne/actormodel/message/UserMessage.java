@@ -59,6 +59,10 @@ public interface UserMessage extends CafienneSerializable {
         return (BootstrapMessage) this;
     }
 
+    default String getDescription() {
+        return this.getClass().getSimpleName();
+    }
+
     /**
      * Return a ValueMap serialization of the message
      */
