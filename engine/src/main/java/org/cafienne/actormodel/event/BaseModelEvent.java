@@ -108,14 +108,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
         generator.writeEndObject();
     }
 
-    /**
-     * Override this method to make a description of the event that is based on it's content.
-     * This method is invoked from toString().
-     */
-    public String getDescription() {
-        return getClass().getSimpleName();
-    }
-
     @Override
     public String toString() {
         return getDescription();
