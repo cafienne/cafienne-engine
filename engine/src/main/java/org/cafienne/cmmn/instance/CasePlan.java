@@ -82,7 +82,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
 
             // Wow, now what? CaseTask did not accept our information, but why??
             //  And... should we handle this by e.g. going to Fault state? Or what? Can we make this inconsistency clear somehow other than through the log file? Generate a special event or so?
-            logger.error("Parent case " + parentCaseId + " did not accept our request " + command + " and responded with a failure\n" + failure));
+            logger.error("Parent case " + parentCaseId + " did not accept our request " + command + " and responded with a failure\n" + failure), null);
     }
 
     @Override
