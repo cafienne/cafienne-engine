@@ -381,9 +381,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         if (!getDefinition().isBlocking()) {
             return;
         }
-        getCaseInstance().informImplementation(command, failure -> {
-            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
-        });
+        getCaseInstance().informImplementation(command, failure -> getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson())), null);
     }
 
     public void giveNewDefinition(ModelCommand command) {

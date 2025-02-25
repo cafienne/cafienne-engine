@@ -42,8 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class ModelActor extends AbstractPersistentActor {
 
@@ -76,12 +74,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Flag indicating whether the model actor runs in debug mode or not
      */
     private boolean debugMode;
-
-    /**
-     * Registration of listeners that are interacting with (other) models through this case.
-     */
-    private final Map<String, Responder> responseListeners = new HashMap<>();
-
     /**
      * CaseScheduler is a lightweight manager to schedule asynchronous works for this Case instance.
      */
@@ -245,18 +237,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return event;
     }
 
-    public Responder getResponseListener(String msgId) {
-        synchronized (responseListeners) {
-            return responseListeners.remove(msgId);
-        }
+    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
+        backOffice.askModel(command, left, right);
     }
 
-    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
-    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
+    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
+        backOffice.askModel(command, left, right);
     }
 
     /**
@@ -268,17 +254,8 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param left    Listener to handle response failures.
      * @param right   Optional listener to handle response success.
      */
-    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        if (recoveryRunning()) {
-//            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
-            return;
-        }
-        synchronized (responseListeners) {
-            responseListeners.put(command.getMessageId(), new Responder(command, left, right));
-        }
-        addDebugInfo(() -> "----------" + this + " sends command " + command.getDescription(), command.rawJson());
-
-        caseSystem.gateway().inform(command, self());
+    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
+        backOffice.askModel(command, left, right);
     }
 
     /**

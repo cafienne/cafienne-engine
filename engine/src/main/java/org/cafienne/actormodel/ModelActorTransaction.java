@@ -46,11 +46,13 @@ public class ModelActorTransaction {
     private final static int avgNumEvents = 30;
     private final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
     private final IncomingActorMessage message;
+    private final BackOffice backOffice;
     private ModelResponse response = null;
     private final TransactionLogger logger;
 
-    ModelActorTransaction(ModelActor actor, IncomingActorMessage message) {
+    ModelActorTransaction(ModelActor actor, BackOffice backOffice, IncomingActorMessage message) {
         this.actor = actor;
+        this.backOffice = backOffice;
         this.actor.setCurrentUser(message.getUser());
         this.message = message;
         this.logger = new TransactionLogger(this, actor);
@@ -79,29 +81,10 @@ public class ModelActorTransaction {
                 reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
             }
         } else if (message.isResponse()) {
-            handleResponse(message.asResponse());
+            backOffice.handleResponse(message.asResponse());
         }
 
         commit();
-    }
-
-    private void handleResponse(ModelResponse msg) {
-        Responder handler = actor.getResponseListener(msg.getMessageId());
-        if (handler == null) {
-            // For all commands that are sent to another case via us, a listener is registered.
-            // If that listener is null, we set a default listener ourselves.
-            // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
-            // and we log a warning for that. It basically means someone else has submitted the command and told the other case to respond to us -
-            // which is strange.
-            actor.getLogger().warn(actor + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
-        } else {
-            actor.addDebugInfo(() -> actor + " received response to command of type " + handler.command.getDescription(), msg.rawJson());
-            if (msg instanceof CommandFailure) {
-                handler.left.handleFailure((CommandFailure) msg);
-            } else {
-                handler.right.handleResponse(msg);
-            }
-        }
     }
 
     private void checkEngineVersion() {
