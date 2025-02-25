@@ -19,15 +19,16 @@ package org.cafienne.system.router
 
 import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
-import org.cafienne.cmmn.actorapi.command.CaseCommand
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.processtask.actorapi.command.ProcessCommand
+import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.cmmn.instance.Case
+import org.cafienne.consentgroup.ConsentGroupActor
+import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.TenantCommand
+import org.cafienne.tenant.TenantActor
 
 import scala.concurrent.Future
 
-class CafienneGateway(caseSystem: CaseSystem) {
+class CaseEngineGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
   private val terminationRequests = collection.concurrent.TrieMap[String, ActorRef]()
   private val actors = collection.concurrent.TrieMap[String, ActorRef]()
@@ -50,10 +51,15 @@ class CafienneGateway(caseSystem: CaseSystem) {
 
   private def getRouter(message: Any): ActorRef = {
     message match {
-      case _: CaseCommand => caseService
-      case _: ProcessCommand => processTaskService
-      case _: TenantCommand => tenantService
-      case _: ConsentGroupCommand => consentGroupService
+      case command: ModelCommand =>
+        val actorClass = command.actorClass()
+        // Unfortunately for some reason we cannot use scala matching on the actor class.
+        // Unclear why (most probably lack of scala knowledge ;))
+        if (actorClass == classOf[Case]) return caseService
+        if (actorClass == classOf[ProcessTaskActor]) return processTaskService
+        if (actorClass == classOf[TenantActor]) return tenantService
+        if (actorClass == classOf[ConsentGroupActor]) return consentGroupService
+        defaultRouterService
       case _ => defaultRouterService
     }
   }

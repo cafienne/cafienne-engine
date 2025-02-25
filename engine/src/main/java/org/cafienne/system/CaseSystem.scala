@@ -26,7 +26,7 @@ import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
-import org.cafienne.system.router.CafienneGateway
+import org.cafienne.system.router.CaseEngineGateway
 import org.cafienne.timerservice.TimerService
 
 import scala.concurrent.ExecutionContextExecutor
@@ -52,7 +52,7 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   /**
     * Retrieve a router for case messages. This will forward the messages to the correct case instance
     */
-  val gateway: CafienneGateway = new CafienneGateway(this)
+  val gateway: CaseEngineGateway = new CaseEngineGateway(this)
 
   // Create singleton actors
   val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
