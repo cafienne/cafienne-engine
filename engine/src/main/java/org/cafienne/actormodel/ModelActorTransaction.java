@@ -20,7 +20,6 @@ package org.cafienne.actormodel;
 import org.apache.pekko.persistence.journal.Tagged;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.CommitEvent;
-import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
@@ -30,7 +29,6 @@ import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.json.Value;
 import org.cafienne.system.health.HealthMonitor;
 import org.slf4j.Logger;
 
@@ -46,11 +44,12 @@ public class ModelActorTransaction {
     private final ModelActor actor;
     private final static int avgNumEvents = 30;
     private final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
-    private DebugEvent debugEvent;
     private final IncomingActorMessage message;
     private ModelResponse response = null;
+    private final TransactionLogger logger;
 
     ModelActorTransaction(ModelActor actor, IncomingActorMessage message) {
+        this.logger = new TransactionLogger(this, actor);
         this.actor = actor;
         this.message = message;
         // First check the engine version, potentially leading to an extra event.
@@ -118,9 +117,8 @@ public class ModelActorTransaction {
         // Inform the sender about the failure
         actor.reply(response);
         // In case of failure we still want to store the debug event. Actually, mostly we need this in case of failure (what else are we debugging for)
-        if (hasDebugEvent()) {
-            actor.persistAsync(addTags(debugEvent), e -> {
-            });
+        if (this.logger.hasDebugEvent()) {
+            actor.persistAsync(addTags(logger.getDebugEvent()), e -> {});
         }
     }
 
@@ -136,8 +134,8 @@ public class ModelActorTransaction {
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg + "\n");
         }
         // Include the debug event if any.
-        if (hasDebugEvent()) {
-            events.addFirst(debugEvent);
+        if (logger.hasDebugEvent()) {
+            events.addFirst(logger.getDebugEvent());
         }
 
         // Apply tagging to the events
@@ -189,25 +187,6 @@ public class ModelActorTransaction {
         }
     }
 
-    /**
-     * Get or create the debug event for this batch.
-     * Only one debug event per handler, containing all debug messages.
-     */
-    private DebugEvent getDebugEvent() {
-        if (debugEvent == null) {
-            debugEvent = new DebugEvent(actor);
-        }
-        return debugEvent;
-    }
-
-    /**
-     * Returns true if debug info is available, and also if the
-     * actor runs in debug mode and is not in recovery
-     */
-    private boolean hasDebugEvent() {
-        return debugEvent != null && actor.debugMode() && !actor.recoveryRunning();
-    }
-
     private boolean hasFailures() {
         return response instanceof CommandFailure;
     }
@@ -223,7 +202,7 @@ public class ModelActorTransaction {
      * If the last event is not a CommitEvent we need one.
      */
     boolean needsCommitEvent() {
-        return hasStatefulEvents() && !(events.get(events.size() - 1) instanceof CommitEvent);
+        return hasStatefulEvents() && !(events.getLast() instanceof CommitEvent);
     }
 
     /**
@@ -238,71 +217,6 @@ public class ModelActorTransaction {
      * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
     void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
-        if (logDebugMessages(logger)) {
-            // Ensure log message is only generated once.
-            Object info = appender.info();
-
-            // Check whether the first additional parameter can be appended to the main info or deserves a separate
-            //  logging entry. Typically, this is done for exceptions and json objects and arrays.
-            if (additionalInfo.length == 0 || needsSeparateLine(additionalInfo[0])) {
-                logObject(logger, info);
-                logObjects(logger, additionalInfo);
-            } else {
-                additionalInfo[0] = String.valueOf(info) + additionalInfo[0];
-                logObjects(logger, additionalInfo);
-            }
-        }
-    }
-
-    private boolean needsSeparateLine(Object additionalObject) {
-        return additionalObject instanceof Throwable ||
-                additionalObject instanceof Value && !((Value<?>) additionalObject).isPrimitive();
-    }
-
-    private void logObjects(Logger logger, Object... any) {
-        for (Object o : any) {
-            logObject(logger, o);
-        }
-    }
-
-    private void logObject(Logger logger, Object o) {
-        if (o instanceof Throwable) {
-            logException(logger, (Throwable) o);
-        } else if (o instanceof Value) {
-            logJSON(logger, (Value<?>) o);
-        } else {
-            // Value of will also convert a null object to "null", so no need to check on null.
-            logString(logger, String.valueOf(o));
-        }
-    }
-
-    private void logString(Logger logger, String logMessage) {
-        if (logMessage.isBlank()) {
-            return;
-        }
-        logger.debug(logMessage); // plain slf4j
-        EngineDeveloperConsole.debugIndentedConsoleLogging(logMessage); // special dev indentation in console
-        getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
-    }
-
-    private void logJSON(Logger logger, Value<?> json) {
-        logger.debug(json.toString());
-        EngineDeveloperConsole.debugIndentedConsoleLogging(json);
-        getDebugEvent().addMessage(json);
-    }
-
-    private void logException(Logger logger, Throwable t) {
-        logger.debug(t.getMessage(), t);
-        EngineDeveloperConsole.debugIndentedConsoleLogging(t);
-        getDebugEvent().addMessage(t);
-    }
-
-    /**
-     * Whether to write log messages.
-     * Log messages are created through invocation of FunctionalInterface, and if this
-     * method returns false, those interfaces are not invoked, in an attempt to improve runtime performance.
-     */
-    private boolean logDebugMessages(Logger logger) {
-        return EngineDeveloperConsole.enabled() || logger.isDebugEnabled() || actor.debugMode();
+        this.logger.addDebugInfo(logger, appender, additionalInfo);
     }
 }
