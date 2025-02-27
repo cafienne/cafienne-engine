@@ -39,11 +39,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * StagingArea captures all state changing events upon handling
- * an {@link IncomingActorMessage}
+ * ModelActorTransaction captures all state changing events upon handling an {@link IncomingActorMessage}
  * It also handles failures and sending responses to complete the lifecycle of the message.
  */
-public class StagingArea {
+public class ModelActorTransaction {
     private final ModelActor actor;
     private final static int avgNumEvents = 30;
     private final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
@@ -51,7 +50,7 @@ public class StagingArea {
     private final IncomingActorMessage message;
     private ModelResponse response = null;
 
-    StagingArea(ModelActor actor, IncomingActorMessage message) {
+    ModelActorTransaction(ModelActor actor, IncomingActorMessage message) {
         this.actor = actor;
         this.message = message;
         // First check the engine version, potentially leading to an extra event.
@@ -63,7 +62,7 @@ public class StagingArea {
         EngineVersion actorVersion = actor.getEngineVersion();
         EngineVersion currentEngineVersion = actor.caseSystem.version();
         if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
-            actor.getLogger().info(actor + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
+            actor.getLogger().info(actor + " changed engine version from\n" + actor.getEngineVersion() + " to\n" + currentEngineVersion);
             addEvent(new EngineVersionChanged(actor, currentEngineVersion));
         }
     }
@@ -73,7 +72,7 @@ public class StagingArea {
      */
     void addEvent(ModelEvent event) {
         events.add(event);
-        addDebugInfo(actor.getLogger(), () -> "Updating actor state for new event "+ event.getDescription());
+        addDebugInfo(getLogger(), () -> "Updating actor state for new event " + event.getDescription());
         event.updateActorState(actor);
     }
 
@@ -84,7 +83,7 @@ public class StagingArea {
     /**
      * Store events in persistence and optionally reply a response to the sender of the incoming message.
      */
-    void store() {
+    void commit() {
         // Handling the incoming message can result in 3 different scenarios that are dealt with below:
         // 1. The message resulted in an exception that needs to be returned to the client; Possibly the case must be restarted.
         // 2. The message resulted in state changes, so the new events need to be persisted, and after persistence the response is sent back to the client.
@@ -120,11 +119,12 @@ public class StagingArea {
         actor.reply(response);
         // In case of failure we still want to store the debug event. Actually, mostly we need this in case of failure (what else are we debugging for)
         if (hasDebugEvent()) {
-            actor.persistAsync(tag(debugEvent), e -> {});
+            actor.persistAsync(addTags(debugEvent), e -> {
+            });
         }
     }
 
-    private Object tag(ModelEvent event) {
+    private Tagged addTags(ModelEvent event) {
         return new Tagged(event, event.tags());
     }
 
@@ -137,23 +137,18 @@ public class StagingArea {
         }
         // Include the debug event if any.
         if (hasDebugEvent()) {
-            events.add(0, debugEvent);
+            events.addFirst(debugEvent);
         }
 
         // Apply tagging to the events
-        final List<Object> taggedEvents = events.stream().map(this::tag).collect(Collectors.toList());
+        final List<Tagged> taggedEvents = events.stream().map(this::addTags).collect(Collectors.toList());
         // When the last event is persisted, we can send a reply. Keep track of that last event here, so that we need not go through the list each time.
-        final Object lastTaggedEvent = taggedEvents.get(taggedEvents.size() - 1);
+        final Tagged lastTaggedEvent = taggedEvents.getLast();
 
         actor.persistAll(taggedEvents, persistedEvent -> {
             HealthMonitor.writeJournal().isOK();
             if (getLogger().isDebugEnabled()) {
-                if (persistedEvent instanceof Tagged) {
-                    Object e = ((Tagged) persistedEvent).payload();
-                    getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + e.getClass().getName());
-                } else {
-                    getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + persistedEvent.getClass().getName());
-                }
+                getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + persistedEvent.payload().getClass().getName());
             }
             if (persistedEvent == lastTaggedEvent) {
                 actor.reply(response);
@@ -162,8 +157,7 @@ public class StagingArea {
     }
 
     /**
-     * When back office encounters command handling failures, they can
-     * report it to the staging area.
+     * When back office encounters command handling failures, they can report it here.
      * Stateful events are not stored, DebugEvent would still get stored.
      */
     void reportFailure(ModelCommand command, Throwable exception, String msg) {
@@ -171,8 +165,7 @@ public class StagingArea {
     }
 
     /**
-     * When back office encounters command handling failures, they can
-     * report it to the staging area.
+     * When back office encounters command handling failures, they can report it here.
      * Stateful events are not stored, DebugEvent would still get stored.
      */
     void reportFailure(Throwable exception, CommandFailure failure, String msg) {
@@ -189,9 +182,6 @@ public class StagingArea {
 
     /**
      * Hook to optionally tell the sender about persistence failures
-     * @param cause
-     * @param event
-     * @param seqNr
      */
     void handlePersistFailure(Throwable cause, Object event, long seqNr) {
         if (message.isCommand()) {
@@ -213,7 +203,6 @@ public class StagingArea {
     /**
      * Returns true if debug info is available, and also if the
      * actor runs in debug mode and is not in recovery
-     * @return
      */
     private boolean hasDebugEvent() {
         return debugEvent != null && actor.debugMode() && !actor.recoveryRunning();
@@ -225,7 +214,6 @@ public class StagingArea {
 
     /**
      * Simplistic
-     * @return
      */
     private boolean hasStatefulEvents() {
         return !events.isEmpty();
@@ -233,7 +221,6 @@ public class StagingArea {
 
     /**
      * If the last event is not a CommitEvent we need one.
-     * @return
      */
     boolean needsCommitEvent() {
         return hasStatefulEvents() && !(events.get(events.size() - 1) instanceof CommitEvent);
@@ -242,12 +229,12 @@ public class StagingArea {
     /**
      * Add debug info to the ModelActor if debug is enabled.
      * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
-     * then the appender's debugInfo method will be invoked to store a string in the log.
+     * then the appender.debugInfo(...) method will be invoked to store a string in the log.
      *
-     * @param logger The slf4j logger instance to check whether debug logging is enabled
-     * @param appender A functional interface returning "an" object, holding the main info to be logged.
-     *                 Note: the interface is only invoked if logging is enabled. This appender typically
-     *                 returns a String that is only created upon demand (in order to speed up a bit)
+     * @param logger         The slf4j logger instance to check whether debug logging is enabled
+     * @param appender       A functional interface returning "an" object, holding the main info to be logged.
+     *                       Note: the interface is only invoked if logging is enabled. This appender typically
+     *                       returns a String that is only created upon demand (in order to speed up a bit)
      * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
     void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
@@ -314,7 +301,6 @@ public class StagingArea {
      * Whether to write log messages.
      * Log messages are created through invocation of FunctionalInterface, and if this
      * method returns false, those interfaces are not invoked, in an attempt to improve runtime performance.
-     * @return
      */
     private boolean logDebugMessages(Logger logger) {
         return EngineDeveloperConsole.enabled() || logger.isDebugEnabled() || actor.debugMode();

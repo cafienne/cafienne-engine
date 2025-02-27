@@ -55,7 +55,7 @@ class BackOffice {
         // 4. Set a new self cleaner (basically resets the timer)
         clearSelfCleaner();
 
-        StagingArea stagingArea = reception.warehouse.prepareNextShipment(message);
+        ModelActorTransaction modelActorTransaction = reception.warehouse.createTransaction(message);
         if (message.isCommand()) {
             ModelCommand command = message.asCommand();
             actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getDescription() , command.rawJson());
@@ -65,21 +65,21 @@ class BackOffice {
                 command.validateCommand(actor);
                 // Then, do actual work of processing in the command itself.
                 command.processCommand(actor);
-                stagingArea.setResponse(command.getResponse());
+                modelActorTransaction.setResponse(command.getResponse());
             } catch (AuthorizationException e) {
-                stagingArea.reportFailure(e, new SecurityFailure(command, e), "");
+                modelActorTransaction.reportFailure(e, new SecurityFailure(command, e), "");
             } catch (InvalidCommandException e) {
-                stagingArea.reportFailure(command, e, "===== Command was invalid ======");
+                modelActorTransaction.reportFailure(command, e, "===== Command was invalid ======");
             } catch (CommandException e) {
-                stagingArea.reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
+                modelActorTransaction.reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
             } catch (Throwable e) {
-                stagingArea.reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
+                modelActorTransaction.reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
             }
         } else if (message.isResponse()) {
             handleResponse(message.asResponse());
         }
 
-        stagingArea.store();
+        modelActorTransaction.commit();
 
         enableSelfCleaner();
     }

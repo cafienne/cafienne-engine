@@ -24,27 +24,27 @@ import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.slf4j.Logger;
 
 /**
- * Warehouse creates a new {@link StagingArea} for each {@link IncomingActorMessage}.
+ * Warehouse creates a new {@link ModelActorTransaction} for each {@link IncomingActorMessage}.
  */
 class Warehouse {
     private final ModelActor actor;
-    private StagingArea staging;
+    private ModelActorTransaction currentTransaction;
     private boolean isOpen = false;
 
     Warehouse(ModelActor actor) {
         this.actor = actor;
     }
 
-    StagingArea prepareNextShipment(IncomingActorMessage message) {
+    ModelActorTransaction createTransaction(IncomingActorMessage message) {
         isOpen = true;
         actor.setCurrentUser(message.getUser());
-        staging = new StagingArea(actor, message);
-        return staging;
+        currentTransaction = new ModelActorTransaction(actor, message);
+        return currentTransaction;
     }
 
     void storeEvent(ModelEvent event) {
         if (isOpen) {
-            staging.addEvent(event);
+            currentTransaction.addEvent(event);
         } else {
             // Recovery is still running.
 
@@ -59,7 +59,7 @@ class Warehouse {
 
     void handlePersistFailure(Throwable cause, Object event, long seqNr) {
         if (isOpen) {
-            staging.handlePersistFailure(cause, event, seqNr);
+            currentTransaction.handlePersistFailure(cause, event, seqNr);
         }
     }
 
@@ -76,7 +76,7 @@ class Warehouse {
      */
     void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
         if (isOpen) {
-            staging.addDebugInfo(logger, appender, additionalInfo);
+            currentTransaction.addDebugInfo(logger, appender, additionalInfo);
         }
     }
 }
