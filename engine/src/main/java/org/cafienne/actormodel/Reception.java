@@ -23,7 +23,10 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.*;
+import org.cafienne.actormodel.response.ActorChokedFailure;
+import org.cafienne.actormodel.response.ActorExistsFailure;
+import org.cafienne.actormodel.response.ActorInStorage;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
 import org.cafienne.storage.actormodel.message.StorageEvent;
 
@@ -31,7 +34,7 @@ import org.cafienne.storage.actormodel.message.StorageEvent;
  * All actor system incoming traffic (either during recovery or upon receiving incoming messages)
  * is passed through the Reception.
  * The reception knows whether the ModelActor is capable of handling the incoming traffic,
- * and when applicable passes it on to the {@link BackOffice}.
+ * and when applicable creates a {@link ModelActorTransaction} to handle the message.
  */
 class Reception {
     private boolean bootstrapPending = true;
@@ -41,13 +44,11 @@ class Reception {
     private boolean isInStorageProcess = false;
     private String actorType = "";
     private final RecoveryRoom recoveryRoom;
-    private final BackOffice backoffice;
     final Warehouse warehouse;
 
     Reception(ModelActor actor) {
         this.actor = actor;
         this.recoveryRoom = new RecoveryRoom(actor, this);
-        this.backoffice = new BackOffice(actor, this);
         this.warehouse = new Warehouse(actor);
     }
 
@@ -61,11 +62,11 @@ class Reception {
     }
 
     void handleMessage(Object message) {
-        if (message instanceof IncomingActorMessage) {
-            IncomingActorMessage visitor = (IncomingActorMessage) message;
+        if (message instanceof IncomingActorMessage visitor) {
             // Responses are always allowed, as they come only when we have requested something
             if (visitor.isResponse() || canPass(visitor.asCommand())) {
-                backoffice.handleVisitor(visitor);
+                ModelActorTransaction currentTransaction = warehouse.createTransaction(visitor);
+                currentTransaction.perform();
             }
         } else if (message instanceof SnapshotProtocol.Message) {
             // Weirdly enough snapshotting takes a different route than event persistence...
@@ -114,7 +115,7 @@ class Reception {
         bootstrapPending = false;
     }
 
-    private void hideFrontdoor(String msg) {
+    private void hideFrontDoor(String msg) {
         isBroken = true;
         recoveryFailureInformation = msg;
     }
@@ -151,27 +152,27 @@ class Reception {
     }
 
     void reportDeserializationFailure(DeserializationFailure failure) {
-        hideFrontdoor("" + failure);
+        hideFrontDoor("" + failure);
     }
 
     void reportInvalidRecoveryEvent(ModelEvent event) {
         if (event.isBootstrapMessage()) {
             // Wrong type of ModelActor. Probably someone tries to re-use the same actor id for another type of ModelActor.
-            hideFrontdoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
+            hideFrontDoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
         } else if (event instanceof StorageEvent) {
             // Someone is archiving or deleting this actor
-            hideFrontdoor("Actor is in storage processing");
+            hideFrontDoor("Actor is in storage processing");
             isInStorageProcess = true;
             actorType = ((StorageEvent) event).metadata().actorType();
         } else {
             // Pretty weird if it happens ...
-            hideFrontdoor("Received unexpected recovery event of type " + event.getClass().getName());
+            hideFrontDoor("Received unexpected recovery event of type " + event.getClass().getName());
         }
     }
 
     void reportStateUpdateFailure(Throwable throwable) {
         actor.getLogger().error("Unexpected error during recovery of " + actor, throwable);
-        hideFrontdoor("Updating actor state failed.");
+        hideFrontDoor("Updating actor state failed.");
     }
 
     void open() {

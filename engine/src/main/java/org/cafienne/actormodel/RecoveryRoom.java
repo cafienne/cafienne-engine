@@ -23,7 +23,6 @@ import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
-import org.cafienne.infrastructure.serialization.Fields;
 
 /**
  * The RecoveryRoom is where the ModelActor is brought back into memory upon reception of new incoming traffic.
@@ -53,8 +52,7 @@ class RecoveryRoom {
         // 4. In all other cases print warn statements and ignore the event.
         if (msg instanceof SnapshotOffer) {
             actor.handleSnapshot((SnapshotOffer) msg);
-        } else if (msg instanceof ModelEvent) {
-            ModelEvent event = (ModelEvent) msg;
+        } else if (msg instanceof ModelEvent event) {
             actor.setCurrentUser(event.getUser());
             if (event instanceof DebugEvent) {
                 // Step 1a, ignore debug events
