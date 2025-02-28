@@ -18,6 +18,9 @@
 package org.cafienne.processtask.instance;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
+import org.cafienne.actormodel.communication.outgoing.RemoteActorState;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
@@ -41,6 +44,7 @@ public class ProcessTaskActor extends ModelActor {
     private SubProcess<?> taskImplementation;
     private ValueMap inputParameters;
     private ValueMap outputParameters;
+    private ParentProcessTaskState processTaskState; // Can only be created when the parent invokes us
 
     public ProcessTaskActor(CaseSystem caseSystem) {
         super(caseSystem);
@@ -86,6 +90,12 @@ public class ProcessTaskActor extends ModelActor {
         return (S) taskImplementation;
     }
 
+    public void handleStartProcessCommand(StartProcess command) {
+        this.parentActorId = command.getParentActorId();
+        this.processTaskState = new ParentProcessTaskState(this);
+        this.addEvent(new ProcessStarted(this, command));
+    }
+
     public void updateState(ProcessStarted event) {
         this.setEngineVersion(event.engineVersion);
         this.setDebugMode(event.debugMode);
@@ -95,7 +105,7 @@ public class ProcessTaskActor extends ModelActor {
         this.parentActorId = event.parentActorId;
         this.rootActorId = event.rootActorId;
         this.inputParameters = event.inputParameters;
-        if (! recoveryRunning()) {
+        if (!recoveryRunning()) {
             addDebugInfo(() -> "Starting process task " + name + " with input: ", inputParameters);
             getImplementation().start();
         }
@@ -104,7 +114,7 @@ public class ProcessTaskActor extends ModelActor {
     public void updateState(ProcessReactivated event) {
         this.taskImplementation = definition.getImplementation().createInstance(this);
         this.inputParameters = event.inputParameters;
-        if (! recoveryRunning()) {
+        if (!recoveryRunning()) {
             addDebugInfo(() -> "Reactivating process " + getName());
             getImplementation().resetOutput();
             getImplementation().reactivate();
@@ -112,21 +122,21 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     public void updateState(ProcessSuspended event) {
-        if (! recoveryRunning()) {
+        if (!recoveryRunning()) {
             addDebugInfo(() -> "Suspending process " + getName());
             getImplementation().suspend();
         }
     }
 
     public void updateState(ProcessResumed event) {
-        if (! recoveryRunning()) {
+        if (!recoveryRunning()) {
             addDebugInfo(() -> "Resuming process " + getName());
             getImplementation().resume();
         }
     }
 
     public void updateState(ProcessTerminated event) {
-        if (! recoveryRunning()) {
+        if (!recoveryRunning()) {
             addDebugInfo(() -> "Terminating process " + getName());
             getImplementation().terminate();
         }
@@ -136,29 +146,26 @@ public class ProcessTaskActor extends ModelActor {
         this.outputParameters = event.output;
         addDebugInfo(() -> "Completing process task " + name + " of process type " + getImplementation().getClass().getName() + " with output:", outputParameters);
         if (recoveryFinished()) {
-            informParent(new CompleteTask(this, outputParameters),
-                    failure -> {
-                        addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
-                        logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-                    },
-                    success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
+            processTaskState.inform(new CompleteTask(this, outputParameters));
         }
     }
 
     public void updateState(ProcessFailed event) {
         outputParameters = event.output;
-        informParent(new FailTask(this, outputParameters), failure -> {
-            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-        }, success -> {
-            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
-        });
+        processTaskState.inform(new FailTask(this, outputParameters));
+
+//                , failure -> {
+//            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+//        }, success -> {
+//            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
+//        });
     }
 
     public void updateState(ProcessDefinitionMigrated event) {
-        addDebugInfo(() -> "====== Migrating ProcessTask["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + event.getNewDefinition().getName() +"\n");
+        addDebugInfo(() -> "====== Migrating ProcessTask[" + getId() + "] with name " + getDefinition().getName() + " to a new definition with name " + event.getNewDefinition().getName() + "\n");
         setDefinition(event.getNewDefinition());
         getImplementation().migrateDefinition(event.getNewDefinition().getImplementation());
-        addDebugInfo(() -> "====== Completed Migration on ProcessTask["+getId()+"] with name " + getDefinition().getName());
+        addDebugInfo(() -> "====== Completed Migration on ProcessTask[" + getId() + "] with name " + getDefinition().getName());
     }
 
     @Override
@@ -185,5 +192,32 @@ public class ProcessTaskActor extends ModelActor {
     @Override
     protected void addCommitEvent(IncomingActorMessage message) {
         addEvent(new ProcessModified(this, message));
+    }
+
+
+    private static class ParentProcessTaskState extends RemoteActorState<ProcessTaskActor> {
+
+        public ParentProcessTaskState(ProcessTaskActor actor) {
+            super(actor, actor.getParentActorId());
+        }
+
+        private void inform(ModelCommand command) {
+            if (targetActorId.isEmpty()) {
+                // No need to inform about our transitions.
+                return;
+            }
+            sendRequest(command);
+//            failure -> {
+//                actor.addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
+//                logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+//            },
+//                    success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
+        }
+
+        @Override
+        public void handleFailure(ActorRequestFailed failure) {
+            actor.addDebugInfo(() -> "Could not complete process task " + actor.getId() + " " + actor.name + " in parent, due to:", failure.toJson());
+            logger.error("Could not complete process task " + actor.getId() + " " + actor.name + " in parent, due to:\n" + failure);
+        }
     }
 }

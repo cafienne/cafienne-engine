@@ -17,9 +17,10 @@
 
 package org.cafienne.timerservice
 
-import org.apache.pekko.actor.{Cancellable, Scheduler}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
+import org.apache.pekko.actor.{Cancellable, Scheduler}
+import org.cafienne.actormodel.communication.outgoing.RemoteActorState
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
 import java.util.concurrent.TimeUnit
@@ -28,6 +29,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 
 class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: Scheduler) extends Runnable with LazyLogging {
   val command = new RaiseEvent(timer.user, timer.caseInstanceId, timer.timerId)
+  val state: TimerItemState = new TimerItemState()
   val millis: Long = timer.moment.toEpochMilli
   val delay: Long = millis - System.currentTimeMillis
 
@@ -37,20 +39,21 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
 
   def run(): Unit = {
     logger.whenDebugEnabled(logger.debug(s"Raising timer in case ${timer.caseInstanceId} for timer ${timer.timerId} on behalf of user ${timer.userId}"))
-    timerService.askModel(command, handleFailingCaseInvocation, handleCaseInvocation)
+    state.raiseTimer()
   }
 
   def cancel(): Boolean = {
     schedule.cancel()
   }
 
-  def handleFailingCaseInvocation(failure: CommandFailure): Unit = {
-    // TODO: we can also update the timer state in the storage???
-    logger.warn(s"Could not trigger timer $timer in case ${timer.caseInstanceId}:" + failure.toJson)
-  }
+  class TimerItemState extends RemoteActorState[TimerService](timerService, timer.caseInstanceId) {
+    def raiseTimer(): Unit = {
+      sendRequest(command)
+    }
 
-  def handleCaseInvocation(response: ModelResponse): Unit = {
-    // TODO: we can also delete the timer here, or update a state for that timer in the store
-    logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer $timer in case ${timer.caseInstanceId}"))
+    override def handleFailure(failure: ActorRequestFailed): Unit = {
+      // TODO: we can also update the timer state in the storage???
+      logger.warn(s"Could not trigger timer $timer in case ${timer.caseInstanceId}:" + failure.exceptionAsJSON)
+    }
   }
 }

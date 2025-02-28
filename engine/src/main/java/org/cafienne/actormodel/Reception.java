@@ -20,6 +20,8 @@ package org.cafienne.actormodel;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.outgoing.command.RequestModelActor;
+import org.cafienne.actormodel.communication.ModelActorSystemMessage;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
@@ -67,11 +69,16 @@ class Reception {
             if (visitor.isResponse() || canPass(visitor.asCommand())) {
                 backOffice.performTransaction(visitor);
             }
-        } else if (message instanceof SnapshotProtocol.Message) {
+        } else if (message instanceof SnapshotProtocol.Message protocolMessage) {
             // Weirdly enough snapshotting takes a different route than event persistence...
-            actor.handleSnapshotProtocolMessage((SnapshotProtocol.Message) message);
-        } else if (message instanceof JournalProtocol.Message) {
-            actor.handleJournalProtocolMessage((JournalProtocol.Message) message);
+            actor.handleSnapshotProtocolMessage(protocolMessage);
+        } else if (message instanceof JournalProtocol.Message protocolMessage) {
+            actor.handleJournalProtocolMessage(protocolMessage);
+        } else if (message instanceof DeserializationFailure failure) {
+            actor.getLogger().error("%s encountered a system error in deserializing a message".formatted(actor), failure);
+            // These exceptions mean basically a bug while developing new commands/events/responses.
+            // Therefore also log to console.
+            failure.exception.printStackTrace(System.out);
         } else {
             actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
         }
@@ -85,7 +92,7 @@ class Reception {
             return informAboutRecoveryFailure(visitor);
         }
 
-        if (!bootstrapPending && visitor.isBootstrapMessage()) {
+        if (!bootstrapPending && visitor.isBootstrapMessage() && !(visitor instanceof RequestModelActor)) {
             // Cannot run e.g. StartCase two times. Also, we should not reveal it already exists.
             handleAlreadyCreated(visitor);
             return false;
@@ -97,13 +104,17 @@ class Reception {
             } else {
                 // Cannot run e.g. CompleteHumanTask if the Case is not yet created.
                 //  Pretty weird if we get to this stage, as the Routes should not let it come here ...
-                fail(visitor, "Expected bootstrap command in " + actor + " instead of " + visitor.getClass().getSimpleName());
+                fail(visitor, "Expected bootstrap command in " + actor + " instead of " + visitor.getDescription());
                 return false;
             }
         }
 
+        if (visitor instanceof ModelActorSystemMessage) {
+            return true;
+        }
+
         if (!actor.supportsCommand(visitor)) {
-            fail(visitor, actor + " does not support commands of type " + visitor.getClass().getSimpleName());
+            fail(visitor, actor + " does not support commands of type " + visitor.getDescription());
             return false;
         }
 
@@ -130,10 +141,10 @@ class Reception {
                 // Trying to do e.g. StartCase in e.g. a TenantActor
                 handleAlreadyCreated(msg);
             } else if (isInStorageProcess) {
-                actor.reply(new ActorInStorage(msg.asCommand(), actorType));
+                actor.reply(new ActorInStorage(msg.asCommand(), actorType), actor.sender());
             } else {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
-                actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
+                actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)), actor.sender());
             }
             actor.takeABreak("Removing ModelActor["+actor.getId()+"] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
         }
@@ -142,12 +153,12 @@ class Reception {
 
     private void handleAlreadyCreated(IncomingActorMessage msg) {
         if (msg.isCommand()) {
-            actor.reply(new ActorExistsFailure(msg.asCommand(), new IllegalArgumentException("Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details")));
+            actor.reply(new ActorExistsFailure(msg.asCommand(), new IllegalArgumentException("Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details")), actor.sender());
         }
     }
 
     private void fail(ModelCommand command, String errorMessage) {
-        actor.reply(new CommandFailure(command, new InvalidCommandException(errorMessage)));
+        actor.reply(new CommandFailure(command, new InvalidCommandException(errorMessage)), actor.sender());
     }
 
     void reportDeserializationFailure(DeserializationFailure failure) {
@@ -158,11 +169,11 @@ class Reception {
         if (event.isBootstrapMessage()) {
             // Wrong type of ModelActor. Probably someone tries to re-use the same actor id for another type of ModelActor.
             hideFrontDoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
-        } else if (event instanceof StorageEvent) {
+        } else if (event instanceof StorageEvent storageEvent) {
             // Someone is archiving or deleting this actor
             hideFrontDoor("Actor is in storage processing");
             isInStorageProcess = true;
-            actorType = ((StorageEvent) event).metadata().actorType();
+            actorType = storageEvent.metadata().actorType();
         } else {
             // Pretty weird if it happens ...
             hideFrontDoor("Received unexpected recovery event of type " + event.getClass().getName());

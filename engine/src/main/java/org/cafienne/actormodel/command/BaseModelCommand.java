@@ -34,7 +34,7 @@ import java.io.IOException;
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
     protected final String msgId;
     public final String actorId;
-    public ActorRef sender;
+    private ActorRef sender;
     protected transient T actor;
     private ModelResponse response;
 

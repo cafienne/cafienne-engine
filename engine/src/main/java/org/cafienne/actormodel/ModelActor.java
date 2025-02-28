@@ -17,21 +17,20 @@
 
 package org.cafienne.actormodel;
 
+import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.PoisonPill;
 import org.apache.pekko.persistence.AbstractPersistentActor;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotOffer;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.outgoing.RemoteActorState;
 import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.CommandFailureListener;
-import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.EngineVersion;
@@ -47,7 +46,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     private final static Logger logger = LoggerFactory.getLogger(ModelActor.class);
     /**
-     * The tenant in which this model is ran by the engine.
+     * The tenant in which this model is run by the engine.
      */
     private String tenant;
     /**
@@ -61,7 +60,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Storage area for the ModelActor, keeps track of state changes
      */
-    private final BackOffice backOffice = new BackOffice(this, monitor);
+    final BackOffice backOffice = new BackOffice(this, monitor);
     /**
      * Front door knows ModelActor state, and determines whether visitors can pass.
      */
@@ -83,7 +82,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private Instant lastModified;
     /**
-     * The moment the next transaction is started; will be used to fill the LastModified event and also inbetween timestamps in events.
+     * The moment the next transaction is started; will be used to fill the LastModified event and also in between timestamps in events.
      */
     private Instant transactionTimestamp;
 
@@ -237,27 +236,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return event;
     }
 
-    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
-    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
-    /**
-     * askModel allows communication between ModelActors. One case (or, typically, plan item special logic) can ask another case to execute
-     * a command, and when the response is received back from the other case, the handler is invoked with that response.
-     * Note that nothing will be sent to the other actor when recovery is running.
-     *
-     * @param command The message to send
-     * @param left    Listener to handle response failures.
-     * @param right   Optional listener to handle response success.
-     */
-    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
     /**
      * Returns the tenant in which the model is running.
      */
@@ -270,7 +248,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @param response - optional message to be told to the current sender
      */
-    public void reply(ModelResponse response) {
+    public void reply(ModelResponse response, ActorRef replyTo) {
         // Always reset the transaction timestamp before replying. Even if there is no reply.
         resetTransactionTimestamp();
         // We should unlock if there is no response or the response is not a failure.
@@ -294,7 +272,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
-        sender().tell(response, self());
+        replyTo.tell(response, self());
     }
 
     /**
@@ -344,7 +322,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Add debug info to the case if debug is enabled.
      * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
-     * then the appender.debugInfo(...) method will be invoked to store a string in the log.
+     * then the appender debugInfo method will be invoked to store a string in the log.
      *
      * @param appender       Producer of the log info
      * @param additionalInfo Additional parameters such as Throwable or json Value will be printed in a special manner
@@ -356,7 +334,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Add debug info to the ModelActor if debug is enabled.
      * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
-     * then the appender.debugInfo(...) method will be invoked to store a string in the log.
+     * then the appender debugInfo method will be invoked to store a string in the log.
      *
      * @param logger         The slf4j logger instance to check whether debug logging is enabled
      * @param appender       A functional interface returning "an" object, holding the main info to be logged.
@@ -433,5 +411,13 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * It can typically be used to send "NotModified" responses
      */
     protected void notModified(IncomingActorMessage source) {
+    }
+
+    public void register(RemoteActorState<?> remoteActorState) {
+        backOffice.register(remoteActorState);
+    }
+
+    public RemoteActorState<?> getRemoteActorState(String actorId) {
+        return backOffice.getRemoteActorState(actorId);
     }
 }

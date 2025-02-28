@@ -20,6 +20,7 @@ package org.cafienne.infrastructure.serialization;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.instance.Path;
 import org.cafienne.json.CafienneJson;
@@ -108,6 +109,18 @@ public interface CafienneSerializable {
         } else {
             generator.writeFieldName(String.valueOf(fieldName));
             value.toJSON().print(generator);
+        }
+    }
+
+    default void writeField(JsonGenerator generator, Object fieldName, ModelCommand value) throws IOException {
+        if (value == null) {
+            generator.writeNullField(String.valueOf(fieldName));
+        } else {
+            generator.writeObjectFieldStart(String.valueOf(fieldName));
+                generator.writeStringField(Fields.manifest.toString(), CafienneSerializer.getManifestString(value));
+                generator.writeFieldName(Fields.content.toString());
+                value.writeThisObject(generator);
+            generator.writeEndObject();
         }
     }
 
