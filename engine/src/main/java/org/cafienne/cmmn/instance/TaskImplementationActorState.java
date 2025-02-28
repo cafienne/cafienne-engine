@@ -17,17 +17,21 @@
 
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
+import org.cafienne.actormodel.communication.outgoing.RemoteActorState;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationStarted;
 
-public class TaskImplementationActorState {
+public class TaskImplementationActorState extends RemoteActorState<Case> {
     private final Task<?> task;
     private boolean isStarted = false;
     private boolean foundFailure = false;
 
     TaskImplementationActorState(Task<?> task) {
+        super(task.getCaseInstance(), task.getId());
         this.task = task;
     }
 
@@ -36,10 +40,15 @@ public class TaskImplementationActorState {
         //  If a task is successfully started in older versions of Cafienne, it will be in state Active;
         //  However, the state of the task interaction is not stored through below handle events.
         //  Therefore, we use the flags in combination with the known task state.
-        //  - if (isStated == true), then we have received and stored an event for it.
+        //  - if (isStarted == true), then we have received and stored an event for it.
         //  - if (foundFailure == true), then we have received and stored an event for it.
         //  - if (foundFailure == false), we did not receive events, and then we rely on state inside the case instead of the implementation.
         return isStarted || (!foundFailure && task.getState().isAlive());
+    }
+
+    @Override
+    public void handleFailure(ActorRequestFailed actorRequestFailed) {
+        actor.addEvent(new TaskCommandRejected(task, actorRequestFailed.command, actorRequestFailed.exceptionAsJSON));
     }
 
     void updateState(TaskImplementationStarted event) {
@@ -72,5 +81,18 @@ public class TaskImplementationActorState {
                 ", foundFailure=" + foundFailure +
                 ", isStarted()=" + isStarted() +
                 '}';
+    }
+
+    public void reactivate() {
+        task.transformInputParameters();
+        task.reactivateImplementation(task.getMappedInputParameters());
+//        if (isStarted()) {
+//            task.transformInputParameters();
+//            task.reactivateImplementation(task.getMappedInputParameters());
+//        } else {
+//            task.addDebugInfo(() -> "Implementation of task " + this + " was not started yet, probably due to failures. Starting again");
+//            task.startInstance();
+//        }
+
     }
 }

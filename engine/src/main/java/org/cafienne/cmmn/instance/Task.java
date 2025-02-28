@@ -19,8 +19,6 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.event.plan.task.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
@@ -100,14 +98,15 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     @Override
     protected final void reactivateInstance() {
+//        implementationState.reactivate();
         handleTransition(() -> {
-            if (implementationState.isStarted()) {
-                transformInputParameters();
-                reactivateImplementation(getMappedInputParameters());
-            } else {
-                addDebugInfo(() -> "Implementation of task " + this + " was not started yet, probably due to failures. Starting again");
-                startInstance();
-            }
+            transformInputParameters();
+            reactivateImplementation(getMappedInputParameters());
+//            if (implementationState.isStarted()) {
+//            } else {
+//                addDebugInfo(() -> "Implementation of task " + this + " was not started yet, probably due to failures. Starting again");
+//                startInstance();
+//            }
         }, Transition.Reactivate);
     }
 
@@ -359,40 +358,49 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     }
 
     public void startTaskImplementation(ModelCommand command) {
-        getCaseInstance().informImplementation(command, failure -> {
-            getCaseInstance().addEvent(new TaskImplementationNotStarted(this, command, failure.toJson()));
-        }, success -> {
-            getCaseInstance().addEvent(new TaskImplementationStarted(this));
-            if (!getDefinition().isBlocking()) {
-                goComplete(new ValueMap());
-            }
-        });
+        implementationState.sendRequest(command);
+//        getCaseInstance().informImplementation(command, failure -> {
+//            System.out.println("TASK GOT REJECTED");
+//
+//            getCaseInstance().addEvent(new TaskImplementationNotStarted(this, command, failure.toJson()));
+//        }, success -> {
+//            getCaseInstance().addEvent(new TaskImplementationStarted(this));
+//            if (!getDefinition().isBlocking()) {
+//                goComplete(new ValueMap());
+//            }
+//        });
     }
 
     public void reactivateTaskImplementation(ModelCommand command) {
-        getCaseInstance().informImplementation(command, failure -> {
-            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
-        }, success -> {
-            getCaseInstance().addEvent(new TaskImplementationReactivated(this));
-        });
+        implementationState.sendRequest(command);
+//        getCaseInstance().informImplementation(command, failure -> {
+//            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+//        }, success -> {
+//            getCaseInstance().addEvent(new TaskImplementationReactivated(this));
+//        });
     }
 
     public void tellTaskImplementation(ModelCommand command) {
         if (!getDefinition().isBlocking()) {
             return;
         }
-        getCaseInstance().informImplementation(command, failure -> getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson())), null);
+        implementationState.sendRequest(command);
+//        getCaseInstance().informImplementation(command, failure -> {
+//            System.out.println("TASK GOT REJECTED");
+//            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+//        }, null);
     }
 
     public void giveNewDefinition(ModelCommand command) {
         if (getState().isInitiated()) {
-            if (getImplementationState().isStarted()) {
-                getCaseInstance().addDebugInfo(() -> this + ": informing task implementation about new definition");
-                // Apparently process has failed so we can trying again
-                tellTaskImplementation(command);
-            } else {
-                getCaseInstance().addDebugInfo(() -> this + ": skipping definition migration for task implementation - task implementation state indicates it is not yet started. Hence upon start or reactivate the definition will be updated");
-            }
+            tellTaskImplementation(command);
+//            if (getImplementationState().isStarted()) {
+//                getCaseInstance().addDebugInfo(() -> this + ": informing task implementation about new definition");
+//                // Apparently process has failed so we can trying again
+//                tellTaskImplementation(command);
+//            } else {
+//                getCaseInstance().addDebugInfo(() -> this + ": skipping definition migration for task implementation - task implementation state indicates it is not yet started. Hence upon start or reactivate the definition will be updated");
+//            }
         }
 
     }

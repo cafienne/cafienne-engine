@@ -38,7 +38,7 @@ public class StartProcess extends ProcessCommand implements BootstrapMessage {
     private final String tenant;
     private final String name;
     private final ValueMap inputParameters;
-    private transient ProcessDefinition definition;
+    private final ProcessDefinition definition;
     private final boolean debugMode;
 
     public StartProcess(UserIdentity user, String tenant, String id, String name, ProcessDefinition definition, ValueMap inputParameters, String parentActorId, String rootActorId, boolean debugMode) {
@@ -94,7 +94,7 @@ public class StartProcess extends ProcessCommand implements BootstrapMessage {
 
     @Override
     protected void process(ProcessTaskActor processTaskActor, SubProcess<?> implementation) {
-        processTaskActor.addEvent(new ProcessStarted(processTaskActor, this));
+        processTaskActor.handleStartProcessCommand(this);
     }
 
     @Override

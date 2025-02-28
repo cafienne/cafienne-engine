@@ -52,7 +52,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         StorageSerializers.register();
     }
 
-    static ManifestWrapper getManifest(String manifestString) {
+    public static ManifestWrapper getManifest(String manifestString) {
         return manifests.get(manifestString);
     }
 

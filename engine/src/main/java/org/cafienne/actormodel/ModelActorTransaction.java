@@ -17,8 +17,11 @@
 
 package org.cafienne.actormodel;
 
+import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.persistence.journal.Tagged;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.incoming.command.RunActorRequest;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
 import org.cafienne.actormodel.event.CommitEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -41,19 +44,19 @@ import java.util.stream.Collectors;
  * ModelActorTransaction captures all state changing events upon handling an {@link IncomingActorMessage}
  * It also handles failures and sending responses to complete the lifecycle of the message.
  */
-class ModelActorTransaction {
+public class ModelActorTransaction {
     private final ModelActor actor;
+    private final ActorRef sender;
     private final static int avgNumEvents = 30;
     private final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
     private final IncomingActorMessage message;
-    private final BackOffice backOffice;
     private ModelResponse response = null;
     private final TransactionLogger logger;
 
-    ModelActorTransaction(ModelActor actor, BackOffice backOffice, IncomingActorMessage message) {
+    ModelActorTransaction(ModelActor actor, IncomingActorMessage message) {
         this.actor = actor;
-        this.backOffice = backOffice;
         this.actor.setCurrentUser(message.getUser());
+        this.sender = actor.sender();
         this.message = message;
         this.logger = new TransactionLogger(this, actor);
         // First check the engine version, potentially leading to an extra event.
@@ -61,30 +64,36 @@ class ModelActorTransaction {
     }
 
     void perform() {
-        if (message.isCommand()) {
-            ModelCommand command = message.asCommand();
-            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getDescription() , command.rawJson());
+        actor.addDebugInfo(() -> "---------- User " + message.getUser().id() + " in " + actor + " receives message " + message.getDescription(), message.rawJson());
 
-            try {
-                // First, simple, validation
-                command.validateCommand(actor);
-                // Then, do actual work of processing in the command itself.
-                command.processCommand(actor);
-                setResponse(command.getResponse());
-            } catch (AuthorizationException e) {
-                reportFailure(e, new SecurityFailure(command, e), "");
-            } catch (InvalidCommandException e) {
-                reportFailure(command, e, "===== Command was invalid ======");
-            } catch (CommandException e) {
-                reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
-            } catch (Throwable e) {
-                reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
-            }
+        if (message.isCommand()) {
+            runCommand(message.asCommand());
         } else if (message.isResponse()) {
-            backOffice.handleResponse(message.asResponse());
+            // These should no longer be coming in, only commands.
+//            actor.backOffice.handleResponse(message.asResponse());
         }
 
         commit();
+    }
+
+    void runCommand(ModelCommand command) {
+//        actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getDescription() , command.rawJson());
+
+        try {
+            // First, simple, validation
+            command.validateCommand(actor);
+            // Then, do actual work of processing in the command itself.
+            command.processCommand(actor);
+            setResponse(command.getResponse());
+        } catch (AuthorizationException e) {
+            reportFailure(e, new SecurityFailure(command, e), "");
+        } catch (InvalidCommandException e) {
+            reportFailure(command, e, "===== Command was invalid ======");
+        } catch (CommandException e) {
+            reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
+        } catch (Throwable e) {
+            reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
+        }
     }
 
     private void checkEngineVersion() {
@@ -146,7 +155,7 @@ class ModelActorTransaction {
 
     private void replyAndPersistDebugEvent(ModelResponse response) {
         // Inform the sender about the failure
-        actor.reply(response);
+        actor.reply(response, sender);
         // In case of failure we still want to store the debug event. Actually, mostly we need this in case of failure (what else are we debugging for)
         if (this.logger.hasDebugEvent()) {
             actor.persistAsync(addTags(logger.getDebugEvent()), e -> {});
@@ -180,7 +189,7 @@ class ModelActorTransaction {
                 getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + persistedEvent.payload().getClass().getName());
             }
             if (persistedEvent == lastTaggedEvent) {
-                actor.reply(response);
+                actor.reply(response, sender);
                 events.forEach(event -> event.afterPersist(actor));
             }
         });
@@ -200,7 +209,11 @@ class ModelActorTransaction {
      */
     void reportFailure(Throwable exception, CommandFailure failure, String msg) {
         actor.addDebugInfo(() -> "", exception, msg);
-        this.response = failure;
+        if (this.message instanceof RunActorRequest actorRequest) {
+            this.response = new ActorRequestFailed(actorRequest.command, exception);
+        } else {
+            this.response = failure;
+        }
     }
 
     /**
@@ -215,7 +228,7 @@ class ModelActorTransaction {
      */
     void handlePersistFailure(Throwable cause, Object event, long seqNr) {
         if (message.isCommand()) {
-            actor.reply(new EngineChokedFailure(message.asCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
+            actor.reply(new EngineChokedFailure(message.asCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")), sender);
         }
     }
 

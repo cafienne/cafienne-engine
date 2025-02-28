@@ -75,10 +75,10 @@ class TransactionLogger {
     }
 
     private void logObject(Logger logger, Object o) {
-        if (o instanceof Throwable) {
-            logException(logger, (Throwable) o);
-        } else if (o instanceof Value) {
-            logJSON(logger, (Value<?>) o);
+        if (o instanceof Throwable t) {
+            logException(logger, t);
+        } else if (o instanceof Value<?> v) {
+            logJSON(logger, v);
         } else {
             // Value of will also convert a null object to "null", so no need to check on null.
             logString(logger, String.valueOf(o));

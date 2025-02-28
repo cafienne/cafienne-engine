@@ -41,7 +41,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     private final ValueMap json;
     protected final String msgId;
     public final String actorId;
-    public ActorRef sender;
+    private ActorRef sender;
     protected transient T actor;
     private ModelResponse response;
 
@@ -85,7 +85,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
      * Through this method, the command is made aware of the actor that is handling it.
      */
     @Override
-    public final void setActor(ModelActor actor) {
+    public void setActor(ModelActor actor) {
         this.actor = (T) actor;
         this.sender = actor.getSender();
     }

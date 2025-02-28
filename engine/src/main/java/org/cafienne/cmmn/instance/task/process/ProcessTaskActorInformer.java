@@ -64,15 +64,15 @@ class ProcessTaskActorInformer extends ProcessInformer {
 
     @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
-        // TODO: reactivate is invoked after actual state has become active again,
-        //  and that means that task.getImplementationState.getStarted returns the wrong value
-        // NOT SURE WHAT THE IMPACT OF SUCH A SCENARIO is
-        if (task.getImplementationState().isStarted()) {
-            // Apparently process has failed so we can trying again
-            task.tellTaskImplementation(new ReactivateProcess(getCaseInstance().getCurrentUser(), task.getId(), inputParameters));
-        } else {
-            startImplementation(inputParameters);
-        }
+        task.tellTaskImplementation(new ReactivateProcess(getCaseInstance().getCurrentUser(), task.getId(), inputParameters));
+//        // TODO: reactivate is invoked after actual state has become active again,
+//        //  and that means that task.getImplementationState.getStarted returns the wrong value
+//        // NOT SURE WHAT THE IMPACT OF SUCH A SCENARIO is
+//        if (task.getImplementationState().isStarted()) {
+//            // Apparently process has failed so we can trying again
+//        } else {
+//            startImplementation(inputParameters);
+//        }
     }
 
     @Override

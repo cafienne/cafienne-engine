@@ -17,6 +17,14 @@
 
 package org.cafienne.infrastructure.serialization.serializers;
 
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.incoming.event.ActorRequestExecuted;
+import org.cafienne.actormodel.communication.incoming.event.ActorRequestStored;
+import org.cafienne.actormodel.communication.incoming.command.RunActorRequest;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestDeliveryReceipt;
+import org.cafienne.actormodel.communication.outgoing.event.ActorRequestDelivered;
+import org.cafienne.actormodel.communication.outgoing.command.RequestModelActor;
 import org.cafienne.cmmn.actorapi.command.ReactivateCase;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
@@ -48,6 +56,8 @@ import org.cafienne.consentgroup.actorapi.command.ReplaceConsentGroup;
 import org.cafienne.consentgroup.actorapi.command.SetConsentGroupMember;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.GetTenantOwners;
 import org.cafienne.tenant.actorapi.command.RemoveTenantUser;
@@ -58,7 +68,19 @@ import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
 import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
 
 public class CommandSerializers {
+    public static <T extends ModelCommand> T deserializeModelCommand(ValueMap json) {
+        String manifest = json.readString(Fields.manifest);
+        return (T) new CafienneSerializer().fromJson(json.readMap(Fields.content), manifest);
+    }
+
     public static void register() {
+        CafienneSerializer.addManifestWrapper(RequestModelActor.class, RequestModelActor::new);
+        CafienneSerializer.addManifestWrapper(RunActorRequest.class, RunActorRequest::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestDelivered.class, ActorRequestDelivered::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestDeliveryReceipt.class, ActorRequestDeliveryReceipt::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestStored.class, ActorRequestStored::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestFailed.class, ActorRequestFailed::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestExecuted.class, ActorRequestExecuted::new);
         addCaseCommands();
         addProcessActorCommands();
         addTenantCommands();
