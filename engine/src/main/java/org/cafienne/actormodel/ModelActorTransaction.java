@@ -22,10 +22,11 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.CommitEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.CommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.EngineChokedFailure;
-import org.cafienne.actormodel.response.ModelResponse;
+import org.cafienne.actormodel.response.*;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.EngineVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
@@ -54,6 +55,55 @@ public class ModelActorTransaction {
         this.message = message;
         // First check the engine version, potentially leading to an extra event.
         this.checkEngineVersion();
+    }
+
+    void perform() {
+        actor.monitor.actorActivated();
+        if (message.isCommand()) {
+            ModelCommand command = message.asCommand();
+            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getDescription() , command.rawJson());
+
+            try {
+                // First, simple, validation
+                command.validateCommand(actor);
+                // Then, do actual work of processing in the command itself.
+                command.processCommand(actor);
+                setResponse(command.getResponse());
+            } catch (AuthorizationException e) {
+                reportFailure(e, new SecurityFailure(command, e), "");
+            } catch (InvalidCommandException e) {
+                reportFailure(command, e, "===== Command was invalid ======");
+            } catch (CommandException e) {
+                reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
+            } catch (Throwable e) {
+                reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
+            }
+        } else if (message.isResponse()) {
+            handleResponse(message.asResponse());
+        }
+
+        commit();
+
+        actor.monitor.actorDeactivated();
+    }
+
+    private void handleResponse(ModelResponse msg) {
+        Responder handler = actor.getResponseListener(msg.getMessageId());
+        if (handler == null) {
+            // For all commands that are sent to another case via us, a listener is registered.
+            // If that listener is null, we set a default listener ourselves.
+            // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
+            // and we log a warning for that. It basically means someone else has submitted the command and told the other case to respond to us -
+            // which is strange.
+            actor.getLogger().warn(actor + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
+        } else {
+            actor.addDebugInfo(() -> actor + " received response to command of type " + handler.command.getDescription(), msg.rawJson());
+            if (msg instanceof CommandFailure) {
+                handler.left.handleFailure((CommandFailure) msg);
+            } else {
+                handler.right.handleResponse(msg);
+            }
+        }
     }
 
     private void checkEngineVersion() {
