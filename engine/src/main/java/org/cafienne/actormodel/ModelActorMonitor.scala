@@ -11,11 +11,11 @@ import scala.concurrent.duration.Duration
 class ModelActorMonitor(val actor: ModelActor) {
   private var selfCleaner: Option[Cancellable] = None
 
-  def actorActivated(): Unit = {
+  def setBusy(): Unit = {
     selfCleaner.foreach(c => c.cancel())
   }
 
-  def actorDeactivated(): Unit = {
+  def setFree(): Unit = {
     if (actor.hasAutoShutdown) {
       // Now set the new selfCleaner
       val idlePeriod = actor.caseSystem.config.actor.idlePeriod

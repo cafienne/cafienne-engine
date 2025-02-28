@@ -26,20 +26,27 @@ import org.slf4j.Logger;
 /**
  * Warehouse creates a new {@link ModelActorTransaction} for each {@link IncomingActorMessage}.
  */
-class Warehouse {
+class BackOffice {
     private final ModelActor actor;
+    private final ModelActorMonitor monitor;
     private ModelActorTransaction currentTransaction;
     private boolean isOpen = false;
 
-    Warehouse(ModelActor actor) {
+    BackOffice(ModelActor actor, ModelActorMonitor monitor) {
         this.actor = actor;
+        this.monitor = monitor;
     }
 
-    ModelActorTransaction createTransaction(IncomingActorMessage message) {
+    void performTransaction(IncomingActorMessage message) {
+        // Tell the actor monitor we're busy
+        monitor.setBusy();
+
         isOpen = true;
-        actor.setCurrentUser(message.getUser());
         currentTransaction = new ModelActorTransaction(actor, message);
-        return currentTransaction;
+        currentTransaction.perform();
+
+        // Tell the actor monitor we're free again
+        monitor.setFree();
     }
 
     void storeEvent(ModelEvent event) {

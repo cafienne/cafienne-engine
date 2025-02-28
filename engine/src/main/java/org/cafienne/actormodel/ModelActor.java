@@ -59,15 +59,15 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * The monitor removes this actor from memory after it has been idle for a certain period
      */
-    final ModelActorMonitor monitor = new ModelActorMonitor(this);
-    /**
-     * Front door knows ModelActor state, and determines whether visitors can pass.
-     */
-    private final Reception reception = new Reception(this);
+    private final ModelActorMonitor monitor = new ModelActorMonitor(this);
     /**
      * Storage area for the ModelActor, keeps track of state changes
      */
-    private final Warehouse warehouse = reception.warehouse;
+    private final BackOffice backOffice = new BackOffice(this, monitor);
+    /**
+     * Front door knows ModelActor state, and determines whether visitors can pass.
+     */
+    private final Reception reception = new Reception(this, backOffice);
     /**
      * User context of current message
      */
@@ -241,7 +241,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Adds an event to the current message handling context
      */
     public <E extends ModelEvent> E addEvent(E event) {
-        warehouse.storeEvent(event);
+        backOffice.storeEvent(event);
         return event;
     }
 
@@ -349,7 +349,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         // Inform the HealthMonitor
         HealthMonitor.writeJournal().hasFailed(cause);
         // Optionally send a reply (in the CommandHandler). If persistence fails, also sending a reply may fail, hence first logging the issue.
-        warehouse.handlePersistFailure(cause, event, seqNr);
+        backOffice.handlePersistFailure(cause, event, seqNr);
         // Stop the actor
         context().stop(self());
     }
@@ -388,7 +388,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
     public void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
-        warehouse.addDebugInfo(logger, appender, additionalInfo);
+        backOffice.addDebugInfo(logger, appender, additionalInfo);
     }
 
     /**

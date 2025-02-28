@@ -50,15 +50,15 @@ public class ModelActorTransaction {
     private final TransactionLogger logger;
 
     ModelActorTransaction(ModelActor actor, IncomingActorMessage message) {
-        this.logger = new TransactionLogger(this, actor);
         this.actor = actor;
+        this.actor.setCurrentUser(message.getUser());
         this.message = message;
+        this.logger = new TransactionLogger(this, actor);
         // First check the engine version, potentially leading to an extra event.
         this.checkEngineVersion();
     }
 
     void perform() {
-        actor.monitor.actorActivated();
         if (message.isCommand()) {
             ModelCommand command = message.asCommand();
             actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getDescription() , command.rawJson());
@@ -83,8 +83,6 @@ public class ModelActorTransaction {
         }
 
         commit();
-
-        actor.monitor.actorDeactivated();
     }
 
     private void handleResponse(ModelResponse msg) {
