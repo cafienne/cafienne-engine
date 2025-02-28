@@ -20,6 +20,8 @@ package org.cafienne.actormodel;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.CaseSystemCommunicationMessage;
+import org.cafienne.actormodel.communication.request.command.RequestModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
@@ -90,7 +92,7 @@ class Reception {
             return informAboutRecoveryFailure(visitor);
         }
 
-        if (!bootstrapPending && visitor.isBootstrapMessage()) {
+        if (!bootstrapPending && visitor.isBootstrapMessage() && !(visitor instanceof RequestModelActor)) {
             // Cannot run e.g. StartCase two times. Also, we should not reveal it already exists.
             handleAlreadyCreated(visitor);
             return false;
@@ -105,6 +107,10 @@ class Reception {
                 fail(visitor, "Expected bootstrap command in " + actor + " instead of " + visitor.getDescription());
                 return false;
             }
+        }
+
+        if (visitor instanceof CaseSystemCommunicationMessage) {
+            return true;
         }
 
         if (!actor.supportsCommand(visitor)) {
@@ -135,10 +141,10 @@ class Reception {
                 // Trying to do e.g. StartCase in e.g. a TenantActor
                 handleAlreadyCreated(msg);
             } else if (isInStorageProcess) {
-                actor.reply(new ActorInStorage(msg.asCommand(), actorType));
+                actor.reply(new ActorInStorage(msg.asCommand(), actorType), actor.sender());
             } else {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
-                actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
+                actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)), actor.sender());
             }
             actor.takeABreak("Removing ModelActor[" + actor.getId() + "] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
         }
@@ -147,12 +153,12 @@ class Reception {
 
     private void handleAlreadyCreated(IncomingActorMessage msg) {
         if (msg.isCommand()) {
-            actor.reply(new ActorExistsFailure(msg.asCommand(), new IllegalArgumentException("Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details")));
+            actor.reply(new ActorExistsFailure(msg.asCommand(), new IllegalArgumentException("Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details")), actor.sender());
         }
     }
 
     private void fail(ModelCommand command, String errorMessage) {
-        actor.reply(new CommandFailure(command, new InvalidCommandException(errorMessage)));
+        actor.reply(new CommandFailure(command, new InvalidCommandException(errorMessage)), actor.sender());
     }
 
     void reportDeserializationFailure(DeserializationFailure failure) {
@@ -180,6 +186,6 @@ class Reception {
     }
 
     void open() {
-        actor.recoveryCompleted();
+        actor.informRecoveryCompletion();
     }
 }

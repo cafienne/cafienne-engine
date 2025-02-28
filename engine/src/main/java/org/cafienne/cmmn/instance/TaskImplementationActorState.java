@@ -17,17 +17,21 @@
 
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.communication.request.state.RemoteActorState;
+import org.cafienne.actormodel.communication.request.response.ActorRequestDeliveryReceipt;
+import org.cafienne.actormodel.communication.request.response.ActorRequestFailure;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationStarted;
 
-public class TaskImplementationActorState {
+public class TaskImplementationActorState extends RemoteActorState<Case> {
     private final Task<?> task;
     private boolean isStarted = false;
     private boolean foundFailure = false;
 
     TaskImplementationActorState(Task<?> task) {
+        super(task.getCaseInstance(), task.getId());
         this.task = task;
     }
 
@@ -36,10 +40,22 @@ public class TaskImplementationActorState {
         //  If a task is successfully started in older versions of Cafienne, it will be in state Active;
         //  However, the state of the task interaction is not stored through below handle events.
         //  Therefore, we use the flags in combination with the known task state.
-        //  - if (isStated == true), then we have received and stored an event for it.
+        //  - if (isStarted == true), then we have received and stored an event for it.
         //  - if (foundFailure == true), then we have received and stored an event for it.
         //  - if (foundFailure == false), we did not receive events, and then we rely on state inside the case instead of the implementation.
         return isStarted || (!foundFailure && task.getState().isAlive());
+    }
+
+    @Override
+    public void handleReceipt(ActorRequestDeliveryReceipt receipt) {
+        if (!task.getDefinition().isBlocking()) {
+            task.makeTransition(Transition.Complete);
+        }
+    }
+
+    @Override
+    public void handleFailure(ActorRequestFailure failure) {
+        actor.addEvent(new TaskCommandRejected(task, failure.command, failure.exceptionAsJSON));
     }
 
     void updateState(TaskImplementationStarted event) {

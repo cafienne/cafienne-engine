@@ -17,21 +17,21 @@
 
 package org.cafienne.actormodel;
 
+import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.PoisonPill;
 import org.apache.pekko.persistence.AbstractPersistentActor;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotOffer;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.reply.state.IncomingRequestState;
+import org.cafienne.actormodel.communication.request.state.RemoteActorState;
 import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.CommandFailureListener;
-import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.EngineVersion;
@@ -66,6 +66,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Front door knows ModelActor state, and determines whether visitors can pass.
      */
     private final Reception reception = new Reception(this, backOffice);
+    /**
+     * If ModelActors send messages to each other, the state of that is handled in the ModelActorCommunication class
+     */
+    private final ModelActorCommunication actorCommunication = new ModelActorCommunication(this);
     /**
      * User context of current message
      */
@@ -211,6 +215,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
 //        System.out.println(this + ": Received " + message.getClass().getName());
     }
 
+    final void informRecoveryCompletion() {
+        actorCommunication.recoveryCompleted();
+        recoveryCompleted();
+    }
+
     protected void recoveryCompleted() {
         getLogger().info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
     }
@@ -237,27 +246,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return event;
     }
 
-    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
-    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
-    /**
-     * askModel allows communication between ModelActors. One case (or, typically, plan item special logic) can ask another case to execute
-     * a command, and when the response is received back from the other case, the handler is invoked with that response.
-     * Note that nothing will be sent to the other actor when recovery is running.
-     *
-     * @param command The message to send
-     * @param left    Listener to handle response failures.
-     * @param right   Optional listener to handle response success.
-     */
-    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener right) {
-        backOffice.askModel(command, left, right);
-    }
-
     /**
      * Returns the tenant in which the model is running.
      */
@@ -270,7 +258,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @param response - optional message to be told to the current sender
      */
-    public void reply(ModelResponse response) {
+    public void reply(ModelResponse response, ActorRef replyTo) {
         // Always reset the transaction timestamp before replying. Even if there is no reply.
         resetTransactionTimestamp();
         // We should unlock if there is no response or the response is not a failure.
@@ -294,7 +282,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
-        sender().tell(response, self());
+        replyTo.tell(response, self());
     }
 
     /**
@@ -433,5 +421,17 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * It can typically be used to send "NotModified" responses
      */
     protected void notModified(IncomingActorMessage source) {
+    }
+
+    public void register(RemoteActorState<?> remoteActorState) {
+        actorCommunication.register(remoteActorState);
+    }
+
+    public RemoteActorState<?> getRemoteActorState(String actorId) {
+        return actorCommunication.getRemoteActorState(actorId);
+    }
+
+    public IncomingRequestState getIncomingRequestState() {
+        return actorCommunication.getIncomingRequestState();
     }
 }
