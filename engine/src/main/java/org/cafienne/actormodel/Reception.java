@@ -44,12 +44,12 @@ class Reception {
     private boolean isInStorageProcess = false;
     private String actorType = "";
     private final RecoveryRoom recoveryRoom;
-    final Warehouse warehouse;
+    final BackOffice backOffice;
 
-    Reception(ModelActor actor) {
+    Reception(ModelActor actor, BackOffice backOffice) {
         this.actor = actor;
         this.recoveryRoom = new RecoveryRoom(actor, this);
-        this.warehouse = new Warehouse(actor);
+        this.backOffice = backOffice;
     }
 
     void handleRecovery(Object msg) {
@@ -65,8 +65,7 @@ class Reception {
         if (message instanceof IncomingActorMessage visitor) {
             // Responses are always allowed, as they come only when we have requested something
             if (visitor.isResponse() || canPass(visitor.asCommand())) {
-                ModelActorTransaction currentTransaction = warehouse.createTransaction(visitor);
-                currentTransaction.perform();
+                backOffice.performTransaction(visitor);
             }
         } else if (message instanceof SnapshotProtocol.Message) {
             // Weirdly enough snapshotting takes a different route than event persistence...
