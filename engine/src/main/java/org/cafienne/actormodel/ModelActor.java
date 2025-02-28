@@ -57,6 +57,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private final String id;
     /**
+     * The monitor removes this actor from memory after it has been idle for a certain period
+     */
+    final ModelActorMonitor monitor = new ModelActorMonitor(this);
+    /**
      * Front door knows ModelActor state, and determines whether visitors can pass.
      */
     private final Reception reception = new Reception(this);

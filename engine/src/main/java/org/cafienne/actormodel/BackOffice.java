@@ -17,7 +17,6 @@
 
 package org.cafienne.actormodel;
 
-import org.apache.pekko.actor.Cancellable;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
@@ -27,10 +26,6 @@ import org.cafienne.actormodel.response.ActorChokedFailure;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.response.SecurityFailure;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Place that handles valid incoming traffic ({@link IncomingActorMessage})
@@ -39,10 +34,12 @@ import java.util.concurrent.TimeUnit;
 class BackOffice {
     private final ModelActor actor;
     private final Reception reception;
+    private final ModelActorMonitor monitor;
 
     BackOffice(ModelActor actor, Reception reception) {
         this.actor = actor;
         this.reception = reception;
+        this.monitor = actor.monitor;
     }
 
     void handleVisitor(IncomingActorMessage message) {
@@ -53,7 +50,7 @@ class BackOffice {
         //  b. ModelResponse --> handle the response
         // 3. Tell the staging area we're done (storing events and sending replies)
         // 4. Set a new self cleaner (basically resets the timer)
-        clearSelfCleaner();
+        monitor.actorActivated();
 
         ModelActorTransaction modelActorTransaction = reception.warehouse.createTransaction(message);
         if (message.isCommand()) {
@@ -81,7 +78,7 @@ class BackOffice {
 
         modelActorTransaction.commit();
 
-        enableSelfCleaner();
+        monitor.actorDeactivated();
     }
 
     private void handleResponse(ModelResponse msg) {
@@ -100,28 +97,6 @@ class BackOffice {
             } else {
                 handler.right.handleResponse(msg);
             }
-        }
-    }
-
-    /**
-     * SelfCleaner provides a mechanism to have the ModelActor remove itself from memory after a specific idle period.
-     */
-    private Cancellable selfCleaner = null;
-
-    private void clearSelfCleaner() {
-        // Receiving message should reset the self-cleaning timer
-        if (selfCleaner != null) {
-            selfCleaner.cancel();
-            selfCleaner = null;
-        }
-    }
-
-    private void enableSelfCleaner() {
-        if (actor.hasAutoShutdown()) {
-            // Now set the new selfCleaner
-            long idlePeriod = actor.caseSystem.config().actor().idlePeriod();
-            FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
-            selfCleaner = actor.getScheduler().schedule(duration, actor::takeABreak);
         }
     }
 }
