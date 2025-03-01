@@ -181,6 +181,7 @@ public class ModelActorTransaction {
             }
             if (persistedEvent == lastTaggedEvent) {
                 actor.reply(response);
+                events.forEach(event -> event.afterPersist(actor));
             }
         });
     }
