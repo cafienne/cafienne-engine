@@ -102,6 +102,7 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     public void updateState(ProcessReactivated event) {
+        this.taskImplementation = definition.getImplementation().createInstance(this);
         this.inputParameters = event.inputParameters;
         if (! recoveryRunning()) {
             addDebugInfo(() -> "Reactivating process " + getName());
