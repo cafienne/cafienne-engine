@@ -72,6 +72,7 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
         DataOutputStream ostream;
 
         try {
+            processTaskActor.addDebugInfo(() -> "Opening url " + targetURL);
             // First let's try to open the connection
             httpConnection = (HttpURLConnection) targetURL.openConnection();
         } catch (IOException failedToOpenURL) {
@@ -80,6 +81,7 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
 
         // Fill in the http method. This is parameterized, and may fail, in which case we cannot continue with the http call and need to raise an error.
         try {
+            processTaskActor.addDebugInfo(() -> "Setting request method " + requestMethod);
             httpConnection.setRequestMethod(requestMethod);
         } catch (IOException e) {
             return result.handleFailure("Cannot set http method " + requestMethod, e);
@@ -103,6 +105,7 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
                 httpConnection.setDoInput(true);
                 httpConnection.setDoOutput(true);
                 try {
+                    processTaskActor.addDebugInfo(() -> "Sending request payload");
                     ostream = new DataOutputStream(httpConnection.getOutputStream());
                     ostream.writeBytes(requestPayload);
                     ostream.flush();
@@ -115,7 +118,9 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
 
         // Now start reading the response ...
         try {
-            result.setResponseCode(httpConnection.getResponseCode());
+            int responseCode = httpConnection.getResponseCode();
+            processTaskActor.addDebugInfo(() -> "Reading response code gave  "+ responseCode);
+            result.setResponseCode(responseCode);
             result.setResponseMessage(httpConnection.getResponseMessage());
             result.setResponseHeaders(httpConnection.getHeaderFields());
         } catch (IOException ioe) {
@@ -124,6 +129,7 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
 
         // ... and if it is not in the HTTP 200 range, we will read the error from the connection and raise it back into the plan-item (which will go "Failed")
         if (result.isOutOf200Range()) {
+            processTaskActor.addDebugInfo(() -> "Reading connection failure information");
             StringBuilder errorMessage = new StringBuilder();
             InputStream errorStream = null;
             try {
@@ -149,6 +155,7 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
         } else { // ... in this path things are "HTTP_OK"
             // And we'll now start reading the content
             try {
+                processTaskActor.addDebugInfo(() -> "Reading response payload");
                 InputStream payloadStream = httpConnection.getInputStream();
                 StringBuilder payload = new StringBuilder();
                 int c;
