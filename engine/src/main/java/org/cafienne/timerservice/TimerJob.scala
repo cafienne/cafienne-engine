@@ -20,7 +20,7 @@ package org.cafienne.timerservice
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.{Cancellable, Scheduler}
 import org.cafienne.actormodel.communication.outgoing.RemoteActorState
-import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed
+import org.cafienne.actormodel.communication.outgoing.response.{ActorRequestFailed, ActorRequestTransferSucceeded}
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
 import java.util.concurrent.TimeUnit
@@ -49,6 +49,10 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
   class TimerItemState extends RemoteActorState[TimerService](timerService, timer.caseInstanceId) {
     def raiseTimer(): Unit = {
       sendRequest(command)
+    }
+
+    override def handleReceipt(receipt: ActorRequestTransferSucceeded): Unit = {
+      // No need to have parent store a receipt event as of now
     }
 
     override def handleFailure(failure: ActorRequestFailed): Unit = {

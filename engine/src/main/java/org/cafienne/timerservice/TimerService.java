@@ -42,6 +42,7 @@ public class TimerService extends ModelActor {
         this.monitor = new TimerMonitor(this);
         this.eventSink = new TimerEventSink(this);
         setEngineVersion(caseSystem.version());
+        setDebugMode(false);
     }
 
     @Override
