@@ -19,6 +19,7 @@ package org.cafienne.actormodel;
 
 import org.apache.pekko.persistence.RecoveryCompleted;
 import org.apache.pekko.persistence.SnapshotOffer;
+import org.cafienne.actormodel.communication.ModelActorSystemMessage;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -56,7 +57,7 @@ class RecoveryRoom {
             actor.setCurrentUser(event.getUser());
             if (event instanceof DebugEvent) {
                 // Step 1a, ignore debug events
-            } else if (actor.supportsEvent(event) || event instanceof EngineVersionChanged) {
+            } else if (actor.supportsEvent(event) || event instanceof EngineVersionChanged || event instanceof ModelActorSystemMessage) {
                 // Step 1b, supported event
                 recoverEvent(event);
             } else {
