@@ -17,21 +17,29 @@
 
 package org.cafienne.actormodel.command;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.apache.pekko.actor.ActorPath;
 import org.apache.pekko.actor.ActorRef;
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.JSONParseFailure;
+import org.cafienne.json.JSONReader;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
+    private final ValueMap json;
     protected final String msgId;
     public final String actorId;
     public ActorRef sender;
@@ -44,6 +52,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     private final U user;
 
     protected BaseModelCommand(U user, String actorId) {
+        this.json = new ValueMap();
         // First, validate actor id
         if (actorId == null) {
             throw new InvalidCommandException("Actor id cannot be null");
@@ -62,6 +71,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected BaseModelCommand(ValueMap json) {
+        this.json = json;
         this.msgId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.user = readUser(json.with(Fields.user));
@@ -171,9 +181,27 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected void writeModelCommand(JsonGenerator generator) throws IOException {
+        writeField(generator, Fields.type, this.getCommandDescription());
         writeField(generator, Fields.messageId, this.getMessageId());
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.user, user);
+    }
+
+    public ValueMap rawJson() {
+        if (this.json.getValue().isEmpty()) {
+            // We first need to serialize...
+            JsonFactory factory = new JsonFactory();
+            StringWriter sw = new StringWriter();
+            try (JsonGenerator generator = factory.createGenerator(sw)) {
+                generator.setPrettyPrinter(new DefaultPrettyPrinter());
+                writeThisObject(generator);
+                return JSONReader.parse(sw.toString());
+//                return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
+            } catch (IOException | JSONParseFailure e) {
+                return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
+            }
+        }
+        return this.json;
     }
 
     public String toString() {

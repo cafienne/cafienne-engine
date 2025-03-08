@@ -38,16 +38,15 @@ public interface CafienneSerializable {
 
     default byte[] toBytes() {
         JsonFactory factory = new JsonFactory();
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            JsonGenerator generator = factory.createGenerator(baos);
+        try (JsonGenerator generator = factory.createGenerator(baos)) {
             generator.setPrettyPrinter(new DefaultPrettyPrinter());
             this.writeThisObject(generator);
-            generator.close();
         } catch (IOException e) {
             throw new RuntimeException("Failure in serialization of an object with type " + this.getClass().getName() + "\n" + e.getMessage(), e);
         } catch (Throwable t) {
-            logger.error("Failed to serialize an object of type " + this.getClass().getName(), t);
+            logger.error("Failed to serialize an object of type {}", this.getClass().getName(), t);
             throw t;
         }
         return baos.toByteArray();
