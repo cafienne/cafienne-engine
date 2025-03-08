@@ -32,6 +32,7 @@ import org.cafienne.util.Guid;
 import java.io.IOException;
 
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
+    private final ValueMap json;
     protected final String msgId;
     public final String actorId;
     private ActorRef sender;
@@ -44,6 +45,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     private final U user;
 
     protected BaseModelCommand(U user, String actorId) {
+        this.json = new ValueMap();
         // First, validate actor id
         if (actorId == null) {
             throw new InvalidCommandException("Actor id cannot be null");
@@ -62,6 +64,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected BaseModelCommand(ValueMap json) {
+        this.json = json;
         this.msgId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.user = readUser(json.with(Fields.user));
@@ -171,9 +174,14 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected void writeModelCommand(JsonGenerator generator) throws IOException {
+        writeField(generator, Fields.type, this.getDescription());
         writeField(generator, Fields.messageId, this.getMessageId());
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.user, user);
+    }
+
+    public ValueMap rawJson() {
+        return this.json;
     }
 
     public String toString() {
