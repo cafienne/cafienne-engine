@@ -51,31 +51,33 @@ class RecoveryRoom {
         // 2. DeserializationFailures indicate inconsistent recovery
         // 3. Invoke a "hook" method to indicate recovery completion upon RecoveryCompleted (used in TimerService)
         // 4. In all other cases print warn statements and ignore the event.
-        if (msg instanceof SnapshotOffer) {
-            actor.handleSnapshot((SnapshotOffer) msg);
-        } else if (msg instanceof ModelEvent event) {
-            actor.setCurrentUser(event.getUser());
-            if (event instanceof DebugEvent) {
-                // Step 1a, ignore debug events
-            } else if (actor.supportsEvent(event) || event instanceof EngineVersionChanged || event instanceof ModelActorSystemMessage) {
-                // Step 1b, supported event
-                recoverEvent(event);
-            } else {
-                // Step 1c. Weird: ModelEvents in recovery of other models??
-                reception.reportInvalidRecoveryEvent(event);
+        switch (msg) {
+            case SnapshotOffer snapshotOffer -> actor.handleSnapshot(snapshotOffer);
+            case ModelEvent event -> {
+                actor.setCurrentUser(event.getUser());
+                if (event instanceof DebugEvent) {
+                    // Step 1a, ignore debug events
+                } else if (actor.supportsEvent(event) || event instanceof EngineVersionChanged || event instanceof ModelActorSystemMessage) {
+                    // Step 1b, supported event
+                    recoverEvent(event);
+                } else {
+                    // Step 1c. Weird: ModelEvents in recovery of other models??
+                    reception.reportInvalidRecoveryEvent(event);
+                }
             }
-        } else if (msg instanceof DeserializationFailure) {
-            // Step 2. Probably incompatible change in event serialization format. Big issue
-            reception.reportDeserializationFailure((DeserializationFailure) msg);
-        } else if (msg instanceof RecoveryCompleted) {
-            // Step 3.
-            if (actor.getLogger().isDebugEnabled()) {
-                actor.getLogger().debug(actor + " completed recovery");
+            case DeserializationFailure deserializationFailure ->
+                // Step 2. Probably incompatible change in event serialization format. Big issue
+                    reception.reportDeserializationFailure(deserializationFailure);
+            case RecoveryCompleted recoveryCompleted -> {
+                // Step 3.
+                if (actor.getLogger().isDebugEnabled()) {
+                    actor.getLogger().debug("{} completed recovery", actor);
+                }
+                reception.open();
             }
-            reception.open();
-        } else {
             // Step 4.
-            actor.getLogger().warn(actor + " received unknown message of type " + msg.getClass().getName() + " during recovery: " + msg);
+            case null -> actor.getLogger().warn("{} received a null object during recovery", actor);
+            default -> actor.getLogger().warn("{} received unknown message of type {} during recovery: {}", actor, msg.getClass().getName(), msg);
         }
     }
 
@@ -89,7 +91,7 @@ class RecoveryRoom {
         }
 //        System.out.println("Recovering event " + actor + ".[" + actor.lastSequenceNr()+ "].[" +  event.getTimestamp().toString().substring(0, 23) +"].[" + event.getClass().getSimpleName()+ "]");
         if (actor.getLogger().isDebugEnabled()) {
-            actor.getLogger().debug("Recovering event " + actor + ".[" + actor.lastSequenceNr()+ "].[" +  event.getTimestamp().toString().substring(0, 23) +"].[" + event.getClass().getSimpleName()+ "]");
+            actor.getLogger().debug("Recovering event {}.[{}].[{}].[{}]", actor, actor.lastSequenceNr(), event.getTimestamp().toString().substring(0, 23), event.getClass().getSimpleName());
         }
         try {
             event.updateActorState(actor);

@@ -80,7 +80,7 @@ class Reception {
             // Therefore also log to console.
             failure.exception.printStackTrace(System.out);
         } else {
-            actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
+            actor.getLogger().warn("{} received a message it cannot handle, of type {}", actor, message.getClass().getName());
         }
     }
 
