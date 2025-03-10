@@ -33,7 +33,7 @@ public class ActorRequestFailed extends ModelActorSystemResponse {
 
     @Override
     protected void process(RemoteActorState<?> state) {
-        state.handleFailure(this);
+        state.registerDelivery(this);
     }
 
     @Override

@@ -22,6 +22,6 @@ public class ActorRequestDeliveryReceipt extends ModelActorSystemResponse {
 
     @Override
     protected void process(RemoteActorState<?> state) {
-        state.handleReceipt(this);
+        state.registerDelivery(this);
     }
 }

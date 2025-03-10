@@ -21,6 +21,7 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.communication.incoming.event.ActorRequestExecuted;
 import org.cafienne.actormodel.communication.incoming.event.ActorRequestStored;
 import org.cafienne.actormodel.communication.incoming.command.RunActorRequest;
+import org.cafienne.actormodel.communication.outgoing.event.ActorRequestCreated;
 import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
 import org.cafienne.actormodel.communication.outgoing.response.ActorRequestDeliveryReceipt;
 import org.cafienne.actormodel.communication.outgoing.event.ActorRequestDelivered;
@@ -76,6 +77,7 @@ public class CommandSerializers {
     public static void register() {
         CafienneSerializer.addManifestWrapper(RequestModelActor.class, RequestModelActor::new);
         CafienneSerializer.addManifestWrapper(RunActorRequest.class, RunActorRequest::new);
+        CafienneSerializer.addManifestWrapper(ActorRequestCreated.class, ActorRequestCreated::new);
         CafienneSerializer.addManifestWrapper(ActorRequestDelivered.class, ActorRequestDelivered::new);
         CafienneSerializer.addManifestWrapper(ActorRequestDeliveryReceipt.class, ActorRequestDeliveryReceipt::new);
         CafienneSerializer.addManifestWrapper(ActorRequestStored.class, ActorRequestStored::new);

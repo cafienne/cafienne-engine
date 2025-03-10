@@ -17,9 +17,9 @@
 
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
 import org.cafienne.actormodel.communication.outgoing.RemoteActorState;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestDeliveryReceipt;
+import org.cafienne.actormodel.communication.outgoing.response.ActorRequestFailed;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
@@ -44,6 +44,14 @@ public class TaskImplementationActorState extends RemoteActorState<Case> {
         //  - if (foundFailure == true), then we have received and stored an event for it.
         //  - if (foundFailure == false), we did not receive events, and then we rely on state inside the case instead of the implementation.
         return isStarted || (!foundFailure && task.getState().isAlive());
+    }
+
+    @Override
+    public void handleReceipt(ActorRequestDeliveryReceipt receipt) {
+        super.handleReceipt(receipt);
+        if (!task.getDefinition().isBlocking()) {
+            task.makeTransition(Transition.Complete);
+        }
     }
 
     @Override
@@ -81,18 +89,5 @@ public class TaskImplementationActorState extends RemoteActorState<Case> {
                 ", foundFailure=" + foundFailure +
                 ", isStarted()=" + isStarted() +
                 '}';
-    }
-
-    public void reactivate() {
-        task.transformInputParameters();
-        task.reactivateImplementation(task.getMappedInputParameters());
-//        if (isStarted()) {
-//            task.transformInputParameters();
-//            task.reactivateImplementation(task.getMappedInputParameters());
-//        } else {
-//            task.addDebugInfo(() -> "Implementation of task " + this + " was not started yet, probably due to failures. Starting again");
-//            task.startInstance();
-//        }
-
     }
 }

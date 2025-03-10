@@ -44,85 +44,90 @@ public class TestSubCase {
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1", Transition.Complete), mainCasePlan ->
         {
             mainCasePlan.print();
+            testCase.insertStep(TestScript.createPingCommand(testUser, caseInstanceId, 1000), ping1 -> {
 
-            // Now wait until the NonBlockingSubCaseTask has been started and has reported that properly back to the engine,
-            // making the corresponding planitem go into completed
-            String nonBlockingSubCaseId = testCase.getEventListener().awaitPlanItemState("NonBlockingSubCaseTask", State.Completed).getPlanItemId();
-            String subCaseId = testCase.getEventListener().awaitPlanItemState("SubCaseTask", State.Active).getPlanItemId();
-            // The SubCaseTask may not have gone beyond Active (e.g. into Completed), test it here on the response; this actually could be a new type of event filter?
-            mainCasePlan.assertTask("SubCaseTask").assertState(State.Active);
+                ping1.print();
 
-            // Now wait until we find the Item1 task in the blocking subcase.
-            String item1IdInSubCase = testCase.getEventListener().waitUntil(PlanItemCreated.class, pic -> pic.getCaseInstanceId().equals(subCaseId) && pic.getPlanItemName().equals("Item1")).getPlanItemId();
+                // Now wait until the NonBlockingSubCaseTask has been started and has reported that properly back to the engine,
+                // making the corresponding planitem go into completed
+                String nonBlockingSubCaseId = testCase.getEventListener().awaitPlanItemState("NonBlockingSubCaseTask", State.Completed).getPlanItemId();
+                String subCaseId = testCase.getEventListener().awaitPlanItemState("SubCaseTask", State.Active).getPlanItemId();
+                // The SubCaseTask may not have gone beyond Active (e.g. into Completed), test it here on the response; this actually could be a new type of event filter?
+                mainCasePlan.assertTask("SubCaseTask").assertState(State.Active);
 
-            String item1InSubCase = testCase.getEventListener().waitUntil(PlanItemTransitioned.class, pit ->
-                    pit.getCaseInstanceId().equals(subCaseId) // Sub case
-                            && pit.getPlanItemId().equals(item1IdInSubCase) // Having plan item with name "Item1" and correct id
-                            && pit.getCurrentState().equals(State.Active) // in state Active
-            ).getPlanItemId();
+                // Now wait until we find the Item1 task in the blocking subcase.
+                String item1IdInSubCase = testCase.getEventListener().waitUntil(PlanItemCreated.class, pic -> pic.getCaseInstanceId().equals(subCaseId) && pic.getPlanItemName().equals("Item1")).getPlanItemId();
+
+                String item1InSubCase = testCase.getEventListener().waitUntil(PlanItemTransitioned.class, pit ->
+                        pit.getCaseInstanceId().equals(subCaseId) // Sub case
+                                && pit.getPlanItemId().equals(item1IdInSubCase) // Having plan item with name "Item1" and correct id
+                                && pit.getCurrentState().equals(State.Active) // in state Active
+                ).getPlanItemId();
 
 
-            // Suspending subCaseTask from MainCase should also suspend SubCase task
-            // And the transition in SubCase task Should be ParentSuspend, but since this is async we first need to ping the sub case with a bit of delay
-            testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "SubCaseTask", Transition.Suspend), result ->
-            {
-                testCase.getEventListener().awaitPlanItemState(subCaseId, State.Suspended);
-                testCase.getEventListener().awaitPlanItemState(item1InSubCase, Transition.ParentSuspend, State.Suspended, State.Active);
-            });
-
-            // Resume SubCaseTask from MainCase - This should also resume Item1 in SubCase
-            testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "SubCaseTask", Transition.Resume), result ->
-            {
-                testCase.getEventListener().awaitPlanItemState(subCaseId, State.Active);
-                testCase.getEventListener().awaitPlanItemState(item1InSubCase, Transition.ParentResume, State.Active, State.Suspended);
-            });
-
-            // Complete Item1 from SubCase - This should also complete the SubCaseTask in MainCase
-            testCase.addStep(new MakePlanItemTransition(testUser, subCaseId, "Item1", Transition.Complete), completeAction -> {
-                testCase.getEventListener().awaitPlanItemState(item1InSubCase, State.Completed);
-                TestScript.debugMessage("Main case: " + mainCasePlan); // This will not print latest state, better freshly get that case and then print
-                testCase.getEventListener().awaitPlanItemState(subCaseId, State.Completed);
-            });
-
-            /**
-             * Suspending NonBlockingSubCaseTask from MainCase should not suspend SubCase task, and the CasePlan of the
-             * non-blocking subcase must still be Active.
-             */
-            testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "NonBlockingSubCaseTask", Transition.Suspend), suspendedMainCase -> {
-                TestScript.debugMessage("resulting main case: " + suspendedMainCase);
-                testCase.insertStep(testCase.createPingCommand(testUser, nonBlockingSubCaseId, 100), nonBlockingSubCasePlan -> {
-                    TestScript.debugMessage("resulting non-blocking sub case: " + nonBlockingSubCasePlan);
-                    nonBlockingSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Start, State.Active, State.Available);
+                // Suspending subCaseTask from MainCase should also suspend SubCase task
+                // And the transition in SubCase task Should be ParentSuspend, but since this is async we first need to ping the sub case with a bit of delay
+                testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "SubCaseTask", Transition.Suspend), result ->
+                {
+                    testCase.getEventListener().awaitPlanItemState(subCaseId, State.Suspended);
+                    testCase.getEventListener().awaitPlanItemState(item1InSubCase, Transition.ParentSuspend, State.Suspended, State.Active);
                 });
-            });
 
-            /**
-             * Suspend the Item1 in NonBlockingSubCase
-             */
-            testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Suspend), nonBlockingSubCasePlan -> {
-                TestScript.debugMessage("resulting non-blocking sub case: " + nonBlockingSubCasePlan);
-                nonBlockingSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Suspend, State.Suspended, State.Active);
-            });
+                // Resume SubCaseTask from MainCase - This should also resume Item1 in SubCase
+                testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "SubCaseTask", Transition.Resume), result ->
+                {
+                    testCase.getEventListener().awaitPlanItemState(subCaseId, State.Active);
+                    testCase.getEventListener().awaitPlanItemState(item1InSubCase, Transition.ParentResume, State.Active, State.Suspended);
+                });
 
-            /**
-             * Complete the subCaseTask - First resume the SubCaseTask and complete it
-             */
+                // Complete Item1 from SubCase - This should also complete the SubCaseTask in MainCase
+                testCase.addStep(new MakePlanItemTransition(testUser, subCaseId, "Item1", Transition.Complete), completeAction -> {
+                    testCase.getEventListener().awaitPlanItemState(item1InSubCase, State.Completed);
+                    TestScript.debugMessage("Main case: " + mainCasePlan); // This will not print latest state, better freshly get that case and then print
+                    testCase.getEventListener().awaitPlanItemState(subCaseId, State.Completed);
+                });
 
-            /**
-             * Resume SubCaseTask from SubCase
-             */
-            testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Resume), resumeSubCasePlan -> {
-                TestScript.debugMessage("resulting non-blocking sub case: " + resumeSubCasePlan);
-                resumeSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Resume, State.Active, State.Suspended);
-            });
+                /**
+                 * Suspending NonBlockingSubCaseTask from MainCase should not suspend SubCase task, and the CasePlan of the
+                 * non-blocking subcase must still be Active.
+                 */
+                testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "NonBlockingSubCaseTask", Transition.Suspend), suspendedMainCase -> {
+                    TestScript.debugMessage("resulting main case: " + suspendedMainCase);
+                    testCase.insertStep(TestScript.createPingCommand(testUser, nonBlockingSubCaseId, 100), nonBlockingSubCasePlan -> {
+                        TestScript.debugMessage("resulting non-blocking sub case: " + nonBlockingSubCasePlan);
+                        nonBlockingSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Start, State.Active, State.Available);
+                    });
+                });
 
-            /**
-             * Complete Item1 from SubCase
-             */
-            testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Complete), completedSubCasePlan -> {
-                TestScript.debugMessage("NonBlockingSubCase: " + completedSubCasePlan);
-                completedSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
-                TestScript.debugMessage("MainCase: " + mainCasePlan); // Probably better to ping and fetch again
+                /**
+                 * Suspend the Item1 in NonBlockingSubCase
+                 */
+                testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Suspend), nonBlockingSubCasePlan -> {
+                    TestScript.debugMessage("resulting non-blocking sub case: " + nonBlockingSubCasePlan);
+                    nonBlockingSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Suspend, State.Suspended, State.Active);
+                });
+
+                /**
+                 * Complete the subCaseTask - First resume the SubCaseTask and complete it
+                 */
+
+                /**
+                 * Resume SubCaseTask from SubCase
+                 */
+                testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Resume), resumeSubCasePlan -> {
+                    TestScript.debugMessage("resulting non-blocking sub case: " + resumeSubCasePlan);
+                    resumeSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Resume, State.Active, State.Suspended);
+                });
+
+                /**
+                 * Complete Item1 from SubCase
+                 */
+                testCase.addStep(new MakePlanItemTransition(testUser, nonBlockingSubCaseId, "Item1", Transition.Complete), completedSubCasePlan -> {
+                    TestScript.debugMessage("NonBlockingSubCase: " + completedSubCasePlan);
+                    completedSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
+                    TestScript.debugMessage("MainCase: " + mainCasePlan); // Probably better to ping and fetch again
+                });
+
             });
         });
 
@@ -199,19 +204,28 @@ public class TestSubCase {
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerFailingBlockingSubCaseTask", Transition.Complete), mainCasePlan -> {
             testCase.getEventListener().awaitPlanItemState("TriggerFailingBlockingSubCaseTask", State.Completed);
-            String subCaseId = testCase.getEventListener().awaitPlanItemState("FailingBlockingSubCaseTask", State.Active).getPlanItemId();
+            String failingBlockingSubCaseTaskId = testCase.getEventListener().awaitPlanItemState("FailingBlockingSubCaseTask", State.Active).getPlanItemId();
             testCase.getEventListener().awaitPlanItemState("FailingBlockingSubCaseTask", Transition.Fault, State.Failed, State.Active);
             mainCasePlan.print();
 
-            ValueMap validMainRequest = new ValueMap();
-            validMainRequest.plus("aBoolean", false);
-            testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> r.print()); // print the updated case file
+            testCase.insertStep(TestScript.createPingCommand(testUser, caseInstanceId, 1000), y -> {
+                ValueMap validMainRequest = new ValueMap();
+                validMainRequest.plus("aBoolean", false);
+                testCase.insertStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> {
+                    r.print();
+                    testCase.insertStep(TestScript.createPingCommand(testUser, caseInstanceId, 2000), e2 -> {
+                        testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), x -> {
+                            testCase.insertStep(TestScript.createPingCommand(testUser, caseInstanceId, 1000), e -> {
+                                // SubCaseTask should be active
+                                testCase.getEventListener().awaitPlanItemState(failingBlockingSubCaseTaskId, State.Active);
+                                x.print();
+                                // Task Item1 in subcase should also be active
+                                testCase.getEventListener().awaitPlanItemState("Item1", State.Active);
+                            });
+                        });
+                    });
 
-            testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), r -> {
-                // SubCaseTask should be active
-                testCase.getEventListener().awaitPlanItemState(subCaseId, State.Active);
-                // Task Item1 in subcase should also be active
-                testCase.getEventListener().awaitPlanItemState("Item1", State.Active);
+                }); // print the updated case file
             });
         });
 
