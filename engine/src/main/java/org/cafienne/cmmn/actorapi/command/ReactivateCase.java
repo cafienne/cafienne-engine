@@ -20,6 +20,7 @@ package org.cafienne.cmmn.actorapi.command;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
+import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -61,39 +62,50 @@ public class ReactivateCase extends StartCase {
 
     @Override
     public void validate(Case caseInstance) {
-        // Now validate the input parameters - especially whether they exist in the definition
-        inputParameters.getValue().forEach((inputParameterName, value) -> {
-            InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(inputParameterName);
-            if (inputParameterDefinition == null) { // Validate whether this input parameter actually exists in the Case
-                throw new InvalidCommandException("An input parameter with name " + inputParameterName + " is not defined in the case");
+        if (caseInstance.getCasePlan() == null) {
+            // Case was never instantiated
+            super.validate(caseInstance);
+        } else {
+
+            // Now validate the input parameters - especially whether they exist in the definition
+            inputParameters.getValue().forEach((inputParameterName, value) -> {
+                InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(inputParameterName);
+                if (inputParameterDefinition == null) { // Validate whether this input parameter actually exists in the Case
+                    throw new InvalidCommandException("An input parameter with name " + inputParameterName + " is not defined in the case");
+                }
+                inputParameterDefinition.validate(value);
+            });
+
+            // If the case team is empty, add current user both as member and as owner,
+            //  including default mapping of tenant roles to case team roles
+            if (caseTeam.isEmpty()) {
+                caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
+                caseTeam = CaseTeam.create(getUser());
             }
-            inputParameterDefinition.validate(value);
-        });
 
-        // If the case team is empty, add current user both as member and as owner,
-        //  including default mapping of tenant roles to case team roles
-        if (caseTeam.isEmpty()) {
-            caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
-            caseTeam = CaseTeam.create(getUser());
+            if (caseTeam.owners().isEmpty()) {
+                throw new CaseTeamError("The case team needs to have at least one owner");
+            }
+
+            // Validates the member and roles
+            caseTeam.validate(definition.getCaseTeamModel());
         }
-
-        if (caseTeam.owners().isEmpty()) {
-            throw new CaseTeamError("The case team needs to have at least one owner");
-        }
-
-        // Validates the member and roles
-        caseTeam.validate(definition.getCaseTeamModel());
     }
 
     @Override
     public void processCaseCommand(Case caseInstance) {
-        // First replace the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
-        caseInstance.getCaseTeam().replace(caseTeam);
+        if (caseInstance.getCasePlan() == null) {
+            // Case was never instantiated
+            super.processCaseCommand(caseInstance);
+        } else {
+            // First replace the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
+            caseInstance.getCaseTeam().replace(caseTeam);
 
-        // Apply input parameters. This may also fill the CaseFile
-        caseInstance.addDebugInfo(() -> "Input parameters for new case of type " + definition.getName(), inputParameters);
-        caseInstance.setInputParameters(inputParameters);
+            // Apply input parameters. This may also fill the CaseFile
+            caseInstance.addDebugInfo(() -> "Input parameters for new case of type " + definition.getName(), inputParameters);
+            caseInstance.setInputParameters(inputParameters);
 
-        caseInstance.getCasePlan().makeTransition(Transition.Reactivate);
+            caseInstance.getCasePlan().makeTransition(Transition.Reactivate);
+        }
     }
 }
