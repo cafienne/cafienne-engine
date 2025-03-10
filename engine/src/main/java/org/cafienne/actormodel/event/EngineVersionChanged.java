@@ -27,7 +27,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class EngineVersionChanged extends BaseModelEvent<ModelActor> {
+public class EngineVersionChanged extends CaseSystemEvent {
 
     private final EngineVersion version;
 
