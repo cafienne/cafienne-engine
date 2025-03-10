@@ -62,18 +62,17 @@ class Reception {
     }
 
     void handleMessage(Object message) {
-        if (message instanceof IncomingActorMessage visitor) {
-            // Responses are always allowed, as they come only when we have requested something
-            if (visitor.isResponse() || canPass(visitor.asCommand())) {
-                backOffice.performTransaction(visitor);
+        switch (message) {
+            case IncomingActorMessage visitor -> {
+                // Responses are always allowed, as they come only when we have requested something
+                if (visitor.isResponse() || canPass(visitor.asCommand())) {
+                    backOffice.performTransaction(visitor);
+                }
             }
-        } else if (message instanceof SnapshotProtocol.Message) {
-            // Weirdly enough snapshotting takes a different route than event persistence...
-            actor.handleSnapshotProtocolMessage((SnapshotProtocol.Message) message);
-        } else if (message instanceof JournalProtocol.Message) {
-            actor.handleJournalProtocolMessage((JournalProtocol.Message) message);
-        } else {
-            actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
+            case SnapshotProtocol.Message snapshotMsg -> actor.handleSnapshotProtocolMessage(snapshotMsg); // Weirdly enough snapshotting takes a different route than event persistence...
+            case JournalProtocol.Message journalMsg -> actor.handleJournalProtocolMessage(journalMsg);
+            case null -> actor.getLogger().warn("{} received a null message from {}", actor, actor.sender());
+            default -> actor.getLogger().warn("{} received a message it cannot handle, of type {}", actor, message.getClass().getName());
         }
     }
 
@@ -124,7 +123,7 @@ class Reception {
     }
 
     private boolean informAboutRecoveryFailure(IncomingActorMessage msg) {
-        actor.getLogger().warn("Aborting recovery of " + actor + " upon request of type "+msg.getClass().getSimpleName() + " from user " + msg.getUser().id() + ". " + recoveryFailureInformation);
+        actor.getLogger().warn("Aborting recovery of " + actor + " upon request of type " + msg.getClass().getSimpleName() + " from user " + msg.getUser().id() + ". " + recoveryFailureInformation);
         if (msg.isCommand()) {
             if (msg.isBootstrapMessage()) {
                 // Trying to do e.g. StartCase in e.g. a TenantActor
@@ -135,7 +134,7 @@ class Reception {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
                 actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
             }
-            actor.takeABreak("Removing ModelActor["+actor.getId()+"] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
+            actor.takeABreak("Removing ModelActor[" + actor.getId() + "] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
         }
         return false;
     }
