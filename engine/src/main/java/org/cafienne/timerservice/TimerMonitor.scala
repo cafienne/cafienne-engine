@@ -21,6 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.Done
 import org.apache.pekko.actor.Scheduler
 import org.apache.pekko.persistence.query.Offset
+import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
 import org.cafienne.system.health.HealthMonitor
 
@@ -47,6 +48,10 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {
     activeTimers.remove(timerId).map(schedule => schedule.cancel())
     runStorage(timerService.storage.removeTimer(timerId, offset))
+  }
+
+  def handleResponseMessage(response: ModelResponse): Unit = {
+    activeTimers.values.filter(timer => timer.command.getMessageId eq response.getMessageId).foreach(_.handleResponse(response))
   }
 
   def runStorage(function: => Future[Done]): Future[Done] = {

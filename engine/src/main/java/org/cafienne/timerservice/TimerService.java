@@ -17,9 +17,8 @@
 
 package org.cafienne.timerservice;
 
-import org.apache.pekko.persistence.SnapshotOffer;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.ModelEvent;
+import org.apache.pekko.actor.AbstractActor;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.timerservice.persistence.TimerStore;
 import org.cafienne.timerservice.persistence.TimerStoreProvider;
@@ -29,50 +28,32 @@ import org.slf4j.LoggerFactory;
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
-public class TimerService extends ModelActor {
+public class TimerService extends AbstractActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
     public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
+    final CaseSystem caseSystem;
     final TimerStore storage;
     final TimerEventSink eventSink;
     final TimerMonitor monitor;
 
     public TimerService(CaseSystem caseSystem) {
-        super(caseSystem);
+        this.caseSystem = caseSystem;
         this.storage = new TimerStoreProvider(caseSystem).store();
         this.monitor = new TimerMonitor(this);
         this.eventSink = new TimerEventSink(this);
-        setEngineVersion(caseSystem.version());
-    }
-
-    @Override
-    protected boolean supportsCommand(Object msg) {
-        return false;
-    }
-
-    @Override
-    protected boolean supportsEvent(ModelEvent msg) {
-        return false;
-    }
-
-    @Override
-    protected boolean hasAutoShutdown() {
-        return false;
-    }
-
-    @Override
-    public String persistenceId() {
-        return CAFIENNE_TIMER_SERVICE;
-    }
-
-    @Override
-    protected void recoveryCompleted() {
-        logger.warn("Starting Timer Service - loading timers every " + caseSystem.config().engine().timerService().interval() + " for a window of " + caseSystem.config().engine().timerService().window() + " ahead");
+        logger.warn("Starting Timer Service - loading timers every {} for a window of {} ahead", caseSystem.config().engine().timerService().interval(), caseSystem.config().engine().timerService().window());
         monitor.start();
         eventSink.start();
     }
 
+    private void handleMessage(Object message) {
+        if (message instanceof ModelResponse response) {
+            monitor.handleResponseMessage(response);
+        }
+    }
+
     @Override
-    protected void handleSnapshot(SnapshotOffer snapshot) {
-        logger.error("Timer Service no longer supports snapshot offers. This functionality was deprecated in Cafienne Engine version 1.1.13 and is completely removed in version 1.1.18");
+    public Receive createReceive() {
+        return receiveBuilder().match(Object.class, this::handleMessage).build();
     }
 }

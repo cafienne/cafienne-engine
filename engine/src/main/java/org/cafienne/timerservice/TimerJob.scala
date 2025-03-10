@@ -17,8 +17,8 @@
 
 package org.cafienne.timerservice
 
-import org.apache.pekko.actor.{Cancellable, Scheduler}
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor.{Cancellable, Scheduler}
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
@@ -28,29 +28,62 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 
 class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: Scheduler) extends Runnable with LazyLogging {
   val command = new RaiseEvent(timer.user, timer.caseInstanceId, timer.timerId)
-  val millis: Long = timer.moment.toEpochMilli
-  val delay: Long = millis - System.currentTimeMillis
+  private val millis: Long = timer.moment.toEpochMilli
+  private val delay: Long = millis - System.currentTimeMillis
+  private val responseTracker = new ResponseTracker
+  private var count = 0L
 
   val duration: FiniteDuration = Duration.create(delay, TimeUnit.MILLISECONDS)
   logger.whenDebugEnabled(logger.debug(s"Scheduling to run timer request ${timer.timerId} in ${duration.length / 1000}.${duration.length % 1000} seconds from now (at ${timer.moment})"))
   val schedule: Cancellable = scheduler.scheduleOnce(duration, this)
 
   def run(): Unit = {
+    // This is the first time the timer goes off. We're sending raiseEvent, and start an additional internal timer.
+    //  this internal timer tracks whether a response is gotten back from the case instance.
+    //  if this is not received within 10 seconds, it tries again, up to 10 times.
+    invokeTimer()
+  }
+
+  private def invokeTimer(): Unit = {
+    count += 1
     logger.whenDebugEnabled(logger.debug(s"Raising timer in case ${timer.caseInstanceId} for timer ${timer.timerId} on behalf of user ${timer.userId}"))
-    timerService.askModel(command, handleFailingCaseInvocation, handleCaseInvocation)
+    if (count > 1) {
+      logger.warn(s"Attempt number $count to raise timer $timer in case ${timer.caseInstanceId}.")
+    }
+    timerService.caseSystem.gateway.inform(command, timerService.self);
+    responseTracker.start()
   }
 
   def cancel(): Boolean = {
     schedule.cancel()
   }
 
-  def handleFailingCaseInvocation(failure: CommandFailure): Unit = {
-    // TODO: we can also update the timer state in the storage???
-    logger.warn(s"Could not trigger timer $timer in case ${timer.caseInstanceId}:" + failure.toJson)
+  def handleResponse(response: ModelResponse): Unit = {
+    responseTracker.stop()
+    response match {
+      case failure: CommandFailure =>
+        logger.warn(s"Could not trigger timer $timer in case ${timer.caseInstanceId}:" + failure.exception())
+      case _ => // nothing to do, the response tracker is already stopped.
+    }
   }
 
-  def handleCaseInvocation(response: ModelResponse): Unit = {
-    // TODO: we can also delete the timer here, or update a state for that timer in the store
-    logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer $timer in case ${timer.caseInstanceId}"))
+  private class ResponseTracker extends Runnable {
+    private var retry: Option[Cancellable] = None
+
+    def run(): Unit = {
+      invokeTimer()
+    }
+
+    def start(): Unit = {
+      if (count > 10) {
+        logger.warn(s"Tried 10 attempts to trigger timer $timer in case ${timer.caseInstanceId}, without getting a response. Timer-retry mechanism is canceled.")
+      } else {
+        stop() // First stop any current schedules
+        retry = Some(scheduler.scheduleOnce(Duration.create(10, TimeUnit.SECONDS), this))
+      }
+    }
+    def stop(): Unit = {
+      retry.foreach(_.cancel());
+    }
   }
 }
