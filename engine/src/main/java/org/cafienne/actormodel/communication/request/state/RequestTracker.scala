@@ -19,6 +19,7 @@ class RequestTracker(val request: Request, val caseSystem: CaseSystem) extends R
     if (count > maxAttempts) {
       logger.warn(s"Maximum number $maxAttempts of attempts to send request is reached. Timer-retry mechanism is canceled.")
       stop()
+      request.failed()
     } else {
       logger.warn(s"Retrying (attempt $count) to send request $request to ${request.getCommand.getActorId} for which so far no delivery confirmation was received")
       request.send()

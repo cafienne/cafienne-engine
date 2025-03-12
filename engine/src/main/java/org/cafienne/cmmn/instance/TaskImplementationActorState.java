@@ -20,6 +20,7 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.communication.request.state.RemoteActorState;
 import org.cafienne.actormodel.communication.request.response.ActorRequestDeliveryReceipt;
 import org.cafienne.actormodel.communication.request.response.ActorRequestFailure;
+import org.cafienne.actormodel.communication.request.state.Request;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationNotStarted;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationReactivated;
@@ -56,6 +57,12 @@ public class TaskImplementationActorState extends RemoteActorState<Case> {
     @Override
     public void handleFailure(ActorRequestFailure failure) {
         actor.addEvent(new TaskCommandRejected(task, failure.command, failure.exceptionAsJSON));
+    }
+
+    @Override
+    protected void requestDeliveryFailed(Request request) {
+        task.addDebugInfo(() -> "Task " + task + " reports failure on sending implementation request " + request);
+        task.getCaseInstance().self().tell(new ActorRequestFailure(request.getCommand(), new Exception("Could not deliver command to implementation")), task.getCaseInstance().self());
     }
 
     void updateState(TaskImplementationStarted event) {

@@ -61,4 +61,7 @@ public abstract class RemoteActorState<LocalActor extends ModelActor> {
     public final void recoveryCompleted() {
         requests.values().forEach(Request::recoveryCompleted);
     }
+
+    protected void requestDeliveryFailed(Request request) {
+    }
 }
