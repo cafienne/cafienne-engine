@@ -126,10 +126,7 @@ class CaseQueriesImpl(queryDB: QueryDB)
   }
 
   override def getCaseTeam(caseInstanceId: String, user: UserIdentity): Future[CaseTeamResponse] = {
-    val usersQuery = for {
-      users <- TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === caseInstanceId)
-      _ <- membershipQuery(user, caseInstanceId)
-    } yield users
+    val usersQuery = TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === caseInstanceId)
     val tenantRolesQuery = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
     val groupsQuery = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
 
@@ -138,9 +135,10 @@ class CaseQueriesImpl(queryDB: QueryDB)
       tenantRoleRecords <- db.run(tenantRolesQuery.result)
       groupRecords <- db.run(groupsQuery.result)
       roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).map(_.roleName).result)
-    } yield (userRecords, tenantRoleRecords, groupRecords, roleRecords))
+      membership <- db.run(membershipQuery(user, caseInstanceId).result)
+    } yield (userRecords, tenantRoleRecords, groupRecords, roleRecords, membership))
       .map(records => {
-        if (records._1.isEmpty) {
+        if (records._5.isEmpty) {
           throw CaseSearchFailure(caseInstanceId)
         }
         val users = records._1
