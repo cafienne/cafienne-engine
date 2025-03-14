@@ -18,7 +18,7 @@
 package org.cafienne.infrastructure.serialization.serializers
 
 import org.cafienne.infrastructure.serialization.CafienneSerializer
-import org.cafienne.storage.actormodel.event.ChildrenReceived
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, TimerDataCleared}
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
 import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
@@ -43,6 +43,7 @@ object StorageSerializers {
     CafienneSerializer.addManifestWrapper(classOf[RemovalStarted], RemovalStarted.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RemovalRequested], RemovalRequested.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[QueryDataRemoved], QueryDataRemoved.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[TimerDataCleared], TimerDataCleared.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildrenRemovalInitiated], ChildrenRemovalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RemovalCompleted], RemovalCompleted.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RemovalRejected], RemovalRejected.deserialize)

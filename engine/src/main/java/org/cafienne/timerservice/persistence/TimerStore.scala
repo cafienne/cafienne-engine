@@ -43,6 +43,8 @@ trait TimerStore extends LazyLogging {
 
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done]
 
+  def removeCaseTimers(caseInstanceId: String): Future[Done]
+
   /**
     * Return a description for this type of timer store, defaults to simple class name
     */

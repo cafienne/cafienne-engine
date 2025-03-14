@@ -19,6 +19,7 @@ package org.cafienne.timerservice;
 
 import org.apache.pekko.actor.AbstractActor;
 import org.cafienne.actormodel.response.ModelResponse;
+import org.cafienne.storage.actormodel.command.ClearTimerData;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.timerservice.persistence.TimerStore;
 import org.cafienne.timerservice.persistence.TimerStoreProvider;
@@ -46,14 +47,8 @@ public class TimerService extends AbstractActor {
         eventSink.start();
     }
 
-    private void handleMessage(Object message) {
-        if (message instanceof ModelResponse response) {
-            monitor.handleResponseMessage(response);
-        }
-    }
-
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(Object.class, this::handleMessage).build();
+        return receiveBuilder().match(Object.class, monitor::handleActorMessage).build();
     }
 }

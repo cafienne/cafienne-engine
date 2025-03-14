@@ -19,10 +19,12 @@ package org.cafienne.timerservice
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.Done
-import org.apache.pekko.actor.Scheduler
+import org.apache.pekko.actor.{ActorRef, Scheduler}
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
+import org.cafienne.storage.actormodel.command.ClearTimerData
+import org.cafienne.storage.actormodel.event.TimerDataCleared
 import org.cafienne.system.health.HealthMonitor
 
 import scala.collection.mutable
@@ -45,13 +47,33 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
     scheduler.scheduleWithFixedDelay(interval, interval)(reader)
   }
 
+  def handleActorMessage(message: Object): Future[Done] = {
+    message match {
+      case response: ModelResponse =>
+        // Find the active timer we just triggered and inform it about the response
+        activeTimers.values.filter(timer => timer.command.getMessageId eq response.getMessageId).foreach(_.handleResponse(response))
+        Future.successful(Done)
+      case clearTimers: ClearTimerData =>
+        val sender: ActorRef = timerService.sender()
+        removeCaseTimers(clearTimers.metadata.actorId).map(done => {
+          sender.tell(TimerDataCleared(clearTimers.metadata), timerService.self)
+          done
+        })
+      case _ =>
+        logger.warn(s"TimerService received an unknown message. The message will be ignored. Type of message is: " + message.getClass.getSimpleName)
+        Future.successful(Done)
+    }
+  }
+
+  def removeCaseTimers(caseInstanceId: String): Future[Done] = {
+    activeTimers.values.filter(timer => timer.command.actorId eq caseInstanceId).map(schedule => schedule.cancel())
+    runStorage(timerService.storage.removeCaseTimers(caseInstanceId))
+    Future.successful(Done)
+  }
+
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {
     activeTimers.remove(timerId).map(schedule => schedule.cancel())
     runStorage(timerService.storage.removeTimer(timerId, offset))
-  }
-
-  def handleResponseMessage(response: ModelResponse): Unit = {
-    activeTimers.values.filter(timer => timer.command.getMessageId eq response.getMessageId).foreach(_.handleResponse(response))
   }
 
   def runStorage(function: => Future[Done]): Future[Done] = {
