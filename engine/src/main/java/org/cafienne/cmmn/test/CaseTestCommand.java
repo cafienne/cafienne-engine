@@ -133,8 +133,8 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
         return testScript.getEventListener();
     }
 
-    public String getCommandDescription() {
-        return "CaseTestCommand[" + getActualCommand().getCommandDescription() +"]";
+    public String getDescription() {
+        return "CaseTestCommand[" + getActualCommand().getDescription() +"]";
     }
 
     @Override

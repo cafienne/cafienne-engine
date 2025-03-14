@@ -17,25 +17,47 @@
 
 package org.cafienne.system.router
 
-import org.apache.pekko.actor.{ActorRef, Props, Terminated}
+import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor.{Actor, ActorRef, Props, Terminated}
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.ActorTerminated
+import org.cafienne.infrastructure.serialization.DeserializationFailure
 import org.cafienne.system.CaseSystem
 
 import scala.collection.mutable
 
 /**
-  * In-memory router for messages sent in the CaseSystem.
-  * Facilitates actor management in a non-clustered actor system.
-  */
-class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef], terminationRequests: mutable.Map[String, ActorRef]) extends CaseMessageRouter {
+ * In-memory router for messages sent in the CaseSystem.
+ * Facilitates actor management in a non-clustered actor system.
+ */
+class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef], terminationRequests: mutable.Map[String, ActorRef]) extends Actor with LazyLogging {
   logger.info(s"Starting case system in local mode, opening router for ${self.path.name}")
+
+  def receive: Actor.Receive = {
+    case kill: TerminateModelActor =>
+      logger.info(s"Received termination request for actor ${kill.actorId}")
+      terminateActor(kill)
+    case m: ModelCommand => forwardMessage(m)
+    case t: Terminated => removeActorRef(t)
+    case d: DeserializationFailure => handleDeserializationFailure(d)
+    case other => handleUnknownMessage(other);
+  }
+
+  def handleDeserializationFailure(value: DeserializationFailure): Unit = {
+    logger.warn(s"The ${getClass.getSimpleName} received a ${value.getClass.getSimpleName} on manifest ${value.manifest}.", value.exception)
+  }
+
+  def handleUnknownMessage(value: Any): Unit = {
+    logger.warn("The " + getClass.getSimpleName + " received an unknown message of type " + value.getClass.getName + ". Enable debug logging to see the contents of the message")
+    logger.whenDebugEnabled(logger.debug("Message:\n", value))
+  }
+
   /**
     * Forward a command to the appropriate ModelActor. Actor will be created if it does not yet exist.
     *
     * @param m
     */
-  override def forwardMessage(m: ModelCommand): Unit = {
+  def forwardMessage(m: ModelCommand): Unit = {
     actors.getOrElseUpdate(m.actorId, createActorRef(m)).forward(m)
   }
 
@@ -53,7 +75,7 @@ class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef],
     ref
   }
 
-  override def terminateActor(msg: TerminateModelActor): Unit = {
+  def terminateActor(msg: TerminateModelActor): Unit = {
     val actorId = msg.actorId;
     // If the actor is not (or no longer) in memory, We can immediately inform the sender
     actors.get(actorId).fold({
@@ -71,7 +93,7 @@ class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef],
     * @param t
     * @return
     */
-  override def removeActorRef(t: Terminated): Unit = {
+  def removeActorRef(t: Terminated): Unit = {
     val actorId = t.actor.path.name
     logger.whenDebugEnabled(logger.debug("ModelActor[" + actorId + "] has been terminated. Removing routing reference"))
     if (actors.remove(actorId).isEmpty) {

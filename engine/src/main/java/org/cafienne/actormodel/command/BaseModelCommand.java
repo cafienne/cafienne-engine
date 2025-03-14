@@ -17,17 +17,16 @@
 
 package org.cafienne.actormodel.command;
 
-import org.apache.pekko.actor.ActorPath;
-import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import org.apache.pekko.actor.ActorPath;
+import org.apache.pekko.actor.ActorRef;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
@@ -36,12 +35,14 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
+    private final ValueMap json;
     protected final String msgId;
     public final String actorId;
-    public ActorRef sender;
+    private ActorRef sender;
     protected transient T actor;
     private ModelResponse response;
 
@@ -51,6 +52,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     private final U user;
 
     protected BaseModelCommand(U user, String actorId) {
+        this.json = new ValueMap();
         // First, validate actor id
         if (actorId == null) {
             throw new InvalidCommandException("Actor id cannot be null");
@@ -69,6 +71,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected BaseModelCommand(ValueMap json) {
+        this.json = json;
         this.msgId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.user = readUser(json.with(Fields.user));
@@ -76,17 +79,14 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
 
     /**
      * Model actor specific command to is responsible for deserializing user to appropriate type.
-     * @param json
-     * @return
      */
     protected abstract U readUser(ValueMap json);
 
     /**
      * Through this method, the command is made aware of the actor that is handling it.
-     * @param actor
      */
     @Override
-    public final void setActor(ModelActor actor) {
+    public void setActor(ModelActor actor) {
         this.actor = (T) actor;
         this.sender = actor.getSender();
     }
@@ -132,7 +132,6 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     /**
      * Note: this method will only return a sensible value when it is invoked from within the command handling context.
      * It is intended for command handlers to have more metadata when creating a ModelResponse.
-     * @return
      */
     public T getActor() {
         return actor;
@@ -140,8 +139,6 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
 
     /**
      * Returns the user context for this command.
-     *
-     * @return
      */
     @Override
     public final U getUser() {
@@ -150,7 +147,6 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
 
     /**
      * Returns a string with the identifier of the actor towards this command must be sent.
-     * @return
      */
     @Override
     public final String getActorId() {
@@ -160,8 +156,6 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     /**
      * Returns the correlation id of this command, that can be used to relate a {@link CaseResponse} back to this
      * original command.
-     *
-     * @return
      */
     public String getMessageId() {
         return msgId;
@@ -172,15 +166,12 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
      * Implementations may override this method to implement their own validation logic.
      * Implementations may throw the {@link InvalidCommandException} if they encounter a validation error
      *
-     * @param modelActor
      * @throws InvalidCommandException If the command is invalid
      */
     public abstract void validate(T modelActor) throws InvalidCommandException;
 
     /**
      * Method to be implemented to handle the command.
-     * @param modelActor
-     * @return
      */
     public abstract void process(T modelActor);
 
@@ -190,14 +181,27 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     protected void writeModelCommand(JsonGenerator generator) throws IOException {
+        writeField(generator, Fields.type, this.getCommandDescription());
         writeField(generator, Fields.messageId, this.getMessageId());
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.user, user);
     }
 
-    @Override
-    public String getCommandDescription() {
-        return getClass().getSimpleName();
+    public ValueMap rawJson() {
+        if (this.json.getValue().isEmpty()) {
+            // We first need to serialize...
+            JsonFactory factory = new JsonFactory();
+            StringWriter sw = new StringWriter();
+            try (JsonGenerator generator = factory.createGenerator(sw)) {
+                generator.setPrettyPrinter(new DefaultPrettyPrinter());
+                writeThisObject(generator);
+                return JSONReader.parse(sw.toString());
+//                return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
+            } catch (IOException | JSONParseFailure e) {
+                return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
+            }
+        }
+        return this.json;
     }
 
     public String toString() {

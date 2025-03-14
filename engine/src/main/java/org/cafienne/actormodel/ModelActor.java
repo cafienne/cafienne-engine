@@ -17,21 +17,21 @@
 
 package org.cafienne.actormodel;
 
+import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.PoisonPill;
 import org.apache.pekko.persistence.AbstractPersistentActor;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotOffer;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.communication.reply.state.IncomingRequestState;
+import org.cafienne.actormodel.communication.request.state.RemoteActorState;
 import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.CommandFailureListener;
-import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.EngineVersion;
@@ -42,28 +42,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class ModelActor extends AbstractPersistentActor {
 
     private final static Logger logger = LoggerFactory.getLogger(ModelActor.class);
     /**
-     * The tenant in which this model is ran by the engine.
+     * The tenant in which this model is run by the engine.
      */
     private String tenant;
     /**
-     * The identifier of the model. Is expected to be unique. However, in practice it is derived from the Actor's path.
+     * The identifier of the model. Is expected to be unique. However, in practice it is derived from the Actor path.
      */
     private final String id;
     /**
-     * Front door knows ModelActor state, and determines whether visitors can pass.
+     * The monitor removes this actor from memory after it has been idle for a certain period
      */
-    private final Reception reception = new Reception(this);
+    private final ModelActorMonitor monitor = new ModelActorMonitor(this);
     /**
      * Storage area for the ModelActor, keeps track of state changes
      */
-    private final Warehouse warehouse = reception.warehouse;
+    private final BackOffice backOffice = new BackOffice(this, monitor);
+    /**
+     * Front door knows ModelActor state, and determines whether visitors can pass.
+     */
+    private final Reception reception = new Reception(this, backOffice);
+    /**
+     * If ModelActors send messages to each other, the state of that is handled in the ModelActorCommunication class
+     */
+    private final ModelActorCommunication actorCommunication = new ModelActorCommunication(this);
     /**
      * User context of current message
      */
@@ -72,12 +78,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Flag indicating whether the model actor runs in debug mode or not
      */
     private boolean debugMode;
-
-    /**
-     * Registration of listeners that are interacting with (other) models through this case.
-     */
-    private final Map<String, Responder> responseListeners = new HashMap<>();
-
     /**
      * CaseScheduler is a lightweight manager to schedule asynchronous works for this Case instance.
      */
@@ -87,7 +87,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private Instant lastModified;
     /**
-     * The moment the next transaction is started; will be used to fill the LastModified event and also inbetween timestamps in events.
+     * The moment the next transaction is started; will be used to fill the LastModified event and also in between timestamps in events.
      */
     private Instant transactionTimestamp;
 
@@ -130,9 +130,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns the id of the parent of this model, i.e., the one that created this model
-     * and maintains it's lifecycle. Should return null or an empty string if there is none.
-     *
-     * @return
+     * and maintains its lifecycle. Should return null or an empty string if there is none.
      */
     public String getParentActorId() {
         return "";
@@ -140,9 +138,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns the id of the parent of this model, i.e., the one that created this model
-     * and maintains it's lifecycle. Should return null or an empty string if there is none.
-     *
-     * @return
+     * and maintains its lifecycle. Should return null or an empty string if there is none.
      */
     public String getRootActorId() {
         return getId();
@@ -150,8 +146,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns the Guid of the model instance
-     *
-     * @return
      */
     public String getId() {
         return id;
@@ -166,8 +160,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Switch debug mode of the ModelActor.
      * When debug mode is enabled, log messages will be added to a DebugEvent that is persisted upon handling
      * an incoming message or recovery.
-     *
-     * @param debugMode
      */
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
@@ -175,8 +167,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns true if the model actor runs in debug mode, false otherwise.
-     *
-     * @return
      */
     public boolean debugMode() {
         return this.debugMode;
@@ -184,8 +174,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns the user context of the current command, event or response
-     *
-     * @return
      */
     public UserIdentity getCurrentUser() {
         return currentUser;
@@ -199,8 +187,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * Returns the scheduler for handling async work (from ProcessTasks and TimerEvent executions).
      * This is just a simple wrapper/delegator for a 'real' scheduler, allowing more fine-grained control
      * over async work in case of restarting an actor due to an error.
-     *
-     * @return
      */
     public CaseScheduler getScheduler() {
         return this.scheduler;
@@ -218,8 +204,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Hook for handling snapshots.
-     *
-     * @param snapshot
      */
     protected void handleSnapshot(SnapshotOffer snapshot) {
     }
@@ -229,6 +213,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     protected void handleJournalProtocolMessage(JournalProtocol.Message message) {
 //        System.out.println(this + ": Received " + message.getClass().getName());
+    }
+
+    final void informRecoveryCompletion() {
+        actorCommunication.recoveryCompleted();
+        recoveryCompleted();
     }
 
     protected void recoveryCompleted() {
@@ -251,56 +240,14 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Adds an event to the current message handling context
-     *
-     * @param event
-     * @param <E>
-     * @return
      */
     public <E extends ModelEvent> E addEvent(E event) {
-        warehouse.storeEvent(event);
+        backOffice.storeEvent(event);
         return event;
-    }
-
-    public Responder getResponseListener(String msgId) {
-        synchronized (responseListeners) {
-            return responseListeners.remove(msgId);
-        }
-    }
-
-    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
-    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
-    /**
-     * askModel allows communication between ModelActors. One case (or, typically, a plan item's special logic) can ask another case to execute
-     * a command, and when the response is received back from the other case, the handler is invoked with that response.
-     * Note that nothing will be sent to the other actor when recovery is running.
-     *
-     * @param command The message to send
-     * @param left    Listener to handle response failures.
-     * @param right   Optional listener to handle response success.
-     */
-    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        if (recoveryRunning()) {
-//            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
-            return;
-        }
-        synchronized (responseListeners) {
-            responseListeners.put(command.getMessageId(), new Responder(command, left, right));
-        }
-        addDebugInfo(() -> "----------" + this + " sends command " + command.getCommandDescription(), command.rawJson());
-
-        caseSystem.gateway().inform(command, self());
     }
 
     /**
      * Returns the tenant in which the model is running.
-     *
-     * @return
      */
     public final String getTenant() {
         return tenant;
@@ -311,7 +258,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @param response - optional message to be told to the current sender
      */
-    public void reply(ModelResponse response) {
+    public void reply(ModelResponse response, ActorRef replyTo) {
         // Always reset the transaction timestamp before replying. Even if there is no reply.
         resetTransactionTimestamp();
         // We should unlock if there is no response or the response is not a failure.
@@ -335,11 +282,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
-        sender().tell(response, self());
+        replyTo.tell(response, self());
     }
 
     /**
-     * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
+     * If the command handler has changed ModelActor state, but then run into an unhandled exception,
      * the actor will remove itself from memory and start again.
      */
     public void failedWithInvalidState(Object msg, Throwable exception) {
@@ -367,7 +314,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         // Inform the HealthMonitor
         HealthMonitor.writeJournal().hasFailed(cause);
         // Optionally send a reply (in the CommandHandler). If persistence fails, also sending a reply may fail, hence first logging the issue.
-        warehouse.handlePersistFailure(cause, event, seqNr);
+        backOffice.handlePersistFailure(cause, event, seqNr);
         // Stop the actor
         context().stop(self());
     }
@@ -385,7 +332,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Add debug info to the case if debug is enabled.
      * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
-     * then the appender's debugInfo method will be invoked to store a string in the log.
+     * then the appender.debugInfo(...) method will be invoked to store a string in the log.
      *
      * @param appender       Producer of the log info
      * @param additionalInfo Additional parameters such as Throwable or json Value will be printed in a special manner
@@ -397,7 +344,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Add debug info to the ModelActor if debug is enabled.
      * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
-     * then the appender's debugInfo method will be invoked to store a string in the log.
+     * then the appender.debugInfo(...) method will be invoked to store a string in the log.
      *
      * @param logger         The slf4j logger instance to check whether debug logging is enabled
      * @param appender       A functional interface returning "an" object, holding the main info to be logged.
@@ -406,14 +353,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
     public void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
-        warehouse.addDebugInfo(logger, appender, additionalInfo);
+        backOffice.addDebugInfo(logger, appender, additionalInfo);
     }
 
     /**
      * Returns the moment at which the last modification to the case was done. I.e., the moment at which a command was completed that resulted into
      * events needing to be persisted.
-     *
-     * @return
      */
     public Instant getLastModified() {
         return lastModified;
@@ -422,8 +367,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Returns the moment at which the last modification to the case was done. I.e., the moment at which a command was completed that resulted into
      * events needing to be persisted.
-     *
-     * @return
      */
     public Instant getTransactionTimestamp() {
         if (transactionTimestamp == null) {
@@ -442,8 +385,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * Returns the logger of the model actor
-     *
-     * @return
      */
     protected Logger getLogger() {
         return logger;
@@ -459,8 +400,8 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * resulting state changes are to be persisted in the event journal.
      * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
      */
-    protected void completeMessageHandling(IncomingActorMessage source, StagingArea stagingArea) {
-        if (stagingArea.needsCommitEvent()) {
+    protected void completeMessageHandling(IncomingActorMessage source, ModelActorTransaction modelActorTransaction) {
+        if (modelActorTransaction.needsCommitEvent()) {
             addCommitEvent(source);
         } else {
             notModified(source);
@@ -480,5 +421,17 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * It can typically be used to send "NotModified" responses
      */
     protected void notModified(IncomingActorMessage source) {
+    }
+
+    public void register(RemoteActorState<?> remoteActorState) {
+        actorCommunication.register(remoteActorState);
+    }
+
+    public RemoteActorState<?> getRemoteActorState(String actorId) {
+        return actorCommunication.getRemoteActorState(actorId);
+    }
+
+    public IncomingRequestState getIncomingRequestState() {
+        return actorCommunication.getIncomingRequestState();
     }
 }

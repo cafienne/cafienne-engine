@@ -33,6 +33,13 @@ public interface ModelEvent extends UserMessage {
         return tags;
     }
 
+    /**
+     * Hook that will be invoked after the event is persisted.
+     * This can be used to run followup actions only after transaction completed.
+     */
+    default void afterPersist(ModelActor actor) {
+    }
+
     void updateActorState(ModelActor actor);
 
     String tenant();
@@ -40,8 +47,6 @@ public interface ModelEvent extends UserMessage {
     String getActorId();
 
     Instant getTimestamp();
-
-    String getDescription();
 
     ValueMap rawJson();
 }

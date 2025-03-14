@@ -70,7 +70,7 @@ trait TaggedEventSource extends ReadJournalProvider with ModelEventFilter with L
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
         getOffset.map { offset: Offset =>
-          logger.warn(s"Starting to read '$tag' events from offset " + offset)
+          logger.info(s"Starting to read '$tag' events from offset " + offset)
           query(offset)
         }
       })

@@ -30,6 +30,7 @@ import java.time.Instant;
  * Basic implementation for ModelResponse to reply to a {@link ModelCommand}
  */
 public abstract class BaseModelResponse implements ModelResponse {
+    private final ValueMap json;
     private final String messageId;
     private final String actorId;
     private Instant lastModified;
@@ -37,6 +38,7 @@ public abstract class BaseModelResponse implements ModelResponse {
     private final String commandType;
 
     protected BaseModelResponse(ModelCommand command) {
+        this.json = new ValueMap();
         this.messageId = command.getMessageId();
         this.actorId = command.actorId();
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
@@ -47,6 +49,7 @@ public abstract class BaseModelResponse implements ModelResponse {
     }
 
     protected BaseModelResponse(ValueMap json) {
+        this.json = json;
         this.messageId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.lastModified = json.readInstant(Fields.lastModified);
@@ -105,5 +108,10 @@ public abstract class BaseModelResponse implements ModelResponse {
     @Override
     public String toString() {
         return asString();
+    }
+
+    @Override
+    public ValueMap rawJson() {
+        return json;
     }
 }

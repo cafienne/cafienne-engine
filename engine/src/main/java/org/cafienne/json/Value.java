@@ -90,11 +90,9 @@ public abstract class Value<T> implements Serializable {
     public String toString() {
         JsonFactory factory = new JsonFactory();
         StringWriter sw = new StringWriter();
-        try {
-            JsonGenerator generator = factory.createGenerator(sw);
+        try (JsonGenerator generator = factory.createGenerator(sw)) {
             generator.setPrettyPrinter(new DefaultPrettyPrinter());
             print(generator);
-            generator.close();
         } catch (IOException e) {
             // Hmmm... scary... not sure if this is a proper solution
             sw.write("Could not print the value because of error");

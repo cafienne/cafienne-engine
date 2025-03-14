@@ -56,8 +56,7 @@ trait QueryDBEventSink extends EventBatchSource[QueryDBEventBatch] with LazyLogg
   }
 
   def reportUnhealthy(throwable: Throwable): Unit = {
-    // No need to print the stack trace itself here, as that is done in HealthMonitor as well.
-    logger.error(s"${getClass.getSimpleName} bumped into an issue that it cannot recover from: ${throwable.getMessage}")
+    logger.error(s"${getClass.getSimpleName} bumped into an issue that it cannot recover from: ${throwable.getMessage}", throwable)
     HealthMonitor.readJournal.hasFailed(throwable)
   }
 }

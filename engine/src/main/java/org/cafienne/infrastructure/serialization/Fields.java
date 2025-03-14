@@ -78,6 +78,8 @@ public enum Fields {
 
     parentActorId,
     rootActorId,
+    targetActorId,
+    sourceActorId,
     inputParameters,
     definition,
     debugMode,

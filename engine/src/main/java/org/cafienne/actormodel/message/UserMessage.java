@@ -59,21 +59,13 @@ public interface UserMessage extends CafienneSerializable {
         return (BootstrapMessage) this;
     }
 
+    default String getDescription() {
+        return this.getClass().getSimpleName();
+    }
+
     /**
      * Return a ValueMap serialization of the message
      */
-    default ValueMap rawJson() {
-        JsonFactory factory = new JsonFactory();
-        StringWriter sw = new StringWriter();
-        try {
-            JsonGenerator generator = factory.createGenerator(sw);
-            generator.setPrettyPrinter(new DefaultPrettyPrinter());
-            writeThisObject(generator);
-            generator.close();
-            Value<?> json = JSONReader.parse(sw.toString());
-            return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
-        } catch (IOException | JSONParseFailure e) {
-            return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
-        }
-    }
+     ValueMap rawJson();
+
 }

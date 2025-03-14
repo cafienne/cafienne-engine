@@ -31,7 +31,7 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugEvent extends BaseModelEvent<ModelActor> {
+public class DebugEvent extends CaseSystemEvent {
     private final ValueMap messages;
 
     public DebugEvent(ModelActor modelActor) {

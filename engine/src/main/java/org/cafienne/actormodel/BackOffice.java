@@ -17,111 +17,78 @@
 
 package org.cafienne.actormodel;
 
-import org.apache.pekko.actor.Cancellable;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.ActorChokedFailure;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.actormodel.response.SecurityFailure;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-
-import java.util.concurrent.TimeUnit;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
+import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import org.slf4j.Logger;
 
 /**
- * Place that handles valid incoming traffic ({@link IncomingActorMessage})
- * It also makes the ModelActor to go back to sleep if it has been idle for a while.
+ * Warehouse creates a new {@link ModelActorTransaction} for each {@link IncomingActorMessage}.
  */
 class BackOffice {
     private final ModelActor actor;
-    private final Reception reception;
+    private final ModelActorMonitor monitor;
+    private ModelActorTransaction currentTransaction;
+    private boolean isOpen = false;
 
-    BackOffice(ModelActor actor, Reception reception) {
+    BackOffice(ModelActor actor, ModelActorMonitor monitor) {
         this.actor = actor;
-        this.reception = reception;
+        this.monitor = monitor;
     }
 
-    void handleVisitor(IncomingActorMessage message) {
-        // Steps:
-        // 1. Remove self cleaner
-        // 2. Handle message
-        //  a. ModelCommand --> handle the command
-        //  b. ModelResponse --> handle the response
-        // 3. Tell the staging area we're done (storing events and sending replies)
-        // 4. Set a new self cleaner (basically resets the timer)
-        clearSelfCleaner();
+    void performTransaction(IncomingActorMessage message) {
+        // Tell the actor monitor we're busy
+        monitor.setBusy();
 
-        StagingArea stagingArea = reception.warehouse.prepareNextShipment(message);
-        if (message.isCommand()) {
-            ModelCommand command = message.asCommand();
-            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.rawJson());
+        // We only receive incoming messages after the ModelActor has successfully recovered.
+        //  This means that from now on, we must track events that are being added.
+        isOpen = true;
 
-            try {
-                // First, simple, validation
-                command.validateCommand(actor);
-                // Then, do actual work of processing in the command itself.
-                command.processCommand(actor);
-                stagingArea.setResponse(command.getResponse());
-            } catch (AuthorizationException e) {
-                stagingArea.reportFailure(e, new SecurityFailure(command, e), "");
-            } catch (InvalidCommandException e) {
-                stagingArea.reportFailure(command, e, "===== Command was invalid ======");
-            } catch (CommandException e) {
-                stagingArea.reportFailure(command, e, "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception");
-            } catch (Throwable e) {
-                stagingArea.reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
-            }
-        } else if (message.isResponse()) {
-            handleResponse(message.asResponse());
-        }
+        // Create a transaction context, and set it.
+        //   The underlying Pekko system ensures that only one transaction is active at a time.
+        currentTransaction = new ModelActorTransaction(actor, message);
+        currentTransaction.perform();
 
-        stagingArea.store();
-
-        enableSelfCleaner();
+        // Tell the actor monitor we're free again
+        monitor.setFree();
     }
 
-    private void handleResponse(ModelResponse msg) {
-        Responder handler = actor.getResponseListener(msg.getMessageId());
-        if (handler == null) {
-            // For all commands that are sent to another case via us, a listener is registered.
-            // If that listener is null, we set a default listener ourselves.
-            // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
-            // and we log a warning for that. It basically means someone else has submitted the command and told the other case to respond to us -
-            // which is strange.
-            actor.getLogger().warn(actor + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
+    void storeEvent(ModelEvent event) {
+        if (isOpen) {
+            currentTransaction.addEvent(event);
         } else {
-            actor.addDebugInfo(() -> actor + " received response to command of type " + handler.command.getCommandDescription(), msg.rawJson());
-            if (msg instanceof CommandFailure) {
-                handler.left.handleFailure((CommandFailure) msg);
-            } else {
-                handler.right.handleResponse(msg);
+            // Recovery is still running.
+
+            // NOTE: ModelActors should not generate events during recovery.
+            //  Such has been implemented for TenantActor and ProcessTaskActor, and partly for Case.
+            //  Enabling the logging will showcase where this pattern has not been completely done.
+            if (EngineDeveloperConsole.enabled()) {
+                EngineDeveloperConsole.debugIndentedConsoleLogging("!!! Recovering " + actor + " generates event of type " + event.getClass().getSimpleName());
             }
+        }
+    }
+
+    void handlePersistFailure(Throwable cause, Object event, long seqNr) {
+        if (isOpen) {
+            currentTransaction.handlePersistFailure(cause, event, seqNr);
         }
     }
 
     /**
-     * SelfCleaner provides a mechanism to have the ModelActor remove itself from memory after a specific idle period.
+     * Add debug info to the ModelActor if debug is enabled.
+     * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
+     * then the appender's debugInfo method will be invoked to store a string in the log.
+     *
+     * @param logger         The slf4j logger instance to check whether debug logging is enabled
+     * @param appender       A functional interface returning "an" object, holding the main info to be logged.
+     *                       Note: the interface is only invoked if logging is enabled. This appender typically
+     *                       returns a String that is only created upon demand (in order to speed up a bit)
+     * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
-    private Cancellable selfCleaner = null;
-
-    private void clearSelfCleaner() {
-        // Receiving message should reset the self-cleaning timer
-        if (selfCleaner != null) {
-            selfCleaner.cancel();
-            selfCleaner = null;
-        }
-    }
-
-    private void enableSelfCleaner() {
-        if (actor.hasAutoShutdown()) {
-            // Now set the new selfCleaner
-            long idlePeriod = actor.caseSystem.config().actor().idlePeriod();
-            FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
-            selfCleaner = actor.getScheduler().schedule(duration, actor::takeABreak);
+    void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
+        if (isOpen) {
+            currentTransaction.addDebugInfo(logger, appender, additionalInfo);
         }
     }
 }
