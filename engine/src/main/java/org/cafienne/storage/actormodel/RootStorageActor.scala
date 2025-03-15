@@ -80,12 +80,6 @@ abstract class RootStorageActor[O <: OffspringNode](val caseSystem: CaseSystem, 
     }
   }
 
-  /**
-    * Invoked after the StorageRequest has been fulfilled.
-    * It will clean the event journal of the RootStorageActor
-    */
-  def clearState(): Unit = deleteMessages(Long.MaxValue)
-
   def getStorageActorRef(metadata: ActorMetadata): ActorRef = getActorRef(metadata, Props(storageActorType, caseSystem, metadata))
 
   /**
@@ -132,19 +126,36 @@ abstract class RootStorageActor[O <: OffspringNode](val caseSystem: CaseSystem, 
    }
 
   /**
+   * Invoked after the StorageRequest has been fulfilled.
+   * It will clean the event journal of the RootStorageActor
+   */
+  def clearState(): Unit = deleteMessages(events.size)
+
+  private var deletionCount = 0L
+  /**
     * When all our events are also removed from the journal we can tell our parent we're done.
     * Also we'll then remove ourselves from memory.
     */
-  def journalCleared(): Unit = {
-    context.stop(self)
+  def journalCleared(e: DeleteMessagesSuccess): Unit = {
+    if (e.toSequenceNr >= events.size) {
+      if (deletionCount > 0) {
+        printLogMessage("Completely cleared journal for " + metadata +" with e: " + e.toSequenceNr +" and event count: " + events.size)
+      }
+      deletionCount = e.toSequenceNr
+      context.stop(self)
+    } else {
+      deletionCount = e.toSequenceNr
+
+      printLogMessage("Cleared journal for " + metadata +" with e: " + e.toSequenceNr +" and event count: " + events.size +" currnet deletieon count: " + deletionCount)
+      printLogMessage("Awaiting next event as we seem not completed")
+//      deleteMessages(events.size)
+    }
   }
 
   /**
     * Triggers the storage process on the state directly if the state already
     * has an initiation event, else if will simply add the given event
     * which triggers the storage process in the state.
-    *
-    * @param event The initiation event to store if one is not yet available
     */
   def triggerStorageProcess(request: StorageCommand, replyTo: ActorRef): Unit = {
     if (hasRequest) {
@@ -160,7 +171,7 @@ abstract class RootStorageActor[O <: OffspringNode](val caseSystem: CaseSystem, 
     case request: StorageCommand => triggerStorageProcess(request, sender())
     case event: StorageEvent => storeEvent(event)
     case t: Terminated => removeActorRef(t)
-    case _: DeleteMessagesSuccess => journalCleared() // Event journal no longer contains our persistence id
+    case e: DeleteMessagesSuccess => journalCleared(e) // Event journal no longer contains our persistence id
     case other => logger.warn(s"${this.getClass.getSimpleName} on $metadata received an unknown message of type ${other.getClass.getName}")
   }
 
