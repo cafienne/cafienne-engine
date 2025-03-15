@@ -19,7 +19,7 @@ package org.cafienne.storage.archival.state
 
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.json.{ValueList, ValueMap}
-import org.cafienne.storage.actormodel.message.{StorageActionUpdated, StorageEvent}
+import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageActionUpdated, StorageEvent}
 import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
@@ -49,6 +49,8 @@ trait ArchivalState extends StorageActorState {
 
   def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
+  override def createStorageStartedEvent: StorageActionStarted = ArchivalStarted(metadata, findCascadingChildren())
+
   override def startStorageProcess(): Unit = {
     val children = findCascadingChildren()
     printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
@@ -56,34 +58,36 @@ trait ArchivalState extends StorageActorState {
   }
 
   /** The archival process is idempotent (i.e., it can be triggered multiple times without ado).
-    * It is typically triggered when recovery is done or after the first incoming ArchiveActorData command is received.
-    * It triggers both child archival and cleaning query data.
-    */
+   * It is typically triggered when recovery is done or after the first incoming ArchiveActorData command is received.
+   * It triggers both child archival and cleaning query data.
+   */
   override def continueStorageProcess(): Unit = {
     if (!parentReceivedChildrenInformation) {
       printLogMessage("Initiating storage process")
       startStorageProcess()
-    } else {
-      if (!queryDataCleared) {
-        printLogMessage("Archiving query data")
-        // Note: instead of removing the info from the QueryDB we could also
-        // set the state in the QueryDB to Archived. Requests to getCase could then return "Case is archived" or so.
-        //  However, then we still would also have to keep authorization information, as that is required
-        //  per individual case instance. But then ... the case would not really be archived?!
-        //  Therefore, it is up to the invoker of the archiving logic to handle such a situation.
-        clearQueryData()
-        actor.self ! QueryDataArchived(metadata)
-      }
+    } else if (!timerDataCleared) {
+      clearTimerData()
+    } else if (!queryDataCleared) {
+      printLogMessage("Deleting query data")
+      // Note: instead of removing the info from the QueryDB we could also
+      // set the state in the QueryDB to Archived. Requests to getCase could then return "Case is archived" or so.
+      //  However, then we still would also have to keep authorization information, as that is required
+      //  per individual case instance. But then ... the case would not really be archived?!
+      //  Therefore, it is up to the invoker of the archiving logic to handle such a situation.
+      clearQueryData()
+      actor.self ! QueryDataArchived(metadata)
     }
-    checkArchivingDone()
+
+
+    checkStorageProcessCompletion()
   }
 
   /** Determine if all data is archived from children and also from QueryDB.
-    * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
-    */
-  def checkArchivingDone(): Unit = {
-    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared;]")
-    if (queryDataCleared) {
+   * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
+   */
+  override def checkStorageProcessCompletion(): Unit = {
+    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared;timerDataCleared=$timerDataCleared;]")
+    if (queryDataCleared && timerDataCleared) {
       if (!isCreated) {
         actor.createArchive()
       }
@@ -113,10 +117,10 @@ trait ArchivalState extends StorageActorState {
   }
 
   /**
-    * Final event to give an indication that the ModelActor has been archived
-    * Up to the ModelActor specific type of state to give the event the proper name.
-    *
-    * @return
-    */
+   * Final event to give an indication that the ModelActor has been archived
+   * Up to the ModelActor specific type of state to give the event the proper name.
+   *
+   * @return
+   */
   def createModelActorStorageEvent: ModelActorArchived
 }
