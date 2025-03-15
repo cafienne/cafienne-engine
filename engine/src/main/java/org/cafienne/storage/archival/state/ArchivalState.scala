@@ -19,14 +19,13 @@ package org.cafienne.storage.archival.state
 
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.json.{ValueList, ValueMap}
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.QueryDBState
+import org.cafienne.storage.actormodel.message.{StorageActionUpdated, StorageEvent}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
 import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
-trait ArchivalState extends QueryDBState {
+trait ArchivalState extends StorageActorState {
   override val actor: ActorDataArchiver
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
@@ -34,11 +33,8 @@ trait ArchivalState extends QueryDBState {
       case event: ArchivalStarted =>
         printLogMessage(s"Starting archival for ${event.metadata}")
         continueStorageProcess()
-      case _: ChildrenReceived =>
-        printLogMessage(s"Stored children information")
-        continueStorageProcess()
-      case _: QueryDataCleared =>
-        printLogMessage(s"QueryDB has been archived")
+      case _: StorageActionUpdated =>
+        printLogMessage(s"Completed on " + event.getDescription)
         continueStorageProcess()
       case event: ArchiveCreated => actor.afterArchiveCreated(event)
       case _: ArchiveReceived => actor.afterArchiveExported()

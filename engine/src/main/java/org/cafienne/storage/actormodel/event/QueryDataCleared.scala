@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.actormodel.event
 
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.message.StorageActionUpdated
 
-trait QueryDataCleared extends StorageEvent
+trait QueryDataCleared extends StorageActionUpdated
 

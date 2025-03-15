@@ -20,7 +20,7 @@ package org.cafienne.storage.actormodel.state
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.ConsentGroupStorage
 
-trait GroupState extends QueryDBState {
+trait GroupState extends StorageActorState {
   override val dbStorage: ConsentGroupStorage = new ConsentGroupStorage(actor.caseSystem.queryDB.writer)
 
   override def findCascadingChildren(): Seq[ActorMetadata] = Seq()

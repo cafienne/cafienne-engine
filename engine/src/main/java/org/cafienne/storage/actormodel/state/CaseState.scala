@@ -22,7 +22,7 @@ import org.cafienne.cmmn.instance.PlanItemType
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.CaseStorage
 
-trait CaseState extends QueryDBState {
+trait CaseState extends StorageActorState {
   override val dbStorage: CaseStorage = new CaseStorage(actor.caseSystem.queryDB.writer)
 
   override def findCascadingChildren(): Seq[ActorMetadata] = {
