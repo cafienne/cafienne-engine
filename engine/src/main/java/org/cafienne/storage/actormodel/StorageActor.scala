@@ -44,7 +44,7 @@ trait StorageActor[S <: StorageActorState]
     * This can be used to clean the storage job state.
     * @param toSequenceNr Up to which event the journal must be cleared
     */
-  def clearState(toSequenceNr: Long = Long.MaxValue): Unit = {
+  def clearState(toSequenceNr: Long = lastSequenceNr): Unit = {
     deleteMessages(toSequenceNr)
   }
 

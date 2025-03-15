@@ -69,11 +69,6 @@ public class CaseModified extends ActorModified<Case> implements CaseEvent {
     }
 
     @Override
-    public String toString() {
-        return "CaseModified[" + getCaseInstanceId() + "] at " + lastModified();
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeActorModified(generator);
         writeField(generator, Fields.numFailures, new LongValue(numFailures));

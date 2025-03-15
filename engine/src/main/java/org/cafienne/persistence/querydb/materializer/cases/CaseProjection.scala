@@ -87,8 +87,8 @@ class CaseProjection(override val batch: CaseEventBatch, caseFileProjection: Cas
           case Some(instance) =>
             this.caseInstance = Some(changer(instance))
           case None =>
-            logger.error(s"Cannot find Case[$caseInstanceId] in database to handle ${event.getClass.getName}:\n\n" + event.toString + "\n\n")
-        }
+            logger.error(s"Cannot find Case[$caseInstanceId] in database to handle ${event.getClass.getSimpleName}.\nEventBatch has ${batch.events.size} events:\n- ${batch.events.map(e => e.event.getDescription).mkString("\n- ")}\n=============\n")
+          }
       case Some(instance) =>
         logger.whenDebugEnabled(logger.debug(s"Found Case[$caseInstanceId] in current transaction cache"))
         this.caseInstance = Some(changer(instance))

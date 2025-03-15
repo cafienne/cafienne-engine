@@ -40,7 +40,7 @@ public abstract class ActorModified<M extends ModelActor> extends BaseModelEvent
     protected ActorModified(M actor, IncomingActorMessage source) {
         super(actor);
         this.source = source;
-        this.sourceString = source.getClass().getName();
+        this.sourceString = source.getDescription();
         this.lastModified = actor.getTransactionTimestamp();
     }
 
@@ -57,7 +57,7 @@ public abstract class ActorModified<M extends ModelActor> extends BaseModelEvent
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + " upon " + sourceString;
+        return super.getDescription() + "[" + getActorId() + "] at " + lastModified() +" upon " + sourceString;
     }
 
     @Override
