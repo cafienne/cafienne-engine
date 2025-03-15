@@ -20,10 +20,10 @@ package org.cafienne.storage.actormodel.event
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.message.StorageActionUpdated
 
 @Manifest
-case class ChildrenReceived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageEvent
+case class ChildrenReceived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionUpdated
 
 object ChildrenReceived {
   def deserialize(json: ValueMap): ChildrenReceived = ChildrenReceived(ActorMetadata.deserializeMetadata(json), Some(json))

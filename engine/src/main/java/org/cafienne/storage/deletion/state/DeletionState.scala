@@ -17,22 +17,18 @@
 
 package org.cafienne.storage.deletion.state
 
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.QueryDBState
+import org.cafienne.storage.actormodel.message.{StorageActionUpdated, StorageEvent}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.deletion.ActorDataRemover
 import org.cafienne.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
 
-trait DeletionState extends QueryDBState {
+trait DeletionState extends StorageActorState {
   override val actor: ActorDataRemover
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
-      case _: ChildrenReceived =>
-        printLogMessage(s"Stored children information")
-        continueStorageProcess()
-      case _: QueryDataCleared =>
-        printLogMessage(s"QueryDB has been cleaned")
+      case _: StorageActionUpdated =>
+        printLogMessage(s"Completed on " + event.getDescription)
         continueStorageProcess()
       case _ => reportUnknownEvent(event)
     }

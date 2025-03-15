@@ -17,12 +17,12 @@
 
 package org.cafienne.storage.actormodel
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.persistence.RecoveryCompleted
 import org.apache.pekko.persistence.journal.Tagged
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.{QueryDBState, StorageActorState}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.system.CaseSystem
 
 trait StorageActor[S <: StorageActorState]
@@ -83,5 +83,3 @@ trait StorageActor[S <: StorageActorState]
     }
   }
 }
-
-trait QueryDBStorageActor[S <: QueryDBState] extends StorageActor[S]

@@ -23,11 +23,15 @@ import org.apache.pekko.actor.ActorRef
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessEvent
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
+import org.cafienne.storage.querydb.QueryDBStorage
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 trait StorageActorState extends ModelEventCollection with LazyLogging {
+  def dbStorage: QueryDBStorage
+
   val actor: BaseStorageActor
   val rootStorageActor: ActorRef = actor.context.parent
 
@@ -61,6 +65,29 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
   def storageStartedEvent: StorageActionStarted = getEvent(classOf[StorageActionStarted])
 
   def startStorageProcess(): Unit
+
+  /**
+   * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
+   * and a Case can determine it based on the PlanItemCreated events it has.
+   *
+   * @return
+   */
+  def findCascadingChildren(): Seq[ActorMetadata] = Seq()
+
+  /** Returns true if the RootStorageActor knows about our children
+   */
+  def parentReceivedChildrenInformation: Boolean = events.exists(_.isInstanceOf[ChildrenReceived])
+
+  /**
+   * Returns true if the query database has been cleaned for the ModelActor
+   */
+  def queryDataCleared: Boolean = events.exists(_.isInstanceOf[QueryDataCleared])
+
+  /**
+   * ModelActor specific implementation to clean up the data generated into the QueryDB based on the
+   * events of this specific ModelActor.
+   */
+  def clearQueryData(): Unit
 
   /**
     * Continues the storage process.
