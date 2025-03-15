@@ -32,6 +32,7 @@ import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
+import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
@@ -195,8 +196,8 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
             try (JsonGenerator generator = factory.createGenerator(sw)) {
                 generator.setPrettyPrinter(new DefaultPrettyPrinter());
                 writeThisObject(generator);
+                generator.close(); // need to close the generator, otherwise sw is empty
                 return JSONReader.parse(sw.toString());
-//                return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
             } catch (IOException | JSONParseFailure e) {
                 return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
             }
