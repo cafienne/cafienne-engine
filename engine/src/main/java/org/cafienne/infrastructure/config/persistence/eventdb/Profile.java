@@ -4,6 +4,7 @@ public enum Profile {
     SQLServer,
     Postgres,
     H2,
+    HSQLDB,
     Unsupported;
 
     private String value;
@@ -15,6 +16,8 @@ public enum Profile {
             return Profile.SQLServer.with(value);
         } else if (value.contains("H2")) {
             return Profile.H2.with(value);
+        } else if (value.contains("Hsqldb")) {
+            return Profile.HSQLDB.with(value);
         } else {
             return Profile.Unsupported.with(value);
         }
@@ -31,6 +34,8 @@ public enum Profile {
     public boolean isH2() {
         return this == H2;
     }
+
+    public boolean isHSQLDB() { return this == HSQLDB; }
 
     private Profile with(String value) {
         this.value = value;
