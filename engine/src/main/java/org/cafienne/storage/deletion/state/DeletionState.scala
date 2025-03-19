@@ -17,31 +17,22 @@
 
 package org.cafienne.storage.deletion.state
 
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.QueryDBState
+import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageActionUpdated, StorageEvent}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.deletion.ActorDataRemover
 import org.cafienne.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
 
-trait DeletionState extends QueryDBState {
+trait DeletionState extends StorageActorState {
   override val actor: ActorDataRemover
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
-      case _: ChildrenReceived =>
-        printLogMessage(s"Stored children information")
-        continueStorageProcess()
-      case _: QueryDataCleared =>
-        printLogMessage(s"QueryDB has been cleaned")
+      case _: StorageActionUpdated =>
+        printLogMessage(s"Completed on " + event.getDescription)
         continueStorageProcess()
       case _ => reportUnknownEvent(event)
     }
   }
-
-  /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
-    * events of this specific ModelActor.
-    */
-  def clearQueryData(): Unit
 
   var hasStarted: Boolean = false
 
@@ -57,27 +48,45 @@ trait DeletionState extends QueryDBState {
     informOwner(RemovalStarted(metadata, children))
   }
 
-  /** The removal process is idempotent (i.e., it can be triggered multiple times without ado).
-    * It is typically triggered when recovery is done or after the first incoming RemoveActorData command is received.
-    * It triggers both child removal and cleaning query data.
-    */
+  override def createStorageStartedEvent: StorageActionStarted = RemovalStarted(metadata, findCascadingChildren())
+
+  /**
+   * The removal process is idempotent (i.e., it can be triggered multiple times without ado).
+   * It is typically triggered when recovery is done or after the first incoming RemoveActorData command is received.
+   * It triggers both child removal and cleaning query data.
+   */
   override def continueStorageProcess(): Unit = {
     if (!parentReceivedChildrenInformation) {
       printLogMessage("Triggering storage process, because parent has not replied that children are received")
       startStorageProcess()
     } else {
-      if (!queryDataCleared) {
+      if (!timerDataCleared) {
+        printLogMessage("Clearing timers")
+        clearTimerData()
+      } else if (!queryDataCleared) {
         printLogMessage("Deleting query data")
         clearQueryData()
         actor.self ! QueryDataRemoved(metadata)
-      } else { // Children found and query data cleared
-        if (completing) {
-          println(s"$metadata: Already completing upon ${events.last.getClass.getSimpleName}")
-          return
-        }
-        completing = true
-        actor.completeStorageProcess()
       }
+    }
+
+    checkStorageProcessCompletion()
+  }
+
+  /**
+   * Determine if all data is removed from children and also from QueryDB.
+   * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
+   */
+  override def checkStorageProcessCompletion(): Unit = {
+    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared;timerDataCleared=$timerDataCleared;]")
+    if (queryDataCleared && timerDataCleared) {
+      if (completing) {
+        println(s"$metadata: Already completing upon ${events.last.getClass.getSimpleName}")
+        return
+      }
+      completing = true
+      actor.completeStorageProcess()
+
     }
   }
 

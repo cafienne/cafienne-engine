@@ -55,6 +55,11 @@ class JDBCTimerStore(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix:
     commit(offset, TableQuery[TimerServiceTable].filter(_.timerId === timerId).delete)
   }
 
+  override def removeCaseTimers(caseInstanceId: String): Future[Done] = {
+    logger.debug("Removing timers in case " + caseInstanceId)
+    commit(None, TableQuery[TimerServiceTable].filter(_.caseInstanceId === caseInstanceId).delete)
+  }
+
   private def commit(offset: Option[Offset], action: dbConfig.profile.api.DBIO[Int]): Future[Done] = {
     val offsetUpdate = offset.map(offset => TableQuery[OffsetStoreTable].insertOrUpdate(OffsetRecord(storageName, offset)))
     val updates = offsetUpdate.fold(Seq(action))(o => Seq(action, o))

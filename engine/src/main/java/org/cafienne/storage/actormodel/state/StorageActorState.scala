@@ -18,16 +18,22 @@
 package org.cafienne.storage.actormodel.state
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
 import org.apache.pekko.actor.ActorRef
+import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessEvent
+import org.cafienne.storage.actormodel.command.ClearTimerData
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared, TimerDataCleared}
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
+import org.cafienne.storage.archival.event.ArchivalStarted
+import org.cafienne.storage.querydb.QueryDBStorage
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 trait StorageActorState extends ModelEventCollection with LazyLogging {
+  def dbStorage: QueryDBStorage
+
   val actor: BaseStorageActor
   val rootStorageActor: ActorRef = actor.context.parent
 
@@ -56,17 +62,60 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
     .headOption // Take the actor class of the bootstrap message found, or else just give a message with the event types that are found.
     .getOrElse(s"Bootstrap message is missing; found ${events.length} events of types: [${events.map(_.getClass.getName).toSet.mkString(",")}]")
 
+  def createStorageStartedEvent: StorageActionStarted
+
   def hasStartEvent: Boolean = events.exists(_.isInstanceOf[StorageActionStarted])
 
   def storageStartedEvent: StorageActionStarted = getEvent(classOf[StorageActionStarted])
 
-  def startStorageProcess(): Unit
+  def startStorageProcess(): Unit = {
+    val children = findCascadingChildren()
+    printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
+    informOwner(ArchivalStarted(metadata, children))
+  }
+
+  /**
+   * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
+   * and a Case can determine it based on the PlanItemCreated events it has.
+   *
+   * @return
+   */
+  def findCascadingChildren(): Seq[ActorMetadata] = Seq()
+
+  /** Returns true if the RootStorageActor knows about our children
+   */
+  def parentReceivedChildrenInformation: Boolean = events.exists(_.isInstanceOf[ChildrenReceived])
+
+  /**
+   * ModelActor specific implementation to clean up the timers registered in the TimerService
+   */
+  def clearTimerData(): Unit = {
+    actor.caseSystem.timerService.tell(ClearTimerData(metadata), actor.self)
+  }
+
+  /**
+   * Returns true if the TimerService has removed any running timers initiated by the ModelActor
+   */
+  def timerDataCleared: Boolean = events.exists(_.isInstanceOf[TimerDataCleared])
+
+  /**
+   * Returns true if the query database has been cleaned for the ModelActor
+   */
+  def queryDataCleared: Boolean = events.exists(_.isInstanceOf[QueryDataCleared])
+
+  /**
+   * ModelActor specific implementation to clean up the data generated into the QueryDB based on the
+   * events of this specific ModelActor.
+   */
+  def clearQueryData(): Unit
 
   /**
     * Continues the storage process.
     * Note, this method must be idempotent as it can be invoked multiple times.
     */
   def continueStorageProcess(): Unit
+
+  def checkStorageProcessCompletion(): Unit
 
   def addEvent(event: ModelEvent): Unit = {
     events += event

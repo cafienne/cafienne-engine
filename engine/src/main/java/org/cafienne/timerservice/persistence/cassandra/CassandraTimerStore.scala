@@ -113,6 +113,16 @@ class CassandraTimerStore(val caseSystem: CaseSystem, readJournal: CassandraRead
     })
   }
 
+  override def removeCaseTimers(caseInstanceId: String): Future[Done] = {
+    val delete = QueryBuilder.deleteFrom(keyspace, timerTable).whereColumn("caseInstanceId").isEqualTo(literal(caseInstanceId)).build()
+    logger.whenDebugEnabled(logger.debug(s"Removing timers for case $caseInstanceId from Cassandra database with statement $delete"))
+    val batch = BatchStatement.builder(BatchType.LOGGED).addStatement(delete)
+    readJournal.session.executeWriteBatch(batch.build).map(_ => {
+      logger.whenDebugEnabled(logger.debug(s"Removed timers for case $caseInstanceId from Cassandra database"))
+      Done
+    })
+  }
+
   override def importTimers(list: Seq[Timer]): Unit = {
     val batch = BatchStatement.builder(BatchType.LOGGED)
     list.map(getInsertStatement).foreach(batch.addStatement)

@@ -20,7 +20,7 @@ package org.cafienne.storage.actormodel.state
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.querydb.TenantStorage
 
-trait TenantState extends QueryDBState {
+trait TenantState extends StorageActorState {
   override val dbStorage: TenantStorage = new TenantStorage(actor.caseSystem.queryDB.writer)
 
   override def findCascadingChildren(): Seq[ActorMetadata] = {

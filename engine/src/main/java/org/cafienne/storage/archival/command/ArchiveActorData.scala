@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.archival.command
 
-import org.cafienne.storage.actormodel.message.StorageCommand
+import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
 import org.cafienne.storage.archival.RootArchiver
 
