@@ -35,6 +35,8 @@ trait BaseStorageActor
   def reportUnknownMessage(msg: Any): Unit = {
     logger.warn(s"$metadata: Received message with unknown type. Ignoring it. Message is of type ${msg.getClass.getName}")
   }
+
+  override def toString: String = s"${this.getClass.getSimpleName}[$metadata]"
 }
 
 /**

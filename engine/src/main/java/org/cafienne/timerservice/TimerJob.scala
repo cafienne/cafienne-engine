@@ -55,6 +55,7 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
   }
 
   def cancel(): Boolean = {
+    responseTracker.stop()
     schedule.cancel()
   }
 
