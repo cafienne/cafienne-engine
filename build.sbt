@@ -125,7 +125,7 @@ val plugins = (project in file("plugins"))
     libraryDependencies ++= Dependencies.plugins ++ Dependencies.engine ++ Dependencies.testEngine)
 
 val service = (project in file("service"))
-  .dependsOn(engine, plugins)
+  .dependsOn(engine)
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt, JavaAppPackaging, AshScriptPlugin, DockerPlugin, ClasspathJarPlugin)
 //  .enablePlugins(AutomateHeaderPlugin)
   .settings(basicSettings: _*)
