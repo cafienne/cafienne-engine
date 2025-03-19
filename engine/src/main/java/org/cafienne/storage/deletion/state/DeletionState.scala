@@ -86,7 +86,6 @@ trait DeletionState extends StorageActorState {
       }
       completing = true
       actor.completeStorageProcess()
-
     }
   }
 

@@ -40,10 +40,11 @@ trait StorageActor[S <: StorageActorState]
   def createState(): S
 
   /**
-    * Invoked after the StorageActor has done it's job.
-    * This can be used to clean the storage job state.
-    * @param toSequenceNr Up to which event the journal must be cleared
-    */
+   * Invoked after the StorageActor has done it's job.
+   * This can be used to clean the storage job state.
+   *
+   * @param toSequenceNr Up to which event the journal must be cleared
+   */
   def clearState(toSequenceNr: Long = lastSequenceNr): Unit = {
     deleteMessages(toSequenceNr)
   }
@@ -70,10 +71,10 @@ trait StorageActor[S <: StorageActorState]
   }
 
   /**
-    * Triggers the storage process on the state directly if the state already
-    * has an initiation event, else if will simply add the given event
-    * which triggers the storage process in the state.
-    */
+   * Triggers the storage process on the state directly if the state already
+   * has an initiation event, else if will simply add the given event
+   * which triggers the storage process in the state.
+   */
   def startStorageProcess(): Unit = {
     if (state.hasStartEvent) {
       state.continueStorageProcess()
