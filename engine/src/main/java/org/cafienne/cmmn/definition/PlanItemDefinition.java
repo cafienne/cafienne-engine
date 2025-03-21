@@ -41,6 +41,9 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
 
     public PlanItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
+        if (this.getName().isEmpty()) {
+            modelDefinition.addDefinitionError("The plan item with id " + this.getId() +" must have a name");
+        }
         this.planItemDefinitionRefValue = parseAttribute("definitionRef", true);
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);

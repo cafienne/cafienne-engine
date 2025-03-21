@@ -25,6 +25,10 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
 
     public PlanItemDefinitionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
+        if (this.getName().isEmpty()) {
+            modelDefinition.addDefinitionError("The " + getItemType() + " with id " + this.getId() +" must have a name");
+        }
+
         defaultControl = parse("defaultControl", ItemControlDefinition.class, false);
         if (defaultControl == null) {
             // Make an item control with the default values

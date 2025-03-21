@@ -42,6 +42,9 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
 
     public DiscretionaryItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
+        if (this.getName().isEmpty()) {
+            modelDefinition.addDefinitionError("The discretionary item with id " + this.getId() +" must have a name");
+        }
         this.planItemDefinitionRefValue = parseAttribute("definitionRef", true);
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);
