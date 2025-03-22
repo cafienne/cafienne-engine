@@ -22,7 +22,6 @@ import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.slf4j.Logger;
@@ -239,10 +238,10 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
-    @Override
-    public CaseFileItem getItem(String propertyName) {
-        // TODO: can we get rid of this override?
-        throw new TransitionDeniedException("Cannot access a property '" + propertyName + "' of the case file item container. Have to address an individual item");
+    protected CaseFileItem constructItem(CaseFileItemDefinition childDefinition) {
+        // Constructing an item for an array should do that on the current.
+        //  If current does not yet exist, we'll create a first array element.
+        return Objects.requireNonNullElseGet(this.current, this::getNextItem).constructItem(childDefinition);
     }
 
     @Override
