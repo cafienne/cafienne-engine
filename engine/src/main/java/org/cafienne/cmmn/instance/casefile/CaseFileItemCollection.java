@@ -45,7 +45,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
         this.host = host;
     }
 
-    private CaseFileItem constructItem(CaseFileItemDefinition childDefinition) {
+    protected CaseFileItem constructItem(CaseFileItemDefinition childDefinition) {
         CaseFileItem item = childDefinition.createInstance(getCaseInstance(), this);
         items.add(item);
         return item;
