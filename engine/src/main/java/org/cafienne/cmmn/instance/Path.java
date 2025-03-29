@@ -226,6 +226,35 @@ public class Path implements Serializable {
     }
 
     /**
+     * Resolve the path on the specified case instance to return the corresponding case file item
+     *
+     * @param caseFile as Value object
+     * @return the Value object resolved for this path
+     * @throws InvalidPathException if the path is not compliant with the case definition, or if it points to
+     *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
+     *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
+     */
+    public Value<?> resolve(Value<?> caseFile) throws InvalidPathException {
+        if (this.isEmpty()) {
+            return caseFile;
+        } else {
+            return this.resolve(caseFile, this.root, this.depth);
+        }
+    }
+    //actual resolver based on a casefile Value<?>
+    private Value<?> resolve(Value<?> caseFile, Path path, int totalDepth) {
+        if (path.name != null && caseFile.isMap()) {
+            if (path.depth < totalDepth) {
+                return this.resolve(caseFile.asMap().get(path.name), root.child, path.depth);
+            } else {
+                return caseFile.asMap().get(path.name); //Should be the same as path.name on depth 0
+            }
+        } else {
+            return caseFile;
+        }
+    }
+
+    /**
      * Resolve this path on the parent.
      *
      * @param parentItem
