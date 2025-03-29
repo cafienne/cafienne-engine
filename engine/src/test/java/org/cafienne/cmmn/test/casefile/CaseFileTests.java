@@ -21,7 +21,8 @@ import org.junit.runners.Suite.SuiteClasses;
     TestMultiplicity.class,
     TestNewCaseFile.class,
     TestRepetitiveFileItems.class,
-    TestTaskInputMapping.class
+    TestTaskInputMapping.class,
+    TestPathValueResolver.class
     })
 public class CaseFileTests {
 
