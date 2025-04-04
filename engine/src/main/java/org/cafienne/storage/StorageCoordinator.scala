@@ -18,104 +18,31 @@
 package org.cafienne.storage
 
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.pekko.Done
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
-import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
-import org.apache.pekko.stream.Materializer
-import org.apache.pekko.stream.scaladsl.Sink
-import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import org.apache.pekko.actor.{ActorRef, Props}
+import org.apache.pekko.util.Timeout
+import org.cafienne.actormodel.exception.CommandException
 import org.cafienne.storage.actormodel.command.StorageCommand
-import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageEvent}
-import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorSupervisor}
-import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.archival.event.ArchivalStarted
-import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.RemovalStarted
-import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.storage.restore.event.RestoreStarted
+import org.cafienne.storage.actormodel.message.{StorageEvent, StorageFailure}
 import org.cafienne.system.CaseSystem
-import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
-class StorageCoordinator(val caseSystem: CaseSystem)
-  extends Actor
-    with StorageActorSupervisor
-    with ReadJournalProvider
-    with LazyLogging {
+class StorageCoordinator(caseSystem: CaseSystem) extends LazyLogging {
+  import org.apache.pekko.pattern.ask
+  implicit val timeout: Timeout = caseSystem.config.actor.askTimout
+  implicit val ec: ExecutionContext = caseSystem.ec
 
-  override val system: ActorSystem = caseSystem.system
-  override val readJournal: String = caseSystem.config.persistence.readJournal
-  implicit val ec: ExecutionContext = caseSystem.system.dispatcher
+  private val storageCoordinator: ActorRef = caseSystem.system.actorOf(Props(classOf[StorageCoordinationActor], caseSystem))
 
-  if (caseSystem.config.engine.storage.recoveryDisabled) {
-    logger.warn("WARNING: Storage Coordination Service does not recover any existing unfinished storage processes; set 'engine.storage-service.auto-start = true' to enable recovery ")
-  } else {
-    logger.warn("Launching Storage Coordination Service")
-    start()
-  }
-
-  private def getActor(command: StorageCommand): ActorRef = getActorRef(s"root_${command.metadata.actorId}", Props(command.RootStorageActorClass, caseSystem, command.metadata))
-
-  def start(): Unit = {
-    runStream() onComplete {
-      case Success(_) =>
-        logger.info("Completed re-activating Storage Deletion Actors")
-      case Failure(ex) =>
-        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from.", ex)
-        HealthMonitor.storageService.hasFailed(ex)
+  def askStorageCoordinator[A <: StorageCommand](command: A)(implicit timeout: Timeout): Future[StorageEvent] = {
+    storageCoordinator.ask(command).map {
+      case storageEvent: StorageEvent => storageEvent
+      case response: StorageFailure =>
+        throw new CommandException(response.getMessage)
+      case other => // Unknown new type of response that is not handled
+        val msg = s"Received an unexpected response after asking ${command.metadata} a command of type ${command.getClass.getSimpleName}. Response is of type ${other.getClass.getSimpleName} - ${other.toString}"
+        logger.error(msg)
+        throw new CommandException(msg)
     }
-  }
-
-  def runStream(): Future[Done] = {
-    implicit val mat: Materializer = Materializer(context)
-
-    journal().currentEventsByTag(StorageEvent.TAG, Offset.noOffset).mapAsync(1)(consumeModelEvent).runWith(Sink.ignore)
-  }
-
-  def consumeModelEvent(envelope: EventEnvelope): Future[Done] = {
-    envelope match {
-      // Trigger deletion process on actors that still have a StorageEvent (the first one is always RemovalInitiated).
-      //  But only trigger it on top level removals, as they will themselves instantiate their children that have not yet been deleted.
-      case EventEnvelope(_, _, _, event: StorageActionStarted) =>
-        if (event.metadata.isRoot) {
-          def restart(commandMaker: ActorMetadata => StorageCommand): Unit = {
-            val command = commandMaker(event.metadata)
-            logger.info(s"Recovering storage process '${command.getClass.getSimpleName}' on actor ${event.metadata}")
-            getActor(command).tell(command, self)
-          }
-
-          event match {
-            case _: RemovalStarted => restart(RemoveActorData)
-            case _: ArchivalStarted => restart(ArchiveActorData)
-            case _: RestoreStarted => restart(RestoreActorData)
-            case other => logger.warn(s"Cannot recover a storage process, because of unrecognized initiation event of type ${other.getClass.getName}")
-          }
-        }
-      case EventEnvelope(_, _, _, _: StorageEvent) => // Other storage events can be safely ignored.
-      case other => logger.error(s"Encountered unexpected storage tag matching event of type ${other.getClass.getName}")
-    }
-    Future.successful(Done)
-  }
-
-  override def receive: Receive = {
-    case command: StorageCommand =>
-      logger.whenDebugEnabled(logger.debug(s"Received $command"))
-      val originalSender = sender()
-      // Tell Cafienne Engine to remove this model actor from memory,
-      //  and then forward the command to the appropriate StorageActor, on behalf of the sender()
-      terminateModelActor(command.metadata, {
-        logger.whenDebugEnabled(logger.debug(s"Actor ${command.metadata.actorId} terminated, triggering follow up: $command"))
-        getActor(command).tell(command, originalSender)
-      })
-    case event: StorageRequestReceived =>
-      logger.whenDebugEnabled(logger.debug(s"Started storage request on ${event.metadata}"))
-    case event: StorageActionCompleted =>
-      // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
-      logger.whenDebugEnabled(logger.debug(s"Completed storage action for ${event.metadata}"))
-    case t: Terminated => removeActorRef(t)
-    case other => logger.warn(s"StorageCoordinator received an unknown message of type ${other.getClass.getName}")
   }
 }

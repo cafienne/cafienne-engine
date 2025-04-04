@@ -17,60 +17,38 @@
 
 package org.cafienne.service.http.storage
 
-import com.typesafe.scalalogging.LazyLogging
-import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.util.Timeout
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
-import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageFailure}
+import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.RemovalCompleted
 import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
 trait StorageRoute extends AuthenticatedRoute {
-  // Start a singleton coordinator.
-  //  The coordinator will also open the event stream on current events to recover existing
-  //  deletion processes that have not yet finished.
-  StorageRoute.startCoordinator(caseSystem)
   implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
   def initiateDataRemoval(metadata: ActorMetadata): Route = {
-    StorageRoute.askStorageCoordinator(RemoveActorData(metadata))
+    askStorageCoordinator(RemoveActorData(metadata))
   }
 
   def initiateDataArchival(metadata: ActorMetadata): Route = {
-    StorageRoute.askStorageCoordinator(ArchiveActorData(metadata))
+    askStorageCoordinator(ArchiveActorData(metadata))
   }
 
   def restoreActorData(metadata: ActorMetadata): Route = {
-    StorageRoute.askStorageCoordinator(RestoreActorData(metadata))
-  }
-}
-
-object StorageRoute extends LazyLogging {
-  private var storageCoordinator: ActorRef = _ // Will be initialized as soon as a StorageRoute is loaded
-
-  def startCoordinator(caseSystem: CaseSystem): Unit = {
-    if (storageCoordinator == null) {
-      val system: ActorSystem = caseSystem.system
-      storageCoordinator = system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
-    }
+    askStorageCoordinator(RestoreActorData(metadata))
   }
 
-  def askStorageCoordinator(command: StorageCommand)(implicit timeout: Timeout): Route = {
-    import org.apache.pekko.pattern.ask
-
-    onComplete(storageCoordinator.ask(command)) {
+  private def askStorageCoordinator(command: StorageCommand)(implicit timeout: Timeout): Route = {
+    onComplete(caseSystem.storageCoordinator.askStorageCoordinator(command)) {
       case Success(value) =>
         value match {
           case _: StorageRequestReceived =>
@@ -82,8 +60,6 @@ object StorageRoute extends LazyLogging {
             complete(StatusCodes.NotFound)
           case _: RemovalCompleted =>
             complete(StatusCodes.NotFound, s"Cannot find ${command.metadata}")
-          case response: StorageFailure =>
-            complete(StatusCodes.NotFound, response.getMessage)
           case other => // Unknown new type of response that is not handled
             logger.error(s"Received an unexpected response after asking ${command.metadata} a command of type ${command.getClass.getSimpleName}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.Accepted)
@@ -91,4 +67,5 @@ object StorageRoute extends LazyLogging {
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }
   }
+
 }
