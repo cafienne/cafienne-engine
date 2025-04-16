@@ -17,6 +17,14 @@
 
 package org.cafienne.persistence.querydb.query.filter
 
+import org.cafienne.persistence.querydb.query.filter.CaseInstanceType.CaseInstanceType
+
+object CaseInstanceType extends Enumeration {
+  type CaseInstanceType = Value
+
+  val Instance, Root = Value
+}
+
 case class TaskFilter(tenant: Option[String] = None,
                       identifiers: Option[String] = None,
                       caseName: Option[String] = None,
@@ -27,4 +35,5 @@ case class TaskFilter(tenant: Option[String] = None,
                       dueOn: Option[String] = None,
                       dueBefore: Option[String] = None,
                       dueAfter: Option[String] = None,
-                      timeZone: Option[String] = None)
+                      timeZone: Option[String] = None,
+                      caseInstanceType: CaseInstanceType = CaseInstanceType.Instance)
