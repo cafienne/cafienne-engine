@@ -25,15 +25,18 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
   val queryDBWriter: QueryDBWriter = queryDB.writer
   val taskQueries = new TaskQueriesImpl(queryDB)
+  val caseQueries = new CaseQueriesImpl(queryDB)
 
   val tenant = "tenant"
   val case33 = "33"
   val case44 = "44"
+  val case55 = "55"
   val case44Child = "44-child"
 
   val testUser: PlatformUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
   val userWithAandB: PlatformUser = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
   val userWithBandC: PlatformUser = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
+  val userWithC: PlatformUser = TestIdentityFactory.createPlatformUser("userC", tenant, Set("C"))
 
   override def beforeAll(): Unit = {
 
@@ -46,6 +49,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     caseUpdater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
     caseUpdater.upsert(CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
     caseUpdater.upsert(CaseRecord(id = case44Child, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
+    caseUpdater.upsert(CaseRecord(id = case55, tenant = tenant, rootCaseId = case55, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
     caseUpdater.commit()
 
     println("Writing case team members")
@@ -62,6 +66,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "A"))
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "B"))
     caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44Child, tenant, testUser, "B"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case55, tenant, userWithC, "A"))
     caseUpdater.commit()
 
     println("Writing tasks and tenant users")
@@ -120,6 +125,25 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     res.size must be(2)
   }
 
+  it should "retrieve a case instance" in {
+    val res = Await.result(caseQueries.getCaseInstance(case55, userWithC), 1.second)
+    res.size must be(1)
+  }
+
+  it should "User having access to cases having no tasks  with root case instance id" in {
+    val res = Await.result(taskQueries.getCaseTasks(case55, userWithC), 1.second)
+    res.size must be(0)
+  }
+
+  it should "User not having access to any case filter all tasks with root case instance id" in {
+    val res = Await.result(taskQueries.getCaseTasks(case44, userWithC, filter = TaskFilter(caseInstanceType = CaseInstanceType.Root)), 1.second)
+    res.size must be(2)
+  }
+
+  it should "filter all tasks with root case id, but without getting all sub case tasks" in {
+    val res = Await.result(taskQueries.getCaseTasks(case44, testUser), 1.second)
+    res.size must be(1)
+  }
 
   it should "not find tasks when not in case team" in {
     val res = Await.result(taskQueries.getAllTasks(userWithBandC), 1.second)
