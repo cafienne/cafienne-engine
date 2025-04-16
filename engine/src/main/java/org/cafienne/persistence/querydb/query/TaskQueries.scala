@@ -21,7 +21,7 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
-import org.cafienne.persistence.querydb.query.filter.TaskFilter
+import org.cafienne.persistence.querydb.query.filter.{CaseInstanceType, TaskFilter}
 import org.cafienne.persistence.querydb.record.TaskRecord
 import org.cafienne.persistence.querydb.schema.QueryDB
 
@@ -40,7 +40,7 @@ trait TaskQueries {
 
   def getTasksWithCaseName(caseName: String, tenant: Option[String], user: UserIdentity): Future[Seq[TaskRecord]] = ???
 
-  def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = ???
+  def getCaseTasks(caseInstanceId: String, user: UserIdentity, filter: TaskFilter = TaskFilter()): Future[Seq[TaskRecord]] = ???
 
   def getAllTasks(user: UserIdentity, filter: TaskFilter = TaskFilter(), area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[TaskRecord]] = ???
 
@@ -97,21 +97,28 @@ class TaskQueriesImpl(queryDB: QueryDB)
     db.run(query.distinct.result)
   }
 
-  override def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = {
+  override def getCaseTasks(caseInstanceId: String, user: UserIdentity, filter: TaskFilter = TaskFilter()): Future[Seq[TaskRecord]] = {
+    val casesTable = TableQuery[CaseInstanceTable]
+    val tasksTable = TableQuery[TaskTable]
     val query = for {
-      // Get the case
-      baseQuery <- TableQuery[TaskTable]
-        .filter(_.caseInstanceId === caseInstanceId)
-        // Note: join full may sound heavy, but it is actually only on the case id, and that MUST exist as well.
-        //  This helps distinguishing between case-not-found and no-tasks-found-on-existing-case-that-we-have-access-to
-        .joinFull(TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).map(_.id)).on(_.caseInstanceId === _)
+      foundCases <- if (filter.caseInstanceType == CaseInstanceType.Root) casesTable.filter(_.rootCaseId === caseInstanceId).filterOpt(filter.caseName)(_.caseName === _).map(_.id) else casesTable.filter(_.id === caseInstanceId).map(_.id)
+      baseQuery <- tasksTable
+        .filter(_.caseInstanceId === foundCases)
+        .filterOpt(filter.tenant)(_.tenant === _)
+        .filterOpt(filter.taskName)(_.taskName === _)
+        .filterOpt(filter.taskState)((row, state) => row.taskState inSet state.split(";"))
+        .filterOpt(filter.owner)(_.owner === _)
+        .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+        .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+        .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+        .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
       // Access control query
       _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
-      if (records.map(_._2).isEmpty) throw CaseSearchFailure(caseInstanceId)
-      records.map(_._1).filter(_.nonEmpty).map(_.get)
+      if (records.isEmpty) throw new CaseSearchFailure(caseInstanceId)
+      records
     })
   }
 
