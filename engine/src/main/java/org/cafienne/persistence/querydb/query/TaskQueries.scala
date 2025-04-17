@@ -21,6 +21,7 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
+import org.cafienne.persistence.querydb.query.filter.CaseInstanceType.CaseInstanceType
 import org.cafienne.persistence.querydb.query.filter.{CaseInstanceType, TaskFilter}
 import org.cafienne.persistence.querydb.record.TaskRecord
 import org.cafienne.persistence.querydb.schema.QueryDB
@@ -97,28 +98,36 @@ class TaskQueriesImpl(queryDB: QueryDB)
     db.run(query.distinct.result)
   }
 
-  override def getCaseTasks(caseInstanceId: String, user: UserIdentity, filter: TaskFilter = TaskFilter()): Future[Seq[TaskRecord]] = {
+  private def createCaseInstanceQuery(caseInstanceId: String, user: UserIdentity, idType: CaseInstanceType): Query[Rep[String], String, Seq] = {
     val casesTable = TableQuery[CaseInstanceTable]
+    for {
+      caseQuery <- if (idType == CaseInstanceType.Root) casesTable.filter(_.rootCaseId === caseInstanceId).map(_.id) else casesTable.filter(_.id === caseInstanceId).map(_.id)
+    } yield caseQuery
+  }
+
+  override def getCaseTasks(caseInstanceId: String, user: UserIdentity, filter: TaskFilter = TaskFilter()): Future[Seq[TaskRecord]] = {
     val tasksTable = TableQuery[TaskTable]
     val query = for {
-      foundCases <- if (filter.caseInstanceType == CaseInstanceType.Root) casesTable.filter(_.rootCaseId === caseInstanceId).filterOpt(filter.caseName)(_.caseName === _).map(_.id) else casesTable.filter(_.id === caseInstanceId).map(_.id)
-      baseQuery <- tasksTable
-        .filter(_.caseInstanceId === foundCases)
-        .filterOpt(filter.tenant)(_.tenant === _)
-        .filterOpt(filter.taskName)(_.taskName === _)
-        .filterOpt(filter.taskState)((row, state) => row.taskState inSet state.split(";"))
-        .filterOpt(filter.owner)(_.owner === _)
-        .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
-        .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
-      // Access control query
+      baseQuery <-
+        createCaseInstanceQuery(caseInstanceId, user, filter.caseInstanceType)
+          .joinLeft(tasksTable
+            .filterOpt(filter.taskName)(_.taskName === _)
+            .filterOpt(filter.taskState)((row, state) => row.taskState inSet state.split(";"))
+            .filterOpt(filter.owner)(_.owner === _)
+            .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+            .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+            .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+            .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+          ).on(_ === _.caseInstanceId)
+
+
       _ <- membershipQuery(user, caseInstanceId)
-    } yield baseQuery
+    } yield (baseQuery)
 
     db.run(query.distinct.result).map(records => {
-      if (records.isEmpty) throw new CaseSearchFailure(caseInstanceId)
-      records
+      if (records.map(_._1).isEmpty) throw CaseSearchFailure(caseInstanceId)
+      System.out.println("Found " + records.size +" records: " + records)
+      records.filter(_._1.nonEmpty).map(_._2).filter(_.nonEmpty).map(_.get)
     })
   }
 

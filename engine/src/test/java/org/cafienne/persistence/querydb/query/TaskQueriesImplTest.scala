@@ -8,7 +8,7 @@ import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
-import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
+import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.persistence.querydb.query.filter.{CaseInstanceType, TaskFilter}
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
 import org.cafienne.persistence.querydb.schema.QueryDB
@@ -136,8 +136,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "User not having access to any case filter all tasks with root case instance id" in {
-    val res = Await.result(taskQueries.getCaseTasks(case44, userWithC, filter = TaskFilter(caseInstanceType = CaseInstanceType.Root)), 1.second)
-    res.size must be(2)
+    assertThrows[CaseSearchFailure] {
+      Await.result(taskQueries.getCaseTasks(case44, userWithC, filter = TaskFilter(caseInstanceType = CaseInstanceType.Root)), 1.second)
+    }
   }
 
   it should "filter all tasks with root case id, but without getting all sub case tasks" in {
