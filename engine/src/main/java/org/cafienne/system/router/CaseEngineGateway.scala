@@ -23,6 +23,8 @@ import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
 import org.cafienne.processtask.instance.ProcessTaskActor
+import org.cafienne.storage.StorageCoordinator
+import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
 
@@ -37,6 +39,7 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
   private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "tenants")
   private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "consent-groups")
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
+  private val storageCoordinator: ActorRef = caseSystem.system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
 
   def request(message: Any): Future[Any] = {
     import org.apache.pekko.pattern.ask
@@ -51,6 +54,7 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
 
   private def getRouter(message: Any): ActorRef = {
     message match {
+      case _: StorageCommand => storageCoordinator
       case command: ModelCommand =>
         val actorClass = command.actorClass()
         // Unfortunately for some reason we cannot use scala matching on the actor class.
