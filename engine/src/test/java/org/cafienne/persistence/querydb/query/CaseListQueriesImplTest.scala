@@ -40,6 +40,9 @@ class CaseListQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConf
   val activeCase: CaseRecord = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
   val terminatedCase: CaseRecord = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, caseName = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
   val completedCase: CaseRecord = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, caseName = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val childCase: CaseRecord = CaseRecord(id = idOfActiveCase + "_child", tenant = tenant, parentCaseId = activeCase.id, rootCaseId = activeCase.id, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val childCase2: CaseRecord = CaseRecord(id = idOfActiveCase + "_child2", tenant = tenant, parentCaseId = activeCase.id, rootCaseId = activeCase.id, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val grandChildCase: CaseRecord = CaseRecord(id = idOfActiveCase + "_child_child", tenant = tenant, parentCaseId = childCase.id, rootCaseId = activeCase.id, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
 
   val planItem1_1: PlanItemRecord = PlanItemRecord(id = UUID.randomUUID().toString, definitionId = "abc", caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
@@ -57,9 +60,12 @@ class CaseListQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConf
   val user: PlatformUser = TestIdentityFactory.createPlatformUser("user1", tenant, Set("A", "B"))
 
   val caseTeamMemberRecords: Seq[CaseTeamUserRecord] = Seq(
-    TestIdentityFactory.createTeamMember(idOfActiveCase, tenant, user, ""),
-    TestIdentityFactory.createTeamMember(idOfTerminatedCase, tenant, user, ""),
-    TestIdentityFactory.createTeamMember(idOfCompletedCase, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(activeCase.id, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(terminatedCase.id, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(completedCase.id, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(childCase.id, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(childCase2.id, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(grandChildCase.id, tenant, user, ""),
   )
 
   override def beforeAll(): Unit = {
@@ -70,6 +76,9 @@ class CaseListQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConf
     caseUpdater.upsert(planItem1_1)
     caseUpdater.upsert(terminatedCase)
     caseUpdater.upsert(completedCase)
+    caseUpdater.upsert(childCase)
+    caseUpdater.upsert(childCase2)
+    caseUpdater.upsert(grandChildCase)
     caseUpdater.upsert(planItem2_1)
     caseTeamMemberRecords.foreach(caseUpdater.upsert)
     TestIdentityFactory.asDatabaseRecords(user).foreach(tenantUpdater.upsert)
@@ -104,7 +113,7 @@ class CaseListQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConf
 
   it should "retrieve cases filtered by status" in {
     val res = Await.result(caselistQueries.getCases(user, tenantFilter.copy(status = Some("Active"))), 3.seconds)
-    res must be (Seq(activeCase))
+    res must contain (activeCase)
   }
 
   it should "retrieve my terminated cases" in {
@@ -115,6 +124,11 @@ class CaseListQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConf
   it should "retrieve my completed cases" in {
     val res = Await.result(caselistQueries.getCases(user, tenantFilter.copy(status = Some("Completed"))), 3.seconds)
     res must be (Seq(completedCase))
+  }
+
+  it should "retrieve cases filtered by root case id" in {
+    val res = Await.result(caselistQueries.getCases(user, CaseFilter(rootCaseId = Some(idOfActiveCase))), 3.seconds)
+    res must be (Seq(activeCase, childCase, childCase2, grandChildCase))
   }
 
   // *******************************************************************************************************************

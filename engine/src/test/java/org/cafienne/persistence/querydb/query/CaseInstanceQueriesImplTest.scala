@@ -11,8 +11,7 @@ import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.materializer.tenant.TenantStorageTransaction
-import org.cafienne.persistence.querydb.query.cmmn.filter.CaseFilter
-import org.cafienne.persistence.querydb.query.cmmn.implementations.{CaseInstanceQueriesImpl, CaseListQueriesImpl}
+import org.cafienne.persistence.querydb.query.cmmn.implementations.CaseInstanceQueriesImpl
 import org.cafienne.persistence.querydb.query.result.CaseList
 import org.cafienne.persistence.querydb.record.{CaseRecord, CaseTeamUserRecord, PlanItemRecord}
 import org.cafienne.persistence.querydb.schema.QueryDB
