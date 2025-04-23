@@ -347,6 +347,7 @@ class CaseQueriesImpl(queryDB: QueryDB)
     val query = for {
       baseQuery <- statusFilter(filter.status)
         .filterOpt(filter.tenant)((t, value) => t.tenant === value)
+        .filterOpt(filter.rootCaseId)((t, value) => t.rootCaseId === value)
         .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
 
       // Validate team membership
