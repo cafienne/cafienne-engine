@@ -34,6 +34,7 @@ import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.system.router.CaseEngineGateway;
+import org.cafienne.system.router.GatewayMessageRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class CaseEventListener {
     private final List<ModelEvent> publishedEvents = new ArrayList<>();
     private List<ModelEvent> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
-    private final CaseEngineGateway caseMessageRouter; // proxy to the case system
+    private final GatewayMessageRouter caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
     private final TestScript testScript;
     private final CaseEventPublisher readJournal;

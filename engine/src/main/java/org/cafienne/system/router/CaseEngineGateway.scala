@@ -30,7 +30,7 @@ import org.cafienne.tenant.TenantActor
 
 import scala.concurrent.Future
 
-class CaseEngineGateway(caseSystem: CaseSystem) {
+class CaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
   private val system: ActorSystem = caseSystem.system
   private val terminationRequests = collection.concurrent.TrieMap[String, ActorRef]()
   private val actors = collection.concurrent.TrieMap[String, ActorRef]()
