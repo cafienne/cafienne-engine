@@ -61,6 +61,8 @@ object Dependencies {
     , "org.apache.commons"      %  "commons-text"                         % "1.13.0" // StrSubstitutor usage inside process tasks
     , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
     , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.2" // Used in StringValue xsd date conversions
+    // UUID v7 support
+    , "com.github.f4b6a3"       %  "uuid-creator"                         % "6.1.1"
     // DB Schema
     , "org.flywaydb"            %  "flyway-core"                          % "9.22.3"
     , "org.flywaydb"            %  "flyway-sqlserver"                     % "9.22.3"

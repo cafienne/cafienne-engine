@@ -17,6 +17,8 @@
 
 package org.cafienne.util;
 
+import com.github.f4b6a3.uuid.UuidCreator;
+
 import java.util.UUID;
 
 
@@ -24,7 +26,7 @@ public class Guid {
     private final UUID uuid;
 
     public Guid() {
-        uuid = UUID.randomUUID();
+        uuid = UuidCreator.getTimeOrderedEpoch();
     }
 
     public String toString() {
