@@ -64,7 +64,7 @@ class TestPublicCaseOutputEvents
 
           val humanTaskId = firstBatch.head.publicEvents.map(_.content).filter(_.isInstanceOf[HumanTaskStarted]).map(_.asInstanceOf[HumanTaskStarted]).map(_.taskId).head
           val taskOutput = new ValueMap("Output", "Output can be anything")
-          val completeLaterTask = new CompleteHumanTask(testUser, caseInstanceId, humanTaskId, new ValueMap("Result", taskOutput))
+          val completeLaterTask = new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, humanTaskId, new ValueMap("Result", taskOutput))
 
           whenReady(caseSystem.sendCommand(completeLaterTask))(_ => {
             whenReady(taskReader) { secondBatch: Seq[PublicCaseEventBatch] => {

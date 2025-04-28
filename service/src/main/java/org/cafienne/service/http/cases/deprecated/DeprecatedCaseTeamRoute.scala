@@ -32,7 +32,7 @@ class DeprecatedCaseTeamRoute(override val httpService: CaseEngineHttpServer) ex
     caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam") {
         entity(as[BackwardCompatibleTeamMemberFormat]) { input =>
-          askCase(user, caseInstanceId, caseOwner => new DeprecatedUpsert(caseOwner, caseInstanceId, input.upsertMemberData))
+          askCase(user, caseInstanceId, caseMember => new DeprecatedUpsert(caseMember, caseInstanceId, caseMember.rootCaseId, input.upsertMemberData))
         }
       }
     }
@@ -44,9 +44,9 @@ class DeprecatedCaseTeamRoute(override val httpService: CaseEngineHttpServer) ex
       path("caseteam" / Segment) { memberId =>
         parameters("type".?) { memberType =>
           if (memberType.nonEmpty && memberType.get == "role") {
-            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamTenantRole(caseMember, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamTenantRole(caseMember, caseInstanceId, caseMember.rootCaseId, memberId))
           } else {
-            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamUser(caseMember, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamUser(caseMember, caseInstanceId, caseMember.rootCaseId, memberId))
           }
         }
       }

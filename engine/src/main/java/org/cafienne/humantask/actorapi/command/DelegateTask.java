@@ -32,8 +32,8 @@ import java.io.IOException;
 public class DelegateTask extends TaskManagementCommand {
     private final CaseUserIdentity delegate;
 
-    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity delegate) {
-        super(user, caseInstanceId, taskId);
+    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, CaseUserIdentity delegate) {
+        super(user, caseInstanceId, rootCaseId, taskId);
         this.delegate = delegate;
     }
 

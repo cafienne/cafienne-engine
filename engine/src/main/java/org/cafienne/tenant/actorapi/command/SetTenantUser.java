@@ -31,8 +31,8 @@ import java.io.IOException;
 public class SetTenantUser extends TenantCommand {
     public final TenantUser newUser;
 
-    public SetTenantUser(TenantUser tenantOwner, String tenant, TenantUser newUser) {
-        super(tenantOwner, tenant);
+    public SetTenantUser(TenantUser tenantOwner, String tenant, TenantUser newUser, String rootCaseId) {
+        super(tenantOwner, tenant, rootCaseId);
         this.newUser = newUser;
     }
 

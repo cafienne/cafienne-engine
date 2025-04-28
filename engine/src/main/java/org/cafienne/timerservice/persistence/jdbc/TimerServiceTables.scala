@@ -38,6 +38,8 @@ trait TimerServiceTables extends SlickTableExtensions {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
+    def rootCaseId = column[String]("root_case_id", O.Default(""))
+
     def moment = column[Instant]("moment")
 
     def tenant = idColumn[String]("tenant")
@@ -49,7 +51,8 @@ trait TimerServiceTables extends SlickTableExtensions {
     def indexTimerId = oldStyleIndex(timerId)
     def indexTenant = oldStyleIndex(tenant)
     def indexMoment = index(oldStyleIxName(moment), moment)
+    def indexRootCaseId = oldStyleIndex(rootCaseId)
 
-    def * = (timerId, caseInstanceId, moment, tenant, user).mapTo[TimerServiceRecord]
+    def * = (timerId, caseInstanceId, rootCaseId, moment, tenant, user).mapTo[TimerServiceRecord]
   }
 }

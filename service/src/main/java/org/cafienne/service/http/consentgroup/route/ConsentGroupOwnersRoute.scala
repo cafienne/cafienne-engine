@@ -52,7 +52,7 @@ class ConsentGroupOwnersRoute(override val httpService: CaseEngineHttpServer) ex
   @Consumes(Array("application/json"))  def replaceGroup: Route = post {
     consentGroupUser { groupOwner =>
         entity(as[ConsentGroupFormat]) { newGroup =>
-          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup(groupOwner)))
+          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup(groupOwner), groupOwner.groupId))
         }
     }
   }
@@ -77,7 +77,7 @@ class ConsentGroupOwnersRoute(override val httpService: CaseEngineHttpServer) ex
     consentGroupUser { groupOwner =>
       path("members") {
         entity(as[ConsentGroupUserFormat]) { newMember =>
-          askConsentGroup(new SetConsentGroupMember(groupOwner, newMember.asMember))
+          askConsentGroup(new SetConsentGroupMember(groupOwner, newMember.asMember, groupOwner.groupId))
         }
       }
     }
@@ -102,7 +102,7 @@ class ConsentGroupOwnersRoute(override val httpService: CaseEngineHttpServer) ex
   def removeGroupMember: Route = delete {
     consentGroupUser { groupOwner =>
       path("members" / Segment) { userId =>
-        askConsentGroup(new RemoveConsentGroupMember(groupOwner, userId))
+        askConsentGroup(new RemoveConsentGroupMember(groupOwner, userId, groupOwner.groupId))
       }
     }
   }

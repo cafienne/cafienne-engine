@@ -35,7 +35,7 @@ abstract class TestScriptCommand extends CaseCommand {
     private final String tenant;
 
     protected TestScriptCommand(String tenant, CaseUserIdentity user, String caseInstanceId) {
-        super(user, caseInstanceId);
+        super(user, caseInstanceId, caseInstanceId);
         this.tenant = tenant;
     }
 

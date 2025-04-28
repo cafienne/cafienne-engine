@@ -26,8 +26,8 @@ import org.cafienne.json.ValueMap;
  * Examples: assign, claim, delegate, revoke, etc.
  */
 public abstract class TaskManagementCommand extends HumanTaskCommand {
-    protected TaskManagementCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
-        super(user, caseInstanceId, taskId);
+    protected TaskManagementCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId) {
+        super(user, caseInstanceId, rootCaseId, taskId);
     }
 
     protected TaskManagementCommand(ValueMap json) {

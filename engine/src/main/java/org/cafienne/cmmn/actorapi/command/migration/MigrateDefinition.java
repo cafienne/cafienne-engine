@@ -33,8 +33,8 @@ public class MigrateDefinition extends MigrateCaseDefinition {
      * @param caseInstanceId The instance identifier of the case
      * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition newDefinition, CaseTeam newTeam) {
-        super(user, caseInstanceId, newDefinition, newTeam);
+    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, String rootCaseId, CaseDefinition newDefinition, CaseTeam newTeam) {
+        super(user, caseInstanceId, rootCaseId, newDefinition, newTeam);
     }
 
     public MigrateDefinition(ValueMap json) {

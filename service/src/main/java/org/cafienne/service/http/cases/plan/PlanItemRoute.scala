@@ -112,7 +112,7 @@ class PlanItemRoute(override val httpService: CaseEngineHttpServer) extends Case
         if (transition == null) {
           complete(StatusCodes.BadRequest, "Transition " + transition + " is not valid")
         } else {
-          askCase(user, caseInstanceId, caseMember => new MakePlanItemTransition(caseMember, caseInstanceId, planItemId, transition))
+          askCase(user, caseInstanceId, caseMember => new MakePlanItemTransition(caseMember, caseInstanceId, caseMember.rootCaseId, planItemId, transition))
         }
       }
     }

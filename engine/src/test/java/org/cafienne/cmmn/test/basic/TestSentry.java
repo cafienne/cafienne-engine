@@ -35,33 +35,33 @@ public class TestSentry {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Stage1").assertState(State.Available);
-            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId, caseInstanceId), items -> {
                 new PlanningTableAssertion(items).assertItem("Disc1");
             });
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), casePlan -> {
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Suspend), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Suspended);
             casePlan.assertPlanItem("Item1.1").assertState(State.Suspended);
         });
 
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), casePlan -> {
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Reactivate), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Active).assertLastTransition(Transition.ParentResume);
             casePlan.assertPlanItem("Item1.1").assertState(State.Active).assertLastTransition(Transition.ParentResume);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);
@@ -83,9 +83,9 @@ public class TestSentry {
             case1.assertPlanItem("Item1").assertState(State.Active);
             case1.assertPlanItem("Stage1").assertState(State.Available);
 
-            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), case2 -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId, caseInstanceId), case2 -> {
                 DiscretionaryItemAssertion discItem = new PlanningTableAssertion(case2).assertItem("Disc1");
-                testCase.insertStep(new AddDiscretionaryItem(testUser, caseInstanceId, "Disc1", discItem.getDefinitionId(), discItem.getParentId(), null), case3 -> {
+                testCase.insertStep(new AddDiscretionaryItem(testUser, caseInstanceId, caseInstanceId, "Disc1", discItem.getDefinitionId(), discItem.getParentId(), null), case3 -> {
                     case3.print();
                     case3.assertPlanItem("Item1").assertState(State.Active);
                     case3.assertPlanItem("Stage1").assertState(State.Available);
@@ -95,7 +95,7 @@ public class TestSentry {
         });
 
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Active);
@@ -103,7 +103,7 @@ public class TestSentry {
             casePlan.assertPlanItem("Disc1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);
@@ -112,7 +112,7 @@ public class TestSentry {
             casePlan.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Disc1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Disc1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);

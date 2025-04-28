@@ -27,8 +27,8 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
 public class TerminateProcess extends ProcessCommand {
-    public TerminateProcess(UserIdentity user, String id) {
-        super(user, id);
+    public TerminateProcess(UserIdentity user, String id, String rootCaseId) {
+        super(user, id, rootCaseId);
     }
 
     public TerminateProcess(ValueMap json) {

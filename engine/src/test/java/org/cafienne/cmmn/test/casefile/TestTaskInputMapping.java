@@ -43,7 +43,7 @@ public class TestTaskInputMapping {
 
             // Now create a new task output, and complete the task with it
             // Completing the task must lead to a new task of the same kind, and we will also complete that one
-            testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, taskAddChild, new ValueMap("Result", child1)), result -> {
+            testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskAddChild, new ValueMap("Result", child1)), result -> {
                 result.print();
                 HumanTaskAssertion casePlan = new HumanTaskAssertion(result);
                 TestScript.debugMessage("taskAddChild - id: " + taskAddChild);
@@ -56,11 +56,11 @@ public class TestTaskInputMapping {
                 PlanItemTransitioned event = testCase.getEventListener().awaitCasePlanEvent("Task.AddChild", PlanItemTransitioned.class,
                         e -> !e.getPlanItemId().equals(taskAddChild) && e.getCurrentState().equals(State.Active));
                 String secondTaskAddChild = event.getPlanItemId();
-                testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, secondTaskAddChild, new ValueMap("Result", child2)), secondResult -> {
+                testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, secondTaskAddChild, new ValueMap("Result", child2)), secondResult -> {
                     secondResult.print();
 
                     // Now trigger the event and check the input of the new TaskWithChild
-                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, "Trigger.TaskWithChild", Transition.Occur), planAfterEvent -> {
+                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Trigger.TaskWithChild", Transition.Occur), planAfterEvent -> {
                         planAfterEvent.print();
                         testCase.getEventListener().awaitTaskInputFilled("TaskWithChild", taskEvent -> {
                             ValueMap expectedInput = new ValueMap("Input", child2.cloneValueNode());
@@ -73,7 +73,7 @@ public class TestTaskInputMapping {
                     });
 
                     // Now trigger the other event and check the input of the new TaskWithChild
-                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, "Trigger.TaskWithContainer", Transition.Occur), planAfterEvent -> {
+                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Trigger.TaskWithContainer", Transition.Occur), planAfterEvent -> {
                         planAfterEvent.print();
                         testCase.getEventListener().awaitTaskInputFilled("TaskWithContainer", taskEvent -> {
                             ValueMap expectedInput = new ValueMap("Input", new ValueList(child1.cloneValueNode(), child2.cloneValueNode()));

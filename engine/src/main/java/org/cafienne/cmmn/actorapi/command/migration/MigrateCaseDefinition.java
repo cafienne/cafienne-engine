@@ -42,8 +42,8 @@ public class MigrateCaseDefinition extends CaseCommand {
      * @param caseInstanceId The instance identifier of the case
      * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateCaseDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition newDefinition, CaseTeam newTeam) {
-        super(user, caseInstanceId);
+    public MigrateCaseDefinition(CaseUserIdentity user, String caseInstanceId, String rootCaseId, CaseDefinition newDefinition, CaseTeam newTeam) {
+        super(user, caseInstanceId, rootCaseId);
         this.newDefinition = newDefinition;
         this.newCaseTeam = newTeam;
     }

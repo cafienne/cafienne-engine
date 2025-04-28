@@ -220,7 +220,7 @@ class CaseRoute(override val httpService: CaseEngineHttpServer) extends CasesRou
   def debugCase: Route = put {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("debug" / Segment) { debugMode =>
-        askCase(user, caseInstanceId, caseMember => new SwitchDebugMode(caseMember, caseInstanceId, debugMode == "true"))
+        askCase(user, caseInstanceId, caseMember => new SwitchDebugMode(caseMember, caseInstanceId, caseMember.rootCaseId, debugMode == "true"))
       }
     }
   }

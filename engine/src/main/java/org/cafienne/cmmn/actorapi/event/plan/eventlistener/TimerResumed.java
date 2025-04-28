@@ -24,7 +24,7 @@ import org.cafienne.json.ValueMap;
 @Manifest
 public class TimerResumed extends TimerSet {
     public TimerResumed(TimerEvent timerEvent) {
-        super(timerEvent);
+        super(timerEvent, timerEvent.rootCaseId);
     }
 
     public TimerResumed(ValueMap json) {

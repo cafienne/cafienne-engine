@@ -28,8 +28,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class SetCaseTeamGroup extends SetCaseTeamMemberCommand<CaseTeamGroup> {
-    public SetCaseTeamGroup(CaseUserIdentity user, String caseInstanceId, CaseTeamGroup newMember) {
-        super(user, caseInstanceId, newMember);
+    public SetCaseTeamGroup(CaseUserIdentity user, String caseInstanceId, String rootCaseId, CaseTeamGroup newMember) {
+        super(user, caseInstanceId, rootCaseId, newMember);
     }
 
     public SetCaseTeamGroup(ValueMap json) {

@@ -29,7 +29,7 @@ public class TestSentryRef {
         StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
-        MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, "Task_1", Transition.Complete);
+        MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Task_1", Transition.Complete);
         testCase.addStep(completeTask1, casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);

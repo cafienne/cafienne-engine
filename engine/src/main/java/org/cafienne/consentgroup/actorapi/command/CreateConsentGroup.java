@@ -29,8 +29,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class CreateConsentGroup extends CollectiveCommand implements BootstrapMessage {
-    public CreateConsentGroup(ConsentGroupUser user, ConsentGroup newGroupInfo) {
-        super(user, newGroupInfo);
+    public CreateConsentGroup(ConsentGroupUser user, String rootCaseId, ConsentGroup newGroupInfo) {
+        super(user, newGroupInfo, rootCaseId);
     }
 
     public CreateConsentGroup(ValueMap json) {

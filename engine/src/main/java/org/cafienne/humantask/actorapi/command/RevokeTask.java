@@ -26,8 +26,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class RevokeTask extends TaskManagementCommand {
-    public RevokeTask(CaseUserIdentity user, String caseInstanceId, String taskId) {
-        super(user, caseInstanceId, taskId);
+    public RevokeTask(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId) {
+        super(user, caseInstanceId, rootCaseId, taskId);
     }
 
     public RevokeTask(ValueMap json) {

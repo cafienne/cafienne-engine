@@ -32,8 +32,8 @@ import java.time.Instant;
 public class FillTaskDueDate extends TaskManagementCommand {
 	private final Instant dueDate;
 
-	public FillTaskDueDate(CaseUserIdentity user, String caseInstanceId, String taskId, Instant dueDate) {
-		super(user, caseInstanceId, taskId);
+	public FillTaskDueDate(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, Instant dueDate) {
+		super(user, caseInstanceId, rootCaseId, taskId);
 		this.dueDate = dueDate;
 	}
 

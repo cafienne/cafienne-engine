@@ -97,7 +97,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
      * @param transition
      */
     private void tell(Transition transition) {
-        tellTaskImplementation(new MakeCaseTransition(getCaseInstance().getCurrentUser(), subCaseId, transition));
+        tellTaskImplementation(new MakeCaseTransition(getCaseInstance().getCurrentUser(), subCaseId, mainCase.getRootCaseId(), transition));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         CaseDefinition newImplementation = newDefinition.getImplementationDefinition();
         CaseTeam newSubCaseTeam = mainCase.getCaseTeam().createSubCaseTeam(newImplementation);
 
-        giveNewDefinition(new MigrateCaseDefinition(getCaseInstance().getCurrentUser(), getId(), newImplementation, newSubCaseTeam));
+        giveNewDefinition(new MigrateCaseDefinition(getCaseInstance().getCurrentUser(), getId(), mainCase.getRootCaseId(), newImplementation, newSubCaseTeam));
     }
 
     @Override

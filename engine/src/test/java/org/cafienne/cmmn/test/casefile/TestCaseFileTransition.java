@@ -74,7 +74,7 @@ public class TestCaseFileTransition {
         helper.plus("Name", "Piet");
         helper.plus("Description", "Piet is a nice guy");
 
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, helperPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, helper, helperPath), casePlan -> {
             casePlan.print();
             casePlan.assertCaseFileItem(helperPath).assertValue(helper);
 
@@ -86,7 +86,7 @@ public class TestCaseFileTransition {
         });
 
         // Completing the task ReviewRequest
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -96,7 +96,7 @@ public class TestCaseFileTransition {
         });
 
         // Completing the task ReviewRequest
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -106,7 +106,7 @@ public class TestCaseFileTransition {
         });
 
         // Suspend the case
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), casePlan -> {
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Suspend), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Suspend, State.Suspended, State.Active);
 
@@ -119,7 +119,7 @@ public class TestCaseFileTransition {
         });
 
         // Reactivate the case
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), casePlan -> {
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Reactivate), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Reactivate, State.Active, State.Suspended);
 
@@ -129,14 +129,14 @@ public class TestCaseFileTransition {
         });
 
         StringValue piet = getCustomer("Piet");
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, customer0), casePlan -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, piet, customer0), casePlan -> {
             casePlan.print();
             // After changing customer, task should still be repeating, although value is now different.
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed, State.Active).assertRepeats();
         });
 
         // Completing the task ReviewRequest; now the task should no longer be repeating
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
 
             // All tasks should be completed, and no more repetition.
@@ -144,7 +144,7 @@ public class TestCaseFileTransition {
         });
 
         // Complete the case, by completing JustAnotherTask
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "JustAnotherTask", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId,"JustAnotherTask", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
 
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed);
@@ -154,7 +154,7 @@ public class TestCaseFileTransition {
         });
 
         ValueList customers = getCustomers("Piet", "Joop");
-        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, customerPath);
+        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, customers, customerPath);
         testCase.addStep(customerReplace, action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
@@ -162,26 +162,26 @@ public class TestCaseFileTransition {
         });
 
         ValueMap newRequestContent = new ValueMap("Customer", getCustomers("Klaas", "Henk"));
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, newRequestContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);
         });
 
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), requestPath), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(0);
         });
 
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, newRequestContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(4);
         });
 
         ValueMap singularRequestCustomerContent = new ValueMap("Customer", getCustomer("Loner"));
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, singularRequestCustomerContent, requestPath), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, singularRequestCustomerContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);

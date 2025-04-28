@@ -27,8 +27,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class SaveTaskOutput extends TaskOutputCommand {
-	public SaveTaskOutput(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(user, caseInstanceId, taskId, taskOutput);
+	public SaveTaskOutput(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, ValueMap taskOutput) {
+		super(user, caseInstanceId, rootCaseId, taskId, taskOutput);
 	}
 
 	public SaveTaskOutput(ValueMap json) {

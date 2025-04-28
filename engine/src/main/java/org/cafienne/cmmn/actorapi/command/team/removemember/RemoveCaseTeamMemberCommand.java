@@ -37,8 +37,8 @@ import java.io.IOException;
 abstract class RemoveCaseTeamMemberCommand<M extends CaseTeamMember> extends CaseTeamCommand {
     protected final String memberId;
 
-    protected RemoveCaseTeamMemberCommand(CaseUserIdentity user, String caseInstanceId, String memberId) {
-        super(user, caseInstanceId);
+    protected RemoveCaseTeamMemberCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String memberId) {
+        super(user, caseInstanceId, rootCaseId);
         this.memberId = memberId;
     }
 

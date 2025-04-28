@@ -54,8 +54,8 @@ public class AddDiscretionaryItem extends CaseCommand {
      * @param definitionId The id of the discretionary item; can be used instead of the name.
      * @param parentId The id of the plan item that contains this discretionary item (i.e., the stage or human task in which it is being planned).
      */
-    public AddDiscretionaryItem(CaseUserIdentity user, String caseInstanceId, String name, String definitionId, String parentId, String newPlanItemId) {
-        super(user, caseInstanceId);
+    public AddDiscretionaryItem(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String name, String definitionId, String parentId, String newPlanItemId) {
+        super(user, caseInstanceId, rootCaseId);
         this.name = name;
         this.planItemId = (newPlanItemId == null || newPlanItemId.isEmpty()) ? new Guid().toString() : newPlanItemId;
         this.definitionId = definitionId;

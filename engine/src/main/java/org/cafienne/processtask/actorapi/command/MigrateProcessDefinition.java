@@ -39,8 +39,8 @@ public class MigrateProcessDefinition extends ProcessCommand {
      * @param caseInstanceId The instance identifier of the case
      * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateProcessDefinition(UserIdentity user, String caseInstanceId, ProcessDefinition newDefinition) {
-        super(user, caseInstanceId);
+    public MigrateProcessDefinition(UserIdentity user, String caseInstanceId, String rootCaseId, ProcessDefinition newDefinition) {
+        super(user, caseInstanceId, rootCaseId);
         this.newDefinition = newDefinition;
     }
 

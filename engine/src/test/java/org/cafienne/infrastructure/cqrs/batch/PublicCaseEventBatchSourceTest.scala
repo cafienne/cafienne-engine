@@ -46,8 +46,8 @@ class PublicCaseEventBatchSourceTest
   val caseInstanceId: String = new Guid().toString
   val caseDefinition: CaseDefinition = loadCaseDefinition("testdefinition/public_event_test.xml")
   val startCaseCommand: StartCase = TestScript.createCaseCommand(testUser, caseInstanceId, caseDefinition, new ValueMap("Root", "Test"))
-  val triggerUserEvent = new MakePlanItemTransition(testUser, caseInstanceId, "UserEvent", Transition.Occur)
-  val completeLaterTask = new MakePlanItemTransition(testUser, caseInstanceId, "LaterTask", Transition.Complete)
+  val triggerUserEvent = new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "UserEvent", Transition.Occur)
+  val completeLaterTask = new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "LaterTask", Transition.Complete)
 
   "PublicCaseEventBatchSource" must {
     "publish events" in {

@@ -173,7 +173,7 @@ public class TestBasicTypes {
         ValueMap childItem = new ValueMap();
         childItem.plus("aChildString", "child-string");
         childItem.plus("aSecondChildString", "child-string-2");
-        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(childItem));
 
         // Now update the child item with new content: one property has a new value, another property is not updated, and a third property is newly
@@ -187,17 +187,17 @@ public class TestBasicTypes {
         ValueMap childItemClone = childItem.cloneValueNode();
         final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
-        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
+        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.plus("aChildInteger", 3);
-        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
+        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(replacedChildItem));
 
         // Now delete the child item.
-        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, childItemPath);
+        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItemPath);
         testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         testCase.runTest();
@@ -216,7 +216,7 @@ public class TestBasicTypes {
         ValueMap childItem = new ValueMap();
         childItem.plus("aChildString", "child-string");
         childItem.plus("aChildInteger", "I should be an integer");
-        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.assertStepFails(createChild);
 
         // Update the child item; Should fail because child is still not created
@@ -224,17 +224,17 @@ public class TestBasicTypes {
         updatedContent.plus("aChildString", "aNewChildString");
         updatedContent.plus("aChildInteger", "I should be an integer");
         
-        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
+        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
         testCase.assertStepFails(updateChild);
 
         // Replace the child item; Should fail because child is still not created
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.plus("aChildInteger", "I should be an integer");
-        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
+        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
         testCase.assertStepFails(replaceChild);
 
         // Now delete the child item.
-        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, childItemPath);
+        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItemPath);
         testCase.assertStepFails(deleteChild);
 
         // Now create a proper child and then we should fail in updating and replacing it
@@ -242,18 +242,18 @@ public class TestBasicTypes {
         // Create a child item; child item contains an invalid value, so it should reject the operation, and child should still be null
         childItem.plus("aChildString", "child-string");
         childItem.plus("aChildInteger", 9);
-        createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
+        createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(this.childItemPath).assertValue(childItem));
 
         // Again try to update the child item; Should fail because command has invalid content
-        updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), this.childItemPath);
+        updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, updatedContent.cloneValueNode(), this.childItemPath);
         testCase.assertStepFails(updateChild);
 
-        replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), this.childItemPath);
+        replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, replacedChildItem.cloneValueNode(), this.childItemPath);
         // And again try to replace the child item; Should fail because command has invalid content
         testCase.assertStepFails(replaceChild);
 
-        deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, this.childItemPath);
+        deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, caseInstanceId, this.childItemPath);
         // Now delete the child item again. That should work.
         testCase.addStep(deleteChild, casePlan -> casePlan.assertCaseFileItem(this.childItemPath).assertValue(Value.NULL));
 
@@ -276,7 +276,7 @@ public class TestBasicTypes {
         ValueList arrayOfChildItem = new ValueList();
         arrayOfChildItem.add(childItem.cloneValueNode());
 
-        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childArrayPath);
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childArrayPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(childArrayPath).assertValue(arrayOfChildItem).assertArrayElement(0).assertValue(childItem));
 
         // Now update the child item with new content: one property has a new value, another property is not updated, and a third property is newly
@@ -290,17 +290,17 @@ public class TestBasicTypes {
         ValueMap childItemClone = childItem.cloneValueNode();
         final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
-        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), child0);
+        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, updatedContent.cloneValueNode(), child0);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.plus("aChildInteger", 3);
-        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
+        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(replacedChildItem));
 
         // Now delete the child item.
-        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, child0);
+        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, caseInstanceId, child0);
         testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(Value.NULL));
 
         testCase.runTest();
@@ -323,14 +323,14 @@ public class TestBasicTypes {
         ValueList arrayOfChildItem = new ValueList();
         arrayOfChildItem.add(childItem.cloneValueNode());
 
-        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childArrayPath);
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childArrayPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(childArrayPath).assertValue(arrayOfChildItem).assertArrayElement(0).assertValue(childItem));
 
         ValueList secondArray = arrayOfChildItem.cloneValueNode();
         secondArray.add(childItem.cloneValueNode());
 
         // add another child
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childArrayPath), caseFile -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, childItem.cloneValueNode(), childArrayPath), caseFile -> {
             caseFile.assertCaseFileItem(childArrayPath).assertSize(2).assertValue(secondArray);
             caseFile.assertCaseFileItem(child0).assertValue(childItem);
             caseFile.assertCaseFileItem(child1).assertValue(childItem);
@@ -350,17 +350,17 @@ public class TestBasicTypes {
         ValueMap childItemClone = childItem.cloneValueNode();
         final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
-        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), child0);
+        UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, caseInstanceId, updatedContent.cloneValueNode(), child0);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.plus("aChildInteger", 3);
-        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
+        ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(replacedChildItem));
 
         // Now delete the child item.
-        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, child0);
+        DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, caseInstanceId, child0);
         testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(Value.NULL));
 
         testCase.runTest();

@@ -31,8 +31,8 @@ import java.io.IOException;
 public class RemoveConsentGroupMember extends ConsentGroupCommand {
     public final String userId;
 
-    public RemoveConsentGroupMember(ConsentGroupUser groupOwner, String userId) {
-        super(groupOwner, groupOwner.groupId());
+    public RemoveConsentGroupMember(ConsentGroupUser groupOwner, String userId, String rootCaseId) {
+        super(groupOwner, groupOwner.groupId(), rootCaseId);
         this.userId = userId;
     }
 

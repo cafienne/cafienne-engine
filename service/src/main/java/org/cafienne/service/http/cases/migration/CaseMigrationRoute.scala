@@ -62,7 +62,7 @@ class CaseMigrationRoute(override val httpService: CaseEngineHttpServer) extends
           val definitionsDocument = caseSystem.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
           val newDefinition = definitionsDocument.getFirstCase
           val newCaseTeam = migrateDefinition.newTeam.map(_.asTeam).orNull
-          askCase(user, caseInstanceId, caseMember => new MigrateDefinition(caseMember, caseInstanceId, newDefinition, newCaseTeam))
+          askCase(user, caseInstanceId, caseMember => new MigrateDefinition(caseMember, caseInstanceId, caseMember.rootCaseId, newDefinition, newCaseTeam))
         }
       }
     }

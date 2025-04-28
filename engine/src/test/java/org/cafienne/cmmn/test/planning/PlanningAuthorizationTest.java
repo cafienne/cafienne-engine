@@ -43,16 +43,16 @@ public class PlanningAuthorizationTest {
 
             final String discretionaryTaskName = "PlanMe";
 
-            testCase.insertStep(new GetDiscretionaryItems(caseOwner, caseInstanceId), step -> {
+            testCase.insertStep(new GetDiscretionaryItems(caseOwner, caseInstanceId, caseInstanceId), step -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(step);
 
                 // Now add discretionary task to the plan
                 DiscretionaryItemAssertion discretionaryTask = pta.assertItem(discretionaryTaskName);
                 String stageId = discretionaryTask.getParentId();
                 String definitionId = discretionaryTask.getDefinitionId();
-                testCase.insertStepFails(new AddDiscretionaryItem(caseMember, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), failure -> {
+                testCase.insertStepFails(new AddDiscretionaryItem(caseMember, caseInstanceId, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), failure -> {
                     // Planning by caseMember should fail, but by planner it should succeed.
-                    testCase.insertStep(new AddDiscretionaryItem(planner, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), CaseAssertion::print);
+                    testCase.insertStep(new AddDiscretionaryItem(planner, caseInstanceId, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), CaseAssertion::print);
                 });
             });
 
@@ -71,7 +71,7 @@ public class PlanningAuthorizationTest {
         StartCase startCase = createCaseCommand(caseOwner, caseInstanceId, definitions, caseTeam);
         testCase.addStep(startCase, CaseAssertion::print);
 
-        testCase.addStep(new GetDiscretionaryItems(caseOwner, caseInstanceId), action -> {
+        testCase.addStep(new GetDiscretionaryItems(caseOwner, caseInstanceId, caseInstanceId), action -> {
 
             final String discretionaryTaskName = "PlanMe";
 
@@ -85,13 +85,13 @@ public class PlanningAuthorizationTest {
             // Now add discretionary task to the plan
             String stageId = discretionaryTask.getParentId();
             String definitionId = discretionaryTask.getDefinitionId();
-            testCase.insertStepFails(new AddDiscretionaryItem(caseMember, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), failure -> {
+            testCase.insertStepFails(new AddDiscretionaryItem(caseMember, caseInstanceId, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), failure -> {
                 // Planning by anonymous should fail, but by planner it should succeed.
-                testCase.insertStep(new AddDiscretionaryItem(planner, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), CaseAssertion::print);
+                testCase.insertStep(new AddDiscretionaryItem(planner, caseInstanceId, caseInstanceId, "PlanMe", definitionId, stageId, "planned-item"), CaseAssertion::print);
             });
         });
 
-        testCase.addStep(new GetDiscretionaryItems(caseOwner, caseInstanceId), response -> {
+        testCase.addStep(new GetDiscretionaryItems(caseOwner, caseInstanceId, caseInstanceId), response -> {
             new PlanningTableAssertion(response).assertNoItems();
             GetDiscretionaryItemsResponse items = response.getTestCommand().getActualResponse();
             TestScript.debugMessage(items.toJson());

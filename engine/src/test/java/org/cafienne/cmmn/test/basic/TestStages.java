@@ -42,7 +42,7 @@ public class TestStages {
             item4.assertHumanTask("Task1.1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1.1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Task1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             StageAssertion item4 = casePlan.assertStage("Item4");

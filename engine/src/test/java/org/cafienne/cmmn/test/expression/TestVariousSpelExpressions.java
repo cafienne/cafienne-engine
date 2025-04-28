@@ -46,7 +46,7 @@ public class TestVariousSpelExpressions {
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
 
             // Now complete the HumanTask with the default output, and validate the task output filled event
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
                 taskCompleted.print();
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -76,27 +76,27 @@ public class TestVariousSpelExpressions {
             testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
         });
 
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new ValueMap(), new Path("SpecialOutput")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new ValueMap(), new Path("SpecialOutput")), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new LongValue(1), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new LongValue(1), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new LongValue(2), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new LongValue(2), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new LongValue(3), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new LongValue(3), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new LongValue(4), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new LongValue(4), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(2).assertStates(State.Terminated, State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Completed);
         });
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new LongValue(5), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, new LongValue(5), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(3).assertStates(State.Terminated, State.Active);
             result.assertPlanItems("Milestone").assertSize(2).assertStates(State.Completed);
         });
@@ -130,7 +130,7 @@ public class TestVariousSpelExpressions {
             //  This ought to result in a new HumanTask, which we will also complete.
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
 
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), case2 -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), case2 -> {
                 // Validate output again. Does not add too much value, as this is also done in the test above
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -147,7 +147,7 @@ public class TestVariousSpelExpressions {
                 // Print the case...
 //                case2.print();
 
-                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), case3 -> {
+                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), case3 -> {
 //                  case3.print();
                     // Await completion of 'nextTaskId'
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Completed);
@@ -172,7 +172,7 @@ public class TestVariousSpelExpressions {
             // Get the id of the first "HumanTask" in the case. It must be in state Active
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
             // Now complete that task with the "stop now" output; this should make the milestone Occur, which must Terminate the Stage.
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), case2 -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), case2 -> {
                 // Validate the output; it must be 'stop now'
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -187,7 +187,7 @@ public class TestVariousSpelExpressions {
 
 //                case2.print();
 
-                testCase.assertStepFails(new CompleteHumanTask(testUser, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), failure -> {
+                testCase.assertStepFails(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), failure -> {
                     failure.print();
                     // Last HumanTask must be terminated
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Terminated);
@@ -208,7 +208,7 @@ public class TestVariousSpelExpressions {
             // Get the id of the first "HumanTask" in the case. It must be in state Active
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
             // Now complete that task with the "stop now" output; this should make the milestone Occur, which must Terminate the Stage.
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, specialTaskOutput.cloneValueNode()), case2 -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, specialTaskOutput.cloneValueNode()), case2 -> {
                 // Validate the output; it must be 'stop now'
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -223,7 +223,7 @@ public class TestVariousSpelExpressions {
 
 //                case2.print();
 
-                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), case3 -> {
+                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), case3 -> {
 //                    case3.print();
                     // Last HumanTask must be terminated
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Completed);

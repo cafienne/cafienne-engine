@@ -37,8 +37,8 @@ public class GetDiscretionaryItems extends CaseCommand {
      * @param caseInstanceId
      *          The id of the case instance to get the discretionary items for
      */
-    public GetDiscretionaryItems(CaseUserIdentity user, String caseInstanceId) {
-        super(user, caseInstanceId);
+    public GetDiscretionaryItems(CaseUserIdentity user, String caseInstanceId, String rootCaseId) {
+        super(user, caseInstanceId, rootCaseId);
     }
 
     public GetDiscretionaryItems(ValueMap json) {

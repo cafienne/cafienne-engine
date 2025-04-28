@@ -41,8 +41,8 @@ public class CreateCaseFileItem extends CaseFileItemCommand {
      * @param newContent         A value structure with contents of the new case file item
      * @param path Path to the case file item to be created
      */
-    public CreateCaseFileItem(CaseUserIdentity user, String caseInstanceId, Value<?> newContent, Path path) {
-        super(user, caseInstanceId, newContent, path, CaseFileItemTransition.Create);
+    public CreateCaseFileItem(CaseUserIdentity user, String caseInstanceId, String rootCaseId,Value<?> newContent, Path path) {
+        super(user, caseInstanceId, rootCaseId, newContent, path, CaseFileItemTransition.Create);
     }
 
     public CreateCaseFileItem(ValueMap json) {

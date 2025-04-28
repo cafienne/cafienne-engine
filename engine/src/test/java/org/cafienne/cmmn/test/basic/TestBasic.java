@@ -78,7 +78,7 @@ public class TestBasic {
         });
 
         // Completing Item1 should activate sentries S3 and S3.2
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("Item1");
@@ -107,7 +107,7 @@ public class TestBasic {
         });
 
         // Completing Item2 should also activate exit criterion of stage Item4, which ought to terminate it's children
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("Item1");

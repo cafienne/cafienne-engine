@@ -36,8 +36,8 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapMess
     public final String name;
     private final List<TenantUser> users;
 
-    public CreateTenant(PlatformOwner user, String tenantId, String name, List<TenantUser> users) {
-        super(user, tenantId);
+    public CreateTenant(PlatformOwner user, String tenantId, String name, List<TenantUser> users, String rootCaseId) {
+        super(user, tenantId, rootCaseId);
         this.name = name;
         this.users = users;
         super.validateUserList(users);

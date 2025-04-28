@@ -53,7 +53,7 @@ public class HandleTaskImplementationTransition extends CaseCommand {
      *                         means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
     public HandleTaskImplementationTransition(ModelActor child, Transition transition) {
-        super(child.getCurrentUser().asCaseUserIdentity(), child.getParentActorId());
+        super(child.getCurrentUser().asCaseUserIdentity(), child.getParentActorId(), child.getRootActorId());
         this.taskId = child.getId();
         this.transition = transition;
     }

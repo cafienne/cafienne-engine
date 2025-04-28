@@ -53,8 +53,8 @@ public class MakePlanItemTransition extends CaseCommand {
      *                       invoked on the new plan item.
      * @param transition     The transition to make on the plan item(s)
      */
-    public MakePlanItemTransition(CaseUserIdentity user, String caseInstanceId, String identifier, Transition transition) {
-        super(user, caseInstanceId);
+    public MakePlanItemTransition(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String identifier, Transition transition) {
+        super(user, caseInstanceId, rootCaseId);
         this.identifier = identifier;
         this.transition = transition;
     }

@@ -27,8 +27,8 @@ import java.io.IOException;
 
 @Manifest
 public class DisableTenant extends PlatformTenantCommand {
-    public DisableTenant(PlatformOwner user, String tenantId) {
-        super(user, tenantId);
+    public DisableTenant(PlatformOwner user, String tenantId, String rootCaseId) {
+        super(user, tenantId, rootCaseId);
     }
 
     public DisableTenant(ValueMap json) {

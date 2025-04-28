@@ -32,8 +32,8 @@ import java.io.IOException;
 public class SetConsentGroupMember extends ConsentGroupCommand {
     private final ConsentGroupMember newMemberInfo;
 
-    public SetConsentGroupMember(ConsentGroupUser groupOwner, ConsentGroupMember newMemberInfo) {
-        super(groupOwner, groupOwner.groupId());
+    public SetConsentGroupMember(ConsentGroupUser groupOwner, ConsentGroupMember newMemberInfo, String rootCaseId) {
+        super(groupOwner, groupOwner.groupId(), rootCaseId);
         this.newMemberInfo = newMemberInfo;
     }
 

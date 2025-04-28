@@ -29,8 +29,8 @@ import org.cafienne.json.ValueMap;
  * Generic abstraction for commands relating to CaseTeam.
  */
 public abstract class CaseTeamCommand extends CaseCommand {
-    protected CaseTeamCommand(CaseUserIdentity user, String caseInstanceId) {
-        super(user, caseInstanceId);
+    protected CaseTeamCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId) {
+        super(user, caseInstanceId, rootCaseId);
     }
 
     protected CaseTeamCommand(ValueMap json) {

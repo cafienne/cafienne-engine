@@ -44,7 +44,7 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
     private CommandFailure actualFailure;
 
     CaseTestCommand(TestScript testScript, CaseCommand command, CaseResponseValidator validator) {
-        super(command.getUser(), command.getCaseInstanceId());
+        super(command.getUser(), command.getCaseInstanceId(), command.getRootCaseId());
         this.testScript = testScript;
         this.actualCommand = command;
         this.validator = validator;

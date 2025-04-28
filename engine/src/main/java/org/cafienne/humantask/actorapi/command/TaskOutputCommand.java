@@ -31,8 +31,8 @@ import java.io.IOException;
 public abstract class TaskOutputCommand extends HumanTaskCommand {
 	protected final ValueMap taskOutput;
 
-	protected TaskOutputCommand(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(user, caseInstanceId, taskId);
+	protected TaskOutputCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, ValueMap taskOutput) {
+		super(user, caseInstanceId, rootCaseId, taskId);
 		this.taskOutput = taskOutput;
 	}
 

@@ -25,8 +25,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class ReplaceConsentGroup extends CollectiveCommand {
-    public ReplaceConsentGroup(ConsentGroupUser user, ConsentGroup newGroupInfo) {
-        super(user, newGroupInfo);
+    public ReplaceConsentGroup(ConsentGroupUser user, ConsentGroup newGroupInfo, String rootCaseId) {
+        super(user, newGroupInfo, rootCaseId);
     }
 
     public ReplaceConsentGroup(ValueMap json) {

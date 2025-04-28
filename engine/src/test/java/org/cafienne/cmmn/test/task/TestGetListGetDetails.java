@@ -77,7 +77,7 @@ public class TestGetListGetDetails {
         // So GetList goes to Failed state & GetDetails remains in Available state
         ValueMap requestObject = new ValueMap();
         requestObject.plus("port", PORT_NUMBER);
-        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTPConfiguration"));
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTPConfiguration"));
         testCase.addStep(createChild, casePlan -> {
 //            casePlan.print();
 
@@ -90,7 +90,7 @@ public class TestGetListGetDetails {
         });
 
         // Reactivate the GetCasesList task; but since the backend is not yet up, it should again lead to failure of GetList
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
 //            casePlan.print();
 
             // Wait for the second failure event
@@ -109,7 +109,7 @@ public class TestGetListGetDetails {
 
         // Now reactive GetList, since stubs have started.
         // This should also lead to 3 times GetDetails task being activated and completed.
-        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(testUser, caseInstanceId, "GetList", Transition.Reactivate);
+        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "GetList", Transition.Reactivate);
         testCase.addStep(reactivateCase, casePlan -> {
 //            casePlan.print();
 

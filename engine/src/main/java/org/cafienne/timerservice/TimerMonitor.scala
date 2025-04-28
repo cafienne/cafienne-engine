@@ -89,7 +89,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
   }
 
   def addTimer(event: TimerSet, offset: Offset): Future[Done] = {
-    val job: Timer = Timer(event.getCaseInstanceId, event.getTimerId, event.getTargetMoment, event.getUser.id)
+    val job: Timer = Timer(event.getCaseInstanceId, event.rootCaseId, event.getTimerId, event.getTargetMoment, event.getUser.id)
     // If the timer fits the current window ahead, immediately schedule it. Otherwise just persist.
     if (reader.fitsActiveWindow(job)) {
       scheduleTimer(job)

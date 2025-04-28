@@ -42,14 +42,14 @@ public class TestCasePlanExitCriteria {
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Review", Transition.Complete), casePlan -> {
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Completed);
             PlanItemAssertion reviewTask2 = casePlan.assertTask("Review2");
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId,"Review2", Transition.Complete), casePlan -> {
             casePlan.assertState(State.Completed);
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Completed);
@@ -74,7 +74,7 @@ public class TestCasePlanExitCriteria {
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId,"Review2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertState(State.Terminated);
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");

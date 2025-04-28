@@ -61,7 +61,7 @@ public class TimerEventDefinition extends EventListenerDefinition {
 
     @Override
     public TimerEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
-        return new TimerEvent(id, index, itemDefinition, this, stage);
+        return new TimerEvent(id, index, itemDefinition, this, stage, caseInstance.getRootActorId());
     }
 
     @Override

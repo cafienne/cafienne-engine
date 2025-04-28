@@ -41,8 +41,8 @@ public class UpdateCaseFileItem extends CaseFileItemCommand {
      * @param newContent         A value structure with contents of the new case file item
      * @param path Path to the case file item to be created
      */
-    public UpdateCaseFileItem(CaseUserIdentity user, String caseInstanceId, Value<?> newContent, Path path) {
-        super(user, caseInstanceId, newContent, path, CaseFileItemTransition.Update);
+    public UpdateCaseFileItem(CaseUserIdentity user, String caseInstanceId, String rootCaseId, Value<?> newContent, Path path) {
+        super(user, caseInstanceId, rootCaseId, newContent, path, CaseFileItemTransition.Update);
     }
 
     public UpdateCaseFileItem(ValueMap json) {

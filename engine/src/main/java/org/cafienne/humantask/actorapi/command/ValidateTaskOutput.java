@@ -30,8 +30,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class ValidateTaskOutput extends TaskOutputCommand {
-	public ValidateTaskOutput(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(user, caseInstanceId, taskId, taskOutput);
+	public ValidateTaskOutput(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, ValueMap taskOutput) {
+		super(user, caseInstanceId, rootCaseId, taskId, taskOutput);
 	}
 
 	public ValidateTaskOutput(ValueMap json) {

@@ -44,7 +44,7 @@ public class TestVariousSpelExpressions2 {
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
 
             // Now complete the HumanTask with the default output, and validate the task output filled event
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
                 taskCompleted.print();
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -171,7 +171,7 @@ public class TestVariousSpelExpressions2 {
             // Now await the first HumanTask to become active, and then complete it, with the default task output;
             //  This ought to result in a new HumanTask, which we will also complete.
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), action -> {
                 // Validate output again. Does not add too much value, as this is also done in the test above
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -187,7 +187,7 @@ public class TestVariousSpelExpressions2 {
                 // Print the case...
 //                TestScript.debugMessage("Current case: " + new CaseAssertion(action));
 
-                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), result -> {
+                testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), result -> {
 //                    TestScript.debugMessage("Current case: " + new CaseAssertion(result));
                     // Await completion of 'nextTaskId'
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Completed);
@@ -212,7 +212,7 @@ public class TestVariousSpelExpressions2 {
             // Get the id of the first "HumanTask" in the case. It must be in state Active
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
             // Now complete that task with the "stop now" output; this should make the milestone Occur, which must Terminate the Stage.
-            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), action -> {
                 // Validate the output; it must be 'stop now'
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -232,7 +232,7 @@ public class TestVariousSpelExpressions2 {
 //                TestScript.debugMessage("Current case: " + casePlan);
 
 
-                testCase.assertStepFails(new CompleteHumanTask(testUser, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), failure -> {
+                testCase.assertStepFails(new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), failure -> {
                     failure.print();
                     // Last HumanTask must be terminated
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Terminated);

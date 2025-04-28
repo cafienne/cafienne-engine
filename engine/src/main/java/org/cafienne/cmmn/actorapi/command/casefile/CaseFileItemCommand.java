@@ -47,8 +47,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
      * @param path   Path to the case file item to be created
      * @param intendedTransition
      */
-    protected CaseFileItemCommand(CaseUserIdentity user, String caseInstanceId, Value<?> newContent, Path path, CaseFileItemTransition intendedTransition) {
-        super(user, caseInstanceId);
+    protected CaseFileItemCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId,Value<?> newContent, Path path, CaseFileItemTransition intendedTransition) {
+        super(user, caseInstanceId, rootCaseId);
         this.path = path;
         this.content = newContent;
         this.intendedTransition = intendedTransition;

@@ -37,8 +37,8 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
      * @param caseInstanceId   The id of the case in which to perform this command.
      * @param path Path to the case file item to be created
      */
-    public DeleteCaseFileItem(CaseUserIdentity user, String caseInstanceId, Path path) {
-        super(user, caseInstanceId, Value.NULL, path, CaseFileItemTransition.Delete);
+    public DeleteCaseFileItem(CaseUserIdentity user, String caseInstanceId, String rootCaseId, Path path) {
+        super(user, caseInstanceId, rootCaseId, Value.NULL, path, CaseFileItemTransition.Delete);
     }
 
     public DeleteCaseFileItem(ValueMap json) {

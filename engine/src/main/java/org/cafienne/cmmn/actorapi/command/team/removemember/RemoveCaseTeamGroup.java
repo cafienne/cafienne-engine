@@ -29,8 +29,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class RemoveCaseTeamGroup extends RemoveCaseTeamMemberCommand<CaseTeamGroup> {
-    public RemoveCaseTeamGroup(CaseUserIdentity user, String caseInstanceId, String groupId) {
-        super(user, caseInstanceId, groupId);
+    public RemoveCaseTeamGroup(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String groupId) {
+        super(user, caseInstanceId, rootCaseId, groupId);
     }
 
     public RemoveCaseTeamGroup(ValueMap json) {

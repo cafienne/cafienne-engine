@@ -43,8 +43,8 @@ public abstract class TenantCommand extends BaseModelCommand<TenantActor, Tenant
      * @param tenantOwner The user that issues this command.
      * @param tenantId    Id of the tenant to send the command to
      */
-    protected TenantCommand(TenantUser tenantOwner, String tenantId) {
-        super(tenantOwner, tenantId);
+    protected TenantCommand(TenantUser tenantOwner, String tenantId, String rootCaseId) {
+        super(tenantOwner, tenantId, rootCaseId);
     }
 
     protected TenantCommand(ValueMap json) {

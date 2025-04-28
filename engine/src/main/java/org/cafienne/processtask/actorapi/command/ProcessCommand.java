@@ -27,8 +27,8 @@ import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> implements ProcessActorMessage {
-    protected ProcessCommand(UserIdentity user, String id) {
-        super(user, id);
+    protected ProcessCommand(UserIdentity user, String actorId, String rootCaseId) {
+        super(user, actorId, rootCaseId);
     }
 
     protected ProcessCommand(ValueMap json) {

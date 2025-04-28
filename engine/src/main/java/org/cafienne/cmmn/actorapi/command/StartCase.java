@@ -71,7 +71,7 @@ public class StartCase extends CaseCommand implements BootstrapMessage {
      * @param rootCaseId          The root case id, if it exists.
      */
     public StartCase(String tenant, CaseUserIdentity user, String caseInstanceId, CaseDefinition definition, ValueMap caseInputParameters, CaseTeam caseTeam, boolean debugMode, String parentCaseId, String rootCaseId) {
-        super(user, caseInstanceId);
+        super(user, caseInstanceId, rootCaseId);
         // First validate the tenant information.
         this.tenant = tenant;
         if (tenant == null || tenant.isEmpty()) {

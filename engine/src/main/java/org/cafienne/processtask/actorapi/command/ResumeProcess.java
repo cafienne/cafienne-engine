@@ -28,8 +28,8 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
 public class ResumeProcess extends ProcessCommand {
-    public ResumeProcess(UserIdentity user, String id) {
-        super(user, id);
+    public ResumeProcess(UserIdentity user, String id, String rootCaseId) {
+        super(user, id, rootCaseId);
     }
 
     public ResumeProcess(ValueMap json) {

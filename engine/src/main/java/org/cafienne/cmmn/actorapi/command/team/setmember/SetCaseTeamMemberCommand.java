@@ -36,8 +36,8 @@ import java.io.IOException;
 abstract class SetCaseTeamMemberCommand<M extends CaseTeamMember> extends CaseTeamCommand {
     protected final M newMember;
 
-    protected SetCaseTeamMemberCommand(CaseUserIdentity user, String caseInstanceId, M newMember) {
-        super(user, caseInstanceId);
+    protected SetCaseTeamMemberCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId, M newMember) {
+        super(user, caseInstanceId, rootCaseId);
         this.newMember = newMember;
     }
 

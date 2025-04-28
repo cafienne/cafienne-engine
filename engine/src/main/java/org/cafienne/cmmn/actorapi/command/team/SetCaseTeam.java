@@ -35,8 +35,8 @@ public class SetCaseTeam extends CaseTeamCommand {
 
     private final CaseTeam caseTeam;
 
-    public SetCaseTeam(CaseUserIdentity user, String caseInstanceId, CaseTeam caseTeam) {
-        super(user, caseInstanceId);
+    public SetCaseTeam(CaseUserIdentity user, String caseInstanceId, String rootCaseId, CaseTeam caseTeam) {
+        super(user, caseInstanceId, rootCaseId);
         this.caseTeam = caseTeam;
     }
 

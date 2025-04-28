@@ -31,8 +31,8 @@ import java.io.IOException;
 public class RemoveTenantUser extends TenantCommand {
     public final String userId;
 
-    public RemoveTenantUser(TenantUser tenantOwner, String tenant, String userId) {
-        super(tenantOwner, tenant);
+    public RemoveTenantUser(TenantUser tenantOwner, String tenant, String userId, String rootCaseId) {
+        super(tenantOwner, tenant, rootCaseId);
         this.userId = userId;
     }
 

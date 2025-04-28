@@ -39,8 +39,8 @@ public class RaiseEvent extends MakePlanItemTransition {
      *                       order. If the transition of such a plan item results in a new plan item in the case with the same name, then the command will _not_ be
      *                       invoked on the new plan item.
      */
-    public RaiseEvent(CaseUserIdentity user, String caseInstanceId, String identifier) {
-        super(user, caseInstanceId, identifier, Transition.Occur);
+    public RaiseEvent(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String identifier) {
+        super(user, caseInstanceId, rootCaseId, identifier, Transition.Occur);
     }
 
     public RaiseEvent(ValueMap json) {

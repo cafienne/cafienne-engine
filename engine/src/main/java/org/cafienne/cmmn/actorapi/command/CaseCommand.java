@@ -39,8 +39,8 @@ public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentit
      * @param user           The user that issues this command.
      * @param caseInstanceId The id of the case in which to perform this command.
      */
-    protected CaseCommand(CaseUserIdentity user, String caseInstanceId) {
-        super(user, caseInstanceId);
+    protected CaseCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId) {
+        super(user, caseInstanceId, rootCaseId);
     }
 
     protected CaseCommand(ValueMap json) {

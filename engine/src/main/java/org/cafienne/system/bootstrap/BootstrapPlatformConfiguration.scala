@@ -125,7 +125,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
       val aPlatformOwner = caseSystem.config.platform.platformOwners.head
 
-      new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
+      new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava, tenantName)
 
     } catch {
       case c: ConfigException => throw new BootstrapFailure("Bootstrap file " + configFile.getAbsolutePath + " is invalid: " + c.getMessage, c)

@@ -31,8 +31,8 @@ import java.io.IOException;
 public class DeprecatedUpsert extends CaseTeamCommand {
     private final UpsertMemberData memberData;
 
-    public DeprecatedUpsert(CaseUserIdentity user, String caseInstanceId, UpsertMemberData member) {
-        super(user, caseInstanceId);
+    public DeprecatedUpsert(CaseUserIdentity user, String caseInstanceId, String rootCaseId, UpsertMemberData member) {
+        super(user, caseInstanceId, rootCaseId);
         this.memberData = member;
     }
 

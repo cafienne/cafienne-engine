@@ -79,7 +79,7 @@ public class TestTaskOutputValidation {
             //
             // SaveTaskOutput - User should be able to save the task output for Unassigned task
             //
-            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
                 action.getEvents().assertNotEmpty();
             });
@@ -87,7 +87,7 @@ public class TestTaskOutputValidation {
             //
             // ClaimTask - User should be able to claim the task
             //
-            testCase.addStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
+            testCase.addStep(new ClaimTask(pete, caseInstanceId, caseInstanceId, taskId), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 taskAssertion.assertAssignee("pete");
             });
@@ -95,18 +95,18 @@ public class TestTaskOutputValidation {
             //
             // ValidateTaskOutput - Task output validation fails on wrong user
             //
-            testCase.addStep(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()));
+            testCase.addStep(new ValidateTaskOutput(gimy, caseInstanceId, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()));
 
             //
             // ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"
             //
-            testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()),
+            testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()),
                     failure -> failure.assertException("Unexpected http response code 500"));
 
             //
             // ValidateTaskOutput - Task output validation fails on wrong output
             //
-            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Value<?> jsonResponse = taskAssertion.getValidationResponse().toJson();
                 if (!(jsonResponse.isMap())) {
@@ -127,7 +127,7 @@ public class TestTaskOutputValidation {
             //
             // ValidateTaskOutput - Task output validation should be ok with decision canceled
             //
-            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Value<?> jsonResponse = taskAssertion.getValidationResponse().toJson();
                 if (!(jsonResponse.isMap())) {
@@ -143,12 +143,12 @@ public class TestTaskOutputValidation {
             //
             // ValidateTaskOutput - Task output validation should be ok with decision approved, and it should not lead to new events
             //
-            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> action.getEvents().assertSize(0));
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> action.getEvents().assertSize(0));
 
             //
             // SaveTaskOutput - User should be able to save the task with invalid output, and it should lead to new events
             //
-            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
 //                casePlan.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
                 action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
                 action.getEvents().assertNotEmpty();
@@ -157,13 +157,13 @@ public class TestTaskOutputValidation {
             //
             // CompleteTaskOutput - User should not be able to complete the task with invalid output
             //
-            testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()),
+            testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()),
                     failure -> failure.assertException(InvalidCommandException.class, "Output for task HumanTask is invalid"));
 
             //
             // CompleteTask - Only the current task assignee should be able to complete the task
             //
-            testCase.addStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(pete, caseInstanceId, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 testCase.getEventListener().awaitTaskOutputFilled(taskId, taskEvent -> {
                     ValueMap taskOutput = taskEvent.getTaskOutputParameters();

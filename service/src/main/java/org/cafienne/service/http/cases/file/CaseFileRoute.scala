@@ -82,7 +82,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def createCaseFileItem: Route = post {
-    casefileContentRoute("create", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new CreateCaseFileItem(caseMember, caseInstanceId, json, path)))
+    casefileContentRoute("create", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new CreateCaseFileItem(caseMember, caseInstanceId, caseMember.rootCaseId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/replace/{path}")
@@ -103,7 +103,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def replaceCaseFileItem: Route = put {
-    casefileContentRoute("replace", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new ReplaceCaseFileItem(caseMember, caseInstanceId, json, path)))
+    casefileContentRoute("replace", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new ReplaceCaseFileItem(caseMember, caseInstanceId, caseMember.rootCaseId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/update/{path}")
@@ -123,7 +123,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   def updateCaseFileItem: Route = put {
-    casefileContentRoute("update", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new UpdateCaseFileItem(caseMember, caseInstanceId, json, path)))
+    casefileContentRoute("update", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new UpdateCaseFileItem(caseMember, caseInstanceId, caseMember.rootCaseId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/delete/{path}")
@@ -143,7 +143,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
   )
   @Consumes(Array("application/json"))
   def deleteCaseFileItem: Route = delete {
-    casefileRoute("delete", (user, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new DeleteCaseFileItem(caseMember, caseInstanceId, path)))
+    casefileRoute("delete", (user, caseInstanceId, path) => askCase(user, caseInstanceId, caseMember => new DeleteCaseFileItem(caseMember, caseInstanceId, caseMember.rootCaseId, path)))
   }
 
   /**

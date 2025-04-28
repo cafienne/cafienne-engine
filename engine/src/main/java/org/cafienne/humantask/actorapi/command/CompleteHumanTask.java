@@ -40,8 +40,8 @@ public class CompleteHumanTask extends TaskOutputCommand {
      * @param taskOutput An optional map with named output parameters for the task. These will be set on the task before the task is reported as complete. This
      *                   means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
-    public CompleteHumanTask(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
-        super(user, caseInstanceId, taskId, taskOutput);
+    public CompleteHumanTask(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, ValueMap taskOutput) {
+        super(user, caseInstanceId, rootCaseId, taskId, taskOutput);
     }
 
     public CompleteHumanTask(ValueMap json) {

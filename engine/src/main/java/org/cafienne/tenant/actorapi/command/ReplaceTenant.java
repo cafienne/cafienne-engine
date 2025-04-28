@@ -31,8 +31,8 @@ import java.util.List;
 public class ReplaceTenant extends TenantCommand {
     private final List<TenantUser> users;
 
-    public ReplaceTenant(TenantUser tenantOwner, String tenant, List<TenantUser> users) {
-        super(tenantOwner, tenant);
+    public ReplaceTenant(TenantUser tenantOwner, String tenant, List<TenantUser> users, String rootCaseId) {
+        super(tenantOwner, tenant, rootCaseId);
         this.users = users;
         super.validateUserList(users);
     }

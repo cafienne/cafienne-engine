@@ -34,7 +34,7 @@ public class TestRequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -46,7 +46,7 @@ public class TestRequiredRule {
         });
 
         // Now complete Item2 multiple times. It is not supposed to repeat more than 10 times, it says in the definition
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.2", Transition.Suspend), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1.2", Transition.Suspend), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -54,7 +54,7 @@ public class TestRequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.2", Transition.Resume), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1.2", Transition.Resume), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -63,7 +63,7 @@ public class TestRequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId,  "Item1.2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -73,7 +73,7 @@ public class TestRequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);

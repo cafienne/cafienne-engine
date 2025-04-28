@@ -43,8 +43,8 @@ public abstract class HumanTaskCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
 
-    protected HumanTaskCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
-        super(user, caseInstanceId);
+    protected HumanTaskCommand(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId) {
+        super(user, caseInstanceId, rootCaseId);
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new NullPointerException("Task id should not be null or empty");
         }

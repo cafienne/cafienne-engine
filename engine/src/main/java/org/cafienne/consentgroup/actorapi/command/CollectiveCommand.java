@@ -38,8 +38,8 @@ import java.io.IOException;
 abstract class CollectiveCommand extends ConsentGroupCommand {
     protected final ConsentGroup newGroupInfo;
 
-    protected CollectiveCommand(ConsentGroupUser user, ConsentGroup newGroupInfo) {
-        super(user, newGroupInfo.id());
+    protected CollectiveCommand(ConsentGroupUser user, ConsentGroup newGroupInfo, String rootCaseId) {
+        super(user, newGroupInfo.id(), rootCaseId);
         this.newGroupInfo = newGroupInfo;
         validateMemberList();
     }

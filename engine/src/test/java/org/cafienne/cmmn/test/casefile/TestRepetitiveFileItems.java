@@ -49,7 +49,7 @@ public class TestRepetitiveFileItems {
 
         // This test sets individual CaseFileItems
         ValueMap topCaseObject = new ValueMap();
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), topPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, topCaseObject.cloneValueNode(), topPath), casePlan -> {
             casePlan.print();
 
             // There still must be 1 repeating review task in state available.
@@ -62,7 +62,7 @@ public class TestRepetitiveFileItems {
 
         // Create the CaseFileItem 'items' under the 'TopCase'; this is just an empty array
         ValueList itemArray = new ValueList();
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemArray.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemArray.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
 
             // Sending empty array contents should not result in new events;
@@ -78,7 +78,7 @@ public class TestRepetitiveFileItems {
         itemArray.add(itemObject); // Also add it to the test object
 
         // We're adding a clone of the item object into the case, so that we properly compare arrays. There must be 1 Review task.
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
             // There should be only 1 item in the case file, and it's value should be equal to the itemObject passed into it
             casePlan.getEvents().assertCaseFileEvent(item0, e -> e.getValue().equals(itemObject));
@@ -95,7 +95,7 @@ public class TestRepetitiveFileItems {
         });
 
         // And add another item, causing changes in the plan (if it all works out). There now must be 2 Review tasks
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
 //
 //            i = 0;
@@ -120,7 +120,7 @@ public class TestRepetitiveFileItems {
         });
 
         // And add another item, causing changes in the plan (if it all works out). There should not be any new Review tasks.
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
 
             // Now the entry criterion of the last task has been met, and no more repetition, so no new tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
@@ -138,7 +138,7 @@ public class TestRepetitiveFileItems {
         });
 
         // And add another item, should not lead to new changes
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
 
             // Now there must be still 3 active review tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
@@ -157,7 +157,7 @@ public class TestRepetitiveFileItems {
         });
 
         // And add another item, causing changes in the plan (if it all works out)
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
 
             // Now there must be still 3 active review tasks
@@ -202,7 +202,7 @@ public class TestRepetitiveFileItems {
         itemArray.add(itemObject.cloneValueNode()); // [1]
 
         // Creating 2 items in the array should trigger 2 new Review tasks
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), topPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, topCaseObject.cloneValueNode(), topPath), casePlan -> {
             casePlan.print();
             // There must be 2 review tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
@@ -221,7 +221,7 @@ public class TestRepetitiveFileItems {
         });
 
         // Add another item. There should not be a new Review task, and the repetition of the second Review task must be false.
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
 
             // One more item ...
@@ -237,7 +237,7 @@ public class TestRepetitiveFileItems {
         });
 
         // And yet another item
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, caseInstanceId, itemObject.cloneValueNode(), itemsPath), casePlan -> {
             casePlan.print();
             // There must be 2 review tasks, one active and one available.
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();

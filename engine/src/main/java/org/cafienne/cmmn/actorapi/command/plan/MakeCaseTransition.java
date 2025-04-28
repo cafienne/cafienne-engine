@@ -40,8 +40,8 @@ public class MakeCaseTransition extends CaseCommand {
      * @param caseInstanceId The id of the case in which to perform this command.
      * @param transition     The transition to be executed on the case
      */
-    public MakeCaseTransition(CaseUserIdentity user, String caseInstanceId, Transition transition) {
-        super(user, caseInstanceId);
+    public MakeCaseTransition(CaseUserIdentity user, String caseInstanceId, String rootCaseId, Transition transition) {
+        super(user, caseInstanceId, rootCaseId);
         this.transition = transition;
     }
 

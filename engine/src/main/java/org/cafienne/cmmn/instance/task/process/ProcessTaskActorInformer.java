@@ -45,12 +45,12 @@ class ProcessTaskActorInformer extends ProcessInformer {
 
     @Override
     protected void suspendImplementation() {
-        task.tellTaskImplementation(new SuspendProcess(getCaseInstance().getCurrentUser(), task.getId()));
+        task.tellTaskImplementation(new SuspendProcess(getCaseInstance().getCurrentUser(), task.getId(), getCaseInstance().getRootCaseId()));
     }
 
     @Override
     protected void resumeImplementation() {
-        task.tellTaskImplementation(new ResumeProcess(getCaseInstance().getCurrentUser(), task.getId()));
+        task.tellTaskImplementation(new ResumeProcess(getCaseInstance().getCurrentUser(), task.getId(), getCaseInstance().getRootCaseId()));
     }
 
     @Override
@@ -58,7 +58,7 @@ class ProcessTaskActorInformer extends ProcessInformer {
         if (task.getHistoryState() == State.Available) {
             getCaseInstance().addDebugInfo(() -> "Terminating process task '" + task.getName() + "' without it being started; no need to inform the task actor");
         } else {
-            task.tellTaskImplementation(new TerminateProcess(getCaseInstance().getCurrentUser(), task.getId()));
+            task.tellTaskImplementation(new TerminateProcess(getCaseInstance().getCurrentUser(), task.getId(), getCaseInstance().getRootCaseId()));
         }
     }
 
@@ -76,6 +76,6 @@ class ProcessTaskActorInformer extends ProcessInformer {
 
     @Override
     protected void migrateDefinition(ProcessTaskDefinition newDefinition) {
-        task.giveNewDefinition(new MigrateProcessDefinition(getCaseInstance().getCurrentUser(), task.getId(), newDefinition.getImplementationDefinition()));
+        task.giveNewDefinition(new MigrateProcessDefinition(getCaseInstance().getCurrentUser(), task.getId(), task.getCaseInstance().getRootActorId(),  newDefinition.getImplementationDefinition()));
     }
 }

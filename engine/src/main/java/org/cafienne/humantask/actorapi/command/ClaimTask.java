@@ -26,8 +26,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class ClaimTask extends TaskManagementCommand {
-    public ClaimTask(CaseUserIdentity user, String caseInstanceId, String taskId) {
-        super(user, caseInstanceId, taskId);
+    public ClaimTask(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId) {
+        super(user, caseInstanceId, rootCaseId, taskId);
     }
 
     public ClaimTask(ValueMap json) {

@@ -32,17 +32,16 @@ import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
     private final ValueMap json;
     protected final String msgId;
     public final String actorId;
+    public final String rootCaseId;
     private ActorRef sender;
     protected transient T actor;
     private ModelResponse response;
@@ -52,7 +51,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
      */
     private final U user;
 
-    protected BaseModelCommand(U user, String actorId) {
+    protected BaseModelCommand(U user, String actorId, String rootCaseId) {
         this.json = new ValueMap();
         // First, validate actor id
         if (actorId == null) {
@@ -69,12 +68,14 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
         this.msgId = new Guid().toString();
         this.user = user;
         this.actorId = actorId;
+        this.rootCaseId = (rootCaseId == null || rootCaseId.isEmpty()) ? actorId : rootCaseId;
     }
 
     protected BaseModelCommand(ValueMap json) {
         this.json = json;
         this.msgId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
+        this.rootCaseId = json.readString(Fields.rootCaseId);
         this.user = readUser(json.with(Fields.user));
     }
 
@@ -161,6 +162,11 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     public String getMessageId() {
         return msgId;
     }
+    
+    @Override
+    public String getRootCaseId() {
+        return rootCaseId;
+    }
 
     /**
      * Before the Model Actor starts processing the command, it will first ask to validate the command.
@@ -185,6 +191,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
         writeField(generator, Fields.type, this.getCommandDescription());
         writeField(generator, Fields.messageId, this.getMessageId());
         writeField(generator, Fields.actorId, this.getActorId());
+        writeField(generator, Fields.rootCaseId, this.rootCaseId);
         writeField(generator, Fields.user, user);
     }
 

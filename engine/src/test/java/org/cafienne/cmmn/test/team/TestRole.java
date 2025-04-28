@@ -38,23 +38,23 @@ public class TestRole {
         testCase.addStep(startCase, CaseAssertion::print);
 
         // With Role admin
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "UserEvent1", Transition.Occur), CaseAssertion::print);
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, caseInstanceId, "UserEvent1", Transition.Occur), CaseAssertion::print);
 
         // With Role admin
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "Item1", Transition.Complete), CaseAssertion::print);
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, caseInstanceId, "Item1", Transition.Complete), CaseAssertion::print);
 
         // With anonymous
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), CaseAssertion::print);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Suspend), CaseAssertion::print);
 
-        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), CaseAssertion::print);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, caseInstanceId, Transition.Reactivate), CaseAssertion::print);
 
-        testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, "Item1.1", Transition.Complete),
+        testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, caseInstanceId, "Item1.1", Transition.Complete),
                 failure -> failure.assertException(TransitionDeniedException.class, "You do not have the permission to perform the task"));
 
         // With admin user
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "Item1.1", Transition.Complete), CaseAssertion::print);
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, caseInstanceId, "Item1.1", Transition.Complete), CaseAssertion::print);
 
-        testCase.addStep(new MakeCaseTransition(admin, caseInstanceId, Transition.Complete), CaseAssertion::print);
+        testCase.addStep(new MakeCaseTransition(admin, caseInstanceId, caseInstanceId, Transition.Complete), CaseAssertion::print);
 
         testCase.runTest();
     }

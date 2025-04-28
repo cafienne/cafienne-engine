@@ -45,7 +45,6 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
 
   //pekko.cluster.sharding.number-of-shards
   private val numberOfPartitions = system.settings.config.getInt("pekko.cluster.sharding.number-of-shards")
-  private val localSystemKey: Long = "localSystemKey".hashCode
 
   private val idExtractor: ShardRegion.ExtractEntityId = {
     case command: CaseCommand => (command.actorId, command)
@@ -60,13 +59,14 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   //use the rootCaseId for deciding on the shard. This is added to the CaseMembership
   private val shardResolver: ShardRegion.ExtractShardId = {
     case m: ModelCommand => {
-      val pidHashKey: Long = m.actorId.hashCode
-      val shard = ((localSystemKey + pidHashKey) % numberOfPartitions).toString
+      val pidHashKey: Long = m.getRootCaseId.hashCode
+      val shard = (pidHashKey % numberOfPartitions).toString
       shard
     }
     case s: StorageCommand =>
+      //TODO storage need to be handled via rootCaseId
       val pidHashKey: Long = s.metadata.actorId.hashCode
-      val shard =  ((localSystemKey + pidHashKey) % numberOfPartitions).toString
+      val shard =  (pidHashKey % numberOfPartitions).toString
       shard
     case ShardRegion.StartEntity(id) =>
       // StartEntity is used by remembering entities feature
@@ -74,7 +74,7 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     case other => {
       System.err.println(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
       // Unsupported command type
-      val shard = ((localSystemKey + other.hashCode()) % numberOfPartitions).toString
+      val shard = (other.hashCode() % numberOfPartitions).toString
       shard
     }
   }

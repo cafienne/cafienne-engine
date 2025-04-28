@@ -41,8 +41,8 @@ public class SwitchDebugMode extends CaseCommand {
      * @param caseInstanceId      The instance identifier of the case
      * @param debugMode           True if debug must be enabled, false if disabled.
      */
-    public SwitchDebugMode(CaseUserIdentity user, String caseInstanceId, boolean debugMode) {
-        super(user, caseInstanceId);
+    public SwitchDebugMode(CaseUserIdentity user, String caseInstanceId, String rootCaseId, boolean debugMode) {
+        super(user, caseInstanceId, rootCaseId);
         this.debugMode = debugMode;
     }
 

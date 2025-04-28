@@ -29,7 +29,7 @@ public class TestHelloWorld {
             casePlan.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);
             casePlan.getEvents().filter(HumanTaskAssigned.class).assertSize(1);
 
-            CompleteHumanTask completeTask1 = new CompleteHumanTask(testUser, caseInstanceId, taskId, new ValueMap());
+            CompleteHumanTask completeTask1 = new CompleteHumanTask(testUser, caseInstanceId, caseInstanceId, taskId, new ValueMap());
             testCase.insertStep(completeTask1, casePlan2 -> {
                 casePlan2.print();
                 casePlan2.assertLastTransition(Transition.Create, State.Active, State.Null);

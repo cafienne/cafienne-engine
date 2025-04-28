@@ -25,8 +25,10 @@ import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import java.time.Instant;
 
 public class TimerEvent extends EventListener<TimerEventDefinition> {
-    public TimerEvent(String id, int index, ItemDefinition itemDefinition, TimerEventDefinition definition, Stage<?> stage) {
+    public final String rootCaseId;
+    public TimerEvent(String id, int index, ItemDefinition itemDefinition, TimerEventDefinition definition, Stage<?> stage, String rootCaseId) {
         super(id, index, itemDefinition, definition, stage);
+        this.rootCaseId = rootCaseId;
     }
 
     private Instant targetMoment = null;
@@ -38,7 +40,7 @@ public class TimerEvent extends EventListener<TimerEventDefinition> {
 
     @Override
     protected void createInstance() {
-        addEvent(new TimerSet(this));
+        addEvent(new TimerSet(this, rootCaseId));
     }
 
     @Override

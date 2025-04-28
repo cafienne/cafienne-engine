@@ -37,8 +37,9 @@ public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupA
      * @param groupOwner The user that issues this command.
      * @param groupId    The id of the consent group
      */
-    protected ConsentGroupCommand(ConsentGroupUser groupOwner, String groupId) {
-        super(groupOwner, groupId);
+    protected ConsentGroupCommand(ConsentGroupUser groupOwner, String groupId, String rootCaseId) {
+        //groupId is the actorId
+        super(groupOwner, groupId, rootCaseId);
     }
 
     protected ConsentGroupCommand(ValueMap json) {

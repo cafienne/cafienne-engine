@@ -34,8 +34,8 @@ import java.io.IOException;
 public class AssignTask extends TaskManagementCommand {
     protected final CaseUserIdentity assignee;
 
-    public AssignTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity assignee) {
-        super(user, caseInstanceId, taskId);
+    public AssignTask(CaseUserIdentity user, String caseInstanceId, String rootCaseId, String taskId, CaseUserIdentity assignee) {
+        super(user, caseInstanceId, rootCaseId, taskId);
         this.assignee = assignee;
     }
 

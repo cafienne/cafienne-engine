@@ -28,8 +28,8 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
 public class SuspendProcess extends ProcessCommand {
-    public SuspendProcess(UserIdentity user, String id) {
-        super(user, id);
+    public SuspendProcess(UserIdentity user, String id, String rootCaseId) {
+        super(user, id, rootCaseId);
     }
 
     public SuspendProcess(ValueMap json) {

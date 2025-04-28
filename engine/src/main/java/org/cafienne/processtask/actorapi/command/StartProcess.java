@@ -42,7 +42,7 @@ public class StartProcess extends ProcessCommand implements BootstrapMessage {
     private final boolean debugMode;
 
     public StartProcess(UserIdentity user, String tenant, String id, String name, ProcessDefinition definition, ValueMap inputParameters, String parentActorId, String rootActorId, boolean debugMode) {
-        super(user, id);
+        super(user, id, rootActorId);
         this.name = name;
         this.tenant = tenant;
         this.parentActorId = parentActorId;
