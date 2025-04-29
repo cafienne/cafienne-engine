@@ -17,10 +17,10 @@
 
 package org.cafienne.system.router
 
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
 import org.apache.pekko.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import org.apache.pekko.util.Timeout
-import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
@@ -71,6 +71,8 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     case ShardRegion.StartEntity(id) =>
       // StartEntity is used by remembering entities feature
       (id.toLong % numberOfPartitions).toString
+    case TerminateModelActor(id) =>
+      (id.toLong % numberOfPartitions).toString
     case other => {
       System.err.println(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
       // Unsupported command type
@@ -99,16 +101,18 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     import org.apache.pekko.pattern.ask
     implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
-    getRouter(message).map(actorRef => actorRef.ask(message)).getOrElse(Future.failed(new Exception(s"No router found for message $message")))
+    getRouter(message).map(actorRef => actorRef.ask(message)).getOrElse(Future.failed(new Exception(s"Cluster: No router found for message $message")))
   }
 
   def inform(message: Any, sender: ActorRef = Actor.noSender): Unit = {
-    getRouter(message).map(actorRef => actorRef.tell(message, sender)).getOrElse(system.log.error(s"No router found for message $message"))
+    getRouter(message).map(actorRef => actorRef.tell(message, sender)).getOrElse(system.log.error(s"Cluster: No router found for message $message"))
   }
 
   private def getRouter(message: Any): Option[ActorRef] = {
     message match {
       case _: StorageCommand => Some(clusteredStorageRegion)
+      case _: TerminateModelActor => Some(clusteredCaseRegion)
+      case _: Terminated => Some(clusteredCaseRegion)
       case command: ModelCommand =>
         val actorClass = command.actorClass()
         if (actorClass == classOf[Case]) return Some(clusteredCaseRegion)
