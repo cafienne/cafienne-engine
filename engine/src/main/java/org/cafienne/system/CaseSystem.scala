@@ -19,6 +19,7 @@ package org.cafienne.system
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
+import org.apache.pekko.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
 import org.cafienne.actormodel.identity.{CaseSystemIdentityRegistration, IdentityRegistration}
 import org.cafienne.infrastructure.EngineVersion
 import org.cafienne.infrastructure.config.CaseSystemConfig
@@ -56,7 +57,17 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   val gateway: GatewayMessageRouter = if (isClusterConfig) { new ClusteredCaseEngineGateway(this)} else { new CaseEngineGateway(this) }
 
   // Create singleton actors
-  val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
+  val timerService: ActorRef = if (isClusterConfig) {
+  //TODO handle shutdown of timer service (now PoisonPill is sent to the timer service, but it is not handled)
+    system.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = Props(classOf[TimerService], this),
+        terminationMessage = PoisonPill,
+        settings = ClusterSingletonManagerSettings(system)),
+      name = TimerService.CAFIENNE_TIMER_SERVICE)
+  } else {
+    system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
+  }
 
   lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)
 
