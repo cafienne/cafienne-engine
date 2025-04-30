@@ -58,7 +58,7 @@ class PlatformRoute(override val httpService: CaseEngineHttpServer) extends Comm
           import scala.jdk.CollectionConverters._
           val newTenantName = newTenant.name
           val users = newTenant.getTenantUsers.asJava
-          askPlatform(new CreateTenant(owner, newTenantName, newTenantName, users, owner.id))
+          askPlatform(new CreateTenant(owner, newTenantName, newTenantName, users, newTenantName))
         }
       }
     }
@@ -81,7 +81,7 @@ class PlatformRoute(override val httpService: CaseEngineHttpServer) extends Comm
   def disableTenant: Route = put {
     platformOwner { owner =>
       path(Segment / "disable") { tenant =>
-        askPlatform(new DisableTenant(owner, tenant.name, owner.id))
+        askPlatform(new DisableTenant(owner, tenant.name, tenant.name))
       }
     }
   }
@@ -103,7 +103,7 @@ class PlatformRoute(override val httpService: CaseEngineHttpServer) extends Comm
   def enableTenant: Route = put {
     platformOwner { owner =>
       path(Segment / "enable") { tenant =>
-        askPlatform(new EnableTenant(owner, tenant.name, owner.id))
+        askPlatform(new EnableTenant(owner, tenant.name, tenant.name))
       }
     }
   }
