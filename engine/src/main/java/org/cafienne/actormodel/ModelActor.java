@@ -31,6 +31,7 @@ import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
+import org.cafienne.actormodel.response.ActorTerminated;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
@@ -142,6 +143,21 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     public String getRootActorId() {
         return getId();
+    }
+
+    @Override
+    public void postStop() throws Exception {
+        System.out.println("Stopping " + this);
+        super.postStop();
+        if (stopRequestor != null) {
+            stopRequestor.tell(new ActorTerminated(id), ActorRef.noSender());
+        }
+    }
+
+    private ActorRef stopRequestor;
+    void requestStop() {
+        stopRequestor = sender();
+        context().stop(self());
     }
 
     /**
@@ -310,7 +326,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         //  Not sure right now what the reason is for this.
 
         // First log a message
-        getLogger().error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
+        getLogger().error("Failure in {} {} during persistence of event {} of type {}. Stopping instance.", getClass().getSimpleName(), getId(), seqNr, event.getClass().getName(), cause);
         // Inform the HealthMonitor
         HealthMonitor.writeJournal().hasFailed(cause);
         // Optionally send a reply (in the CommandHandler). If persistence fails, also sending a reply may fail, hence first logging the issue.

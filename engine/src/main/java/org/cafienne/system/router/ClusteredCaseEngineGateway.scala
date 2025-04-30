@@ -17,10 +17,12 @@
 
 package org.cafienne.system.router
 
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props, Terminated}
 import org.apache.pekko.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import org.apache.pekko.util.Timeout
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
+import org.cafienne.actormodel.communication.CaseSystemCommunicationCommand
+import org.cafienne.actormodel.communication.request.command.RequestModelActor
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
@@ -52,6 +54,9 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     case command: TenantCommand => (command.actorId, command)
     case command: ConsentGroupCommand => (command.actorId, command)
     case command: StorageCommand => (command.metadata.actorId, command)
+    case command: CaseSystemCommunicationCommand => (command.actorId, command)
+    case msg: TerminateModelActor => (msg.actorId, (msg))//ShardRegion.Passivate(PoisonPill) (or TerminateModelActor itself)
+    case startEntity: ShardRegion.StartEntity => (startEntity.entityId, startEntity)
     case other => throw new Error(s"Cannot extract actor id for messages of type ${other.getClass.getName}")
   }
 
@@ -68,13 +73,20 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
       val pidHashKey: Long = s.metadata.actorId.hashCode
       val shard =  (pidHashKey % numberOfPartitions).toString
       shard
+    case c: CaseSystemCommunicationCommand =>
+      val pidHashKey: Long = c.command.getRootCaseId.hashCode
+      (pidHashKey % numberOfPartitions).toString
     case ShardRegion.StartEntity(id) =>
       // StartEntity is used by remembering entities feature
-      (id.toLong % numberOfPartitions).toString
-    case TerminateModelActor(id) =>
-      (id.toLong % numberOfPartitions).toString
+      (id.hashCode.toLong % numberOfPartitions).toString
+    case TerminateModelActor(id, clazz) =>
+      system.log.info(s"TerminateModelActor ${clazz.getSimpleName} message received for id: " + id)
+      (id.hashCode.toLong % numberOfPartitions).toString
+    case Terminated(actorRef) =>
+      system.log.info("Terminated message received for actorRef: " + actorRef + " not routed via root case id")
+      (actorRef.hashCode() % numberOfPartitions).toString
     case other => {
-      System.err.println(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
+      system.log.warning(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
       // Unsupported command type
       val shard = (other.hashCode() % numberOfPartitions).toString
       shard
@@ -111,7 +123,13 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   private def getRouter(message: Any): Option[ActorRef] = {
     message match {
       case _: StorageCommand => Some(clusteredStorageRegion)
-      case _: TerminateModelActor => Some(clusteredCaseRegion)
+      case modelActor: TerminateModelActor =>
+        if (modelActor.clazz equals(classOf[TenantActor])) {
+          Some(clusteredTenantRegion)
+        } else {
+          Some(clusteredCaseRegion)
+        }
+      case cmd: CaseSystemCommunicationCommand => getRouter(cmd.command)
       case _: Terminated => Some(clusteredCaseRegion)
       case command: ModelCommand =>
         val actorClass = command.actorClass()

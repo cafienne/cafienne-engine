@@ -18,7 +18,7 @@
 package org.cafienne.system.router
 
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.pekko.actor.{Actor, ActorRef, Props, Terminated}
+import org.apache.pekko.actor.{Actor, ActorRef, PoisonPill, Props, Terminated}
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.infrastructure.serialization.DeserializationFailure
@@ -83,7 +83,8 @@ class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef],
     })(actor => {
       // Otherwise, store the request, stop the actor and, when the Termination is received, we will inform the requester.
       terminationRequests.put(actorId, sender())
-      context.stop(actor)
+      //context.stop(actor)
+      actor.tell(PoisonPill, self)
     })
   }
 

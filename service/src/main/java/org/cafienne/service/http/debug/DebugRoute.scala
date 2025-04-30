@@ -26,9 +26,11 @@ import jakarta.ws.rs.{GET, PATCH, Path, Produces}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.command.TerminateModelActor
+import org.cafienne.cmmn.instance.Case
 import org.cafienne.infrastructure.cqrs.instance.ModelEventsReader
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.CommandRoute
+import org.cafienne.tenant.TenantActor
 
 import scala.util.{Failure, Success}
 
@@ -93,17 +95,21 @@ class DebugRoute(override val httpService: CaseEngineHttpServer) extends Command
   )
   @Produces(Array("application/json"))
   def forceRecovery: Route = patch {
-    path("force-recovery" / Segment) { modelId =>
+    path("force-recovery" / Segment) { modelId => {
+      parameters("actorType".withDefault("case")) { actorType =>
       validUser { user =>
+        val clazz = if (actorType.equalsIgnoreCase("tenant")) classOf[TenantActor] else classOf[Case]
         if (!caseSystem.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          onComplete(caseSystem.gateway.request(TerminateModelActor(modelId))) {
+          onComplete(caseSystem.gateway.request(TerminateModelActor(modelId, clazz))) {
             case Success(value) => complete(StatusCodes.OK, s"Forced recovery of $modelId")
             case Failure(err) => throw err;
           }
         }
       }
     }
+    }
+  }
   }
 }

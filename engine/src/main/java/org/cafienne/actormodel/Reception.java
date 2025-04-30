@@ -17,9 +17,12 @@
 
 package org.cafienne.actormodel;
 
+import org.apache.pekko.cluster.sharding.ShardRegion;
+import org.apache.pekko.cluster.sharding.ShardRegion$;
 import org.apache.pekko.persistence.JournalProtocol;
 import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.communication.CaseSystemCommunicationMessage;
 import org.cafienne.actormodel.communication.request.command.RequestModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -65,6 +68,14 @@ class Reception {
 
     void handleMessage(Object message) {
         switch (message) {
+            case TerminateModelActor terminate -> {
+                System.out.println("received termination message " + actor);
+                actor.requestStop();
+            }
+            case ShardRegion.Passivate passivate -> {
+                System.out.println("{} received Passivate {} message " + actor + " " + passivate.stopMessage().getClass().getSimpleName());
+                actor.context().stop(actor.self());
+            }
             case IncomingActorMessage visitor -> {
                 // Responses are always allowed, as they come only when we have requested something
                 if (visitor.isResponse() || canPass(visitor.asCommand())) {
