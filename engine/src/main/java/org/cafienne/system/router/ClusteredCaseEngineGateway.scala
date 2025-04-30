@@ -63,6 +63,18 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   //Subcases, processtasks need to end up at the same shard as the original case. (also in follow up calls)
   //use the rootCaseId for deciding on the shard. This is added to the CaseMembership
   private val shardResolver: ShardRegion.ExtractShardId = {
+    case ShardRegion.StartEntity(id) =>
+      // StartEntity is used by remembering entities feature
+      (id.hashCode.toLong % numberOfPartitions).toString
+    case TerminateModelActor(id, clazz) =>
+      system.log.info(s"TerminateModelActor ${clazz.getSimpleName} message received for id: " + id)
+      (id.hashCode.toLong % numberOfPartitions).toString
+    case Terminated(actorRef) =>
+      system.log.info("Terminated message received for actorRef: " + actorRef + " not routed via root case id")
+      (actorRef.hashCode() % numberOfPartitions).toString
+    case c: CaseSystemCommunicationCommand =>
+      val pidHashKey: Long = c.command.getRootCaseId.hashCode
+      (pidHashKey % numberOfPartitions).toString
     case m: ModelCommand => {
       val pidHashKey: Long = m.getRootCaseId.hashCode
       val shard = (pidHashKey % numberOfPartitions).toString
@@ -73,18 +85,6 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
       val pidHashKey: Long = s.metadata.actorId.hashCode
       val shard =  (pidHashKey % numberOfPartitions).toString
       shard
-    case c: CaseSystemCommunicationCommand =>
-      val pidHashKey: Long = c.command.getRootCaseId.hashCode
-      (pidHashKey % numberOfPartitions).toString
-    case ShardRegion.StartEntity(id) =>
-      // StartEntity is used by remembering entities feature
-      (id.hashCode.toLong % numberOfPartitions).toString
-    case TerminateModelActor(id, clazz) =>
-      system.log.info(s"TerminateModelActor ${clazz.getSimpleName} message received for id: " + id)
-      (id.hashCode.toLong % numberOfPartitions).toString
-    case Terminated(actorRef) =>
-      system.log.info("Terminated message received for actorRef: " + actorRef + " not routed via root case id")
-      (actorRef.hashCode() % numberOfPartitions).toString
     case other => {
       system.log.warning(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
       // Unsupported command type
