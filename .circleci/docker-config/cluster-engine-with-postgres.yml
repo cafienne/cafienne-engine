@@ -1,0 +1,63 @@
+services:
+  cafienne1:
+    image: cafienne/engine:latest
+    labels:
+      component: cafienne-engine
+    network_mode: host
+    expose:
+      - 2027
+    hostname: cafienne1
+    container_name: cafienne1
+    environment:
+      EVENT_DB_PROFILE: ${EVENT_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
+      EVENT_DB_DRIVER: ${EVENT_DB_DRIVER:-org.postgresql.Driver}
+      EVENT_DB_USER: ${EVENT_DB_USER:-postgres}
+      EVENT_DB_PASSWORD: ${EVENT_DB_PASSWORD:-postgres}
+      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:postgresql://localhost:6432/cluster1?reWriteBatchedInserts=true}
+      QUERY_DB_PROFILE: ${QUERY_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
+      QUERY_DB_DRIVER: ${QUERY_DB_DRIVER:-org.postgresql.Driver}
+      QUERY_DB_USER: ${QUERY_DB_USER:-postgres}
+      QUERY_DB_PASSWORD: ${QUERY_DB_PASSWORD:-postgres}
+      QUERY_DB_URL: ${QUERY_DB_URL:-jdbc:postgresql://localhost:6432/cluster1?reWriteBatchedInserts=true}
+    healthcheck:
+      test: ["CMD", "wget", "-s", "http://localhost:2027/api-docs/swagger.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/archive1:/opt/cafienne/archive
+      - /home/circleci/cafienne-engine/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/cluster-conf/node1:/opt/cafienne/conf
+      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/cafienne/bootstrap
+  cafienne2:
+    image: cafienne/engine:latest
+    labels:
+      component: cafienne-engine
+    network_mode: host
+    expose:
+      - 2028
+    hostname: cafienne2
+    container_name: cafienne2
+    environment:
+      EVENT_DB_PROFILE: ${EVENT_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
+      EVENT_DB_DRIVER: ${EVENT_DB_DRIVER:-org.postgresql.Driver}
+      EVENT_DB_USER: ${EVENT_DB_USER:-postgres}
+      EVENT_DB_PASSWORD: ${EVENT_DB_PASSWORD:-postgres}
+      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:postgresql://localhost:6432/cluster1?reWriteBatchedInserts=true}
+      QUERY_DB_PROFILE: ${QUERY_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
+      QUERY_DB_DRIVER: ${QUERY_DB_DRIVER:-org.postgresql.Driver}
+      QUERY_DB_USER: ${QUERY_DB_USER:-postgres}
+      QUERY_DB_PASSWORD: ${QUERY_DB_PASSWORD:-postgres}
+      QUERY_DB_URL: ${QUERY_DB_URL:-jdbc:postgresql://localhost:6432/cluster2?reWriteBatchedInserts=true}
+    healthcheck:
+      test: ["CMD", "wget", "-s", "http://localhost:2027/api-docs/swagger.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/archive2:/opt/cafienne/archive
+      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/cluster-conf/node2:/opt/cafienne/conf
+      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/cafienne/bootstrap

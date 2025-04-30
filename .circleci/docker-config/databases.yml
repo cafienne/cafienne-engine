@@ -103,3 +103,27 @@ services:
       POSTGRES_PASSWORD: mysecret
       POSTGRES_DB: cafienne-query
     command: postgres --port=6430
+
+  postgres-for-cluster:
+    image: postgres:16
+    network_mode: host
+    command: postgres -c 'max_connections=1000' --port=6432
+    container_name: postgres-for-cluster
+    environment:
+      - "TZ=Europe/Amsterdam"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=postgres"
+#      - "POSTGRES_HOST_AUTH_METHOD=scram-sha-256"
+#      - "POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256"
+    ports:
+      - "6432:6432"
+    expose:
+      - 6432
+    hostname: postgres-for-cluster
+    volumes:
+      - "/home/circleci/cafienne-engine/.circleci/src/cluster-conf/postgres-init:/docker-entrypoint-initdb.d"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres --port 6432" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
