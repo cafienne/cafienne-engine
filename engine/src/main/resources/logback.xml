@@ -12,7 +12,7 @@
 
     <!-- Show Storage Service logging INFO is light, DEBUG is full logging -->
     <!--    <logger name="org.cafienne.storage" level="INFO"/>-->
-    <!--    <logger name="org.cafienne.storage" level="DEBUG"/>-->
+        <logger name="org.cafienne.storage" level="DEBUG"/>
 
     <!-- Show HTTP traffic logging -->
     <!--        <logger name="org.cafienne.service.http" level="DEBUG" />-->
