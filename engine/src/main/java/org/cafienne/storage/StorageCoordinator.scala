@@ -93,6 +93,8 @@ class StorageCoordinator(val caseSystem: CaseSystem)
             case _: RestoreStarted => restart(RestoreActorData)
             case other => logger.warn(s"Cannot recover a storage process, because of unrecognized initiation event of type ${other.getClass.getName}")
           }
+        } else {
+          logger.warn(s"Cannot recover a storage process, because the actor ${event.metadata} is not a root actor")
         }
       case EventEnvelope(_, _, _, _: StorageEvent) => // Other storage events can be safely ignored.
       case other => logger.error(s"Encountered unexpected storage tag matching event of type ${other.getClass.getName}")

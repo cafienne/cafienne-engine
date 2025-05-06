@@ -70,7 +70,7 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
     system.actorOf(
       ClusterSingletonProxy.props(
         singletonManagerPath = "/user/" + TimerService.CAFIENNE_TIMER_SERVICE,
-        settings = ClusterSingletonProxySettings(system).withRole("worker")),
+        settings = ClusterSingletonProxySettings(system)),
       name = "timerServiceProxy")
   } else {
     system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);

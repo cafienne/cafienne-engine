@@ -17,12 +17,11 @@
 
 package org.cafienne.system.router
 
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props, Terminated}
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
 import org.apache.pekko.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import org.apache.pekko.util.Timeout
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.communication.CaseSystemCommunicationCommand
-import org.cafienne.actormodel.communication.request.command.RequestModelActor
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
