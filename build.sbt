@@ -1,3 +1,5 @@
+import sbt.Keys.localStaging
+
 /**
  * Global settings
  */
@@ -10,16 +12,6 @@ val basicSettings = {
     organization := "org.cafienne",
     organizationName := "Batav B.V.",
     startYear := Some(2014),
-
-    /**
-     * Resolver repositories
-     */
-    resolvers ++= Seq(
-      Resolver.jcenterRepo,
-      Resolver.DefaultMavenRepository,
-      "typesafe releases" at "https://repo.typesafe.com/typesafe/releases",
-    ) ++ Resolver.sonatypeOssRepos("releases"),
-
 
     /**
      * Compiler settings
@@ -62,16 +54,13 @@ val basicSettings = {
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
 
-    // add sonatype repository settings
-    // snapshot versions publish to sonatype snapshot repository
-    // other versions publish to sonatype staging repository
-    publishTo := Some(
-      if (isSnapshot.value)
-        Opts.resolver.sonatypeOssSnapshots.head
-      else
-        Opts.resolver.sonatypeStaging
-    ),
-
+    //When you add the file below to your .sbt folder, ask the repository manager for a set of credentials
+    credentials += Credentials(Path.userHome / ".sbt" / "sonatype_central_credentials"),
+    publishTo := {
+      val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+      if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+      else localStaging.value
+    },
     /**
      * Version generation, depends on the [[GitInfoAnalyzer]]
      */
