@@ -19,10 +19,10 @@ package org.cafienne.persistence.querydb.query.cmmn.implementations
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
-import org.cafienne.persistence.querydb.query.QueryDBReader
 import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseMembership
 import org.cafienne.persistence.querydb.record._
 import org.cafienne.persistence.querydb.schema.QueryDB
+import org.cafienne.persistence.querydb.schema.table.CaseIdentifierRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -174,7 +174,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends QueryDBReader with LazyLogging
     * Query that validates that the user belongs to the team of the specified case, either by explicit
     * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
     */
-  def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
+  def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String]): Query[CaseIdentifierView, CaseIdentifierRecord, Seq] = {
     val groupMembership = TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
       .join(TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId))
       .on((group, member) => {
@@ -195,7 +195,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends QueryDBReader with LazyLogging
     val userIdentityRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId).filter(_.tenantRole.inSet(user.roles))
 
     // Return a filter on the case that also matches membership existence somewhere
-    caseInstanceQuery
+    TableQuery[CaseIdentifierView]
       .filter(_.id === caseInstanceId)
       .filter(_ => userIdBasedMembership.exists || tenantRoleBasedMembership.exists || groupMembership.exists || userIdentityRoleBasedMembership.exists)
   }
@@ -204,7 +204,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends QueryDBReader with LazyLogging
     * Query that validates that the user belongs to the team of the specified case,
     * and adds an optional business identifiers filter to the query.
     */
-  def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String], identifiers: Option[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
+  def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String], identifiers: Option[String]): Query[CaseIdentifierView, CaseIdentifierRecord, Seq] = {
     if (identifiers.isEmpty) membershipQuery(user, caseInstanceId)
     else for {
       teamMemberShip <- membershipQuery(user, caseInstanceId)
