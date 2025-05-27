@@ -88,6 +88,7 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "The id of the case to get the tasks from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "includeSubCaseTasks", description = "Whether to include tasks of subcases (defaults to false)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Boolean]), required = false),
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -99,7 +100,10 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
   def getCaseTasks: Route = get {
     caseUser { user =>
       path("case" / Segment) {
-        caseInstanceId => runListQuery(caseInstanceQueries.getCaseTasks(caseInstanceId, user))
+        caseInstanceId =>
+          parameters("includeSubCaseTasks".?) { includeSubCaseTasks =>
+            runListQuery(caseInstanceQueries.getCaseTasks(caseInstanceId, user, includeSubCaseTasks.getOrElse("false").equals("true")))
+          }
       }
     }
   }

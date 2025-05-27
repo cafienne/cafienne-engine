@@ -190,22 +190,103 @@ class CaseInstanceQueriesImpl(queryDB: QueryDB)
         }
     }
   }
-  
-  override def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = {
-    val query = for {
-      // Get the case
-      baseQuery <- TableQuery[TaskTable]
-        .filter(_.caseInstanceId === caseInstanceId)
-        // Note: join full may sound heavy, but it is actually only on the case id, and that MUST exist as well.
-        //  This helps distinguishing between case-not-found and no-tasks-found-on-existing-case-that-we-have-access-to
-        .joinFull(TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).map(_.id)).on(_.caseInstanceId === _)
-      // Access control query
-      _ <- membershipQuery(user, caseInstanceId)
-    } yield baseQuery
 
-    db.run(query.distinct.result).map(records => {
-      if (records.map(_._2).isEmpty) throw CaseSearchFailure(caseInstanceId)
-      records.map(_._1).filter(_.nonEmpty).map(_.get)
-    })
+  override def getCaseTasks(caseInstanceId: String, user: UserIdentity, includeSubCaseTasks: Boolean): Future[Seq[TaskRecord]] = {
+    if (includeSubCaseTasks) {
+      //    println("\n================= USER " + user.id +" IS FETCHING TASKS OF " + caseInstanceId)
+
+      // Below 2 queries could be re-usable. They enable fetching a chain of cases, once without authorization information, the other with authorization information
+      val rootCaseChain = for {
+        root <- TableQuery[CaseIdentifierView].filter(_.id === caseInstanceId).map(_.rootCaseId)
+        ids <- TableQuery[CaseIdentifierView].filter(_.rootCaseId === root)
+      } yield ids
+
+      val authorizedCaseChain = for {
+        ids <- rootCaseChain
+        _ <- membershipQuery(user, ids.id)
+      } yield ids
+
+      // We're joining 2 queries:
+      //  1. on the one hand get the entire chain of cases to which the caseInstanceId belongs
+      //  2. then also fetch all tasks for all those cases, but with full authorization information on the cases to which those tasks belong
+      //  The second query helps us to understand that a case is accessible by the user, the first one is needed to find out which cases are a subcase of the requested caseInstanceId
+      val tasksWithAuthorization = authorizedCaseChain.joinFull(TableQuery[TaskTable]).on(_.id === _.caseInstanceId)
+
+      // Joining left, because the case tree must always exist, and if it doesn't we don't have access to it either and we'll throw case search failure.
+      val query = rootCaseChain.joinFull(tasksWithAuthorization).on(_.id === _._2.map(_.caseInstanceId))
+
+      //      println("\n\nQuery\n" + query.result.statements.mkString("") + "\n\n")
+
+      db.run(query.result).map(records => {
+        //        val summary = records.map(record => "case["+record._1.map(_.id).getOrElse("NONE") + "]: " + record._2.map(_._1.fold("not authorized")(_ => "having access ")).getOrElse("   NO AUTH    ")  + "  |  " + record._2.map(_._2.map(_.taskName).getOrElse("no task here")).getOrElse(" NO TASKS"))
+        //        println("\n\n" + user.id +" found " + records.length +" records for case " + caseInstanceId +":\n" + summary.mkString("\n"))
+
+        val accessibleCases = records.map(_._2).filter(_.nonEmpty).map(_.get).map(_._1).filter(_.nonEmpty).map(_.get)
+        if (accessibleCases.isEmpty) {
+          //          println("No accessible cases")
+          throw CaseSearchFailure(caseInstanceId)
+        } else if (!accessibleCases.exists(c => c.id == caseInstanceId)) {
+          //          println("Root case requested not accessible")
+          throw CaseSearchFailure(caseInstanceId)
+        } else {
+
+          // Mechanism to build a hierarchy of case and subcases
+          case class CaseNode(id: String, parent: String, root: String) {
+            import scala.collection.mutable.ListBuffer
+
+            val isRoot: Boolean = id == root
+            val subcases: ListBuffer[CaseNode] = new ListBuffer()
+            def chain: Seq[CaseNode] = Seq(this) ++ this.subcases.flatMap(_.chain)
+            //
+            //    def print(indent: String = ""): Unit = {
+            //      println(indent + id)
+            //      subcases.foreach(_.print(indent + "  "))
+            //    }
+          }
+
+          // First map the list of all cases with the same root case. If empty or it doesn't contain our case id, then the case does not exist
+          val caseNodes = records.map(_._1).filter(_.nonEmpty).map(_.get).map(r => CaseNode(r.id, r.parentCaseId, r.rootCaseId)).distinct
+          val caseNode = caseNodes.find(node => node.id == caseInstanceId).getOrElse({
+            //            println("Case really not found")
+            throw CaseSearchFailure(caseInstanceId)
+          })
+
+          // Now build a tree structure with all cases and their subcases, starting from the root case id
+          caseNodes.foreach(node => caseNodes.find(parent => parent.id == node.parent).foreach(parent => parent.subcases += node))
+
+          //          println("Found " + accessibleCases.length +" cases with access. Searching for tasks in subtree ")
+          //          caseNode.print()
+
+          val accessibleCaseInstanceNodes = caseNode.chain.filter(node => accessibleCases.exists(c => c.id == node.id))
+          if (accessibleCaseInstanceNodes.isEmpty) {
+            // The user does not have access to any of the cases in the case tree for the given caseInstanceId, hence giving search failure.
+            //            println("No accessible cases in case tree")
+            throw CaseSearchFailure(caseInstanceId)
+          }
+
+          // Now get the tasks from the query result, and filter them for the cases in the chain of the requested caseInstanceId
+          val tasks = records.map(_._2).filter(_.nonEmpty).map(_.get).filter(_._1.nonEmpty).map(_._2).filter(_.nonEmpty).map(_.get)
+          val result = tasks.filter(task => accessibleCaseInstanceNodes.exists(c => c.id == task.caseInstanceId))
+          //          println("\n" + user.id +" found " + result.length +" tasks "+ result.map(r => (r.taskName , r.id, r.caseInstanceId)).mkString("\n"))
+          result
+        }
+      })
+    } else {
+      val query = for {
+        // Get the case
+        baseQuery <- TableQuery[TaskTable]
+          .filter(_.caseInstanceId === caseInstanceId)
+          // Note: join full may sound heavy, but it is actually only on the case id, and that MUST exist as well.
+          //  This helps distinguishing between case-not-found and no-tasks-found-on-existing-case-that-we-have-access-to
+          .joinFull(TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).map(_.id)).on(_.caseInstanceId === _)
+        // Access control query
+        _ <- membershipQuery(user, caseInstanceId)
+      } yield baseQuery
+
+      db.run(query.distinct.result).map(records => {
+        if (records.map(_._2).isEmpty) throw CaseSearchFailure(caseInstanceId)
+        records.map(_._1).filter(_.nonEmpty).map(_.get)
+      })
+    }
   }
 }

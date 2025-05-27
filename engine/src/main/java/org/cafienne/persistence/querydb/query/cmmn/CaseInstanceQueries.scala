@@ -25,5 +25,5 @@ trait CaseInstanceQueries {
 
   def getPlanItemDocumentation(planItemId: String, user: UserIdentity): Future[Documentation]
 
-  def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]]
+  def getCaseTasks(caseInstanceId: String, user: UserIdentity, includeSubCaseTasks: Boolean = false): Future[Seq[TaskRecord]]
 }
