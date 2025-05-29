@@ -9,7 +9,7 @@ import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.query.cmmn.authorization.AuthorizationQueriesImpl
-import org.cafienne.persistence.querydb.query.cmmn.implementations.TaskQueriesImpl
+import org.cafienne.persistence.querydb.query.cmmn.implementations.{CaseInstanceQueriesImpl, TaskQueriesImpl}
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
 import org.cafienne.persistence.querydb.schema.QueryDB
@@ -18,8 +18,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
   val persistenceConfig: PersistenceConfig = new SystemConfig(TestConfig.config).cafienne.persistence
@@ -27,6 +27,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val queryDBWriter: QueryDBWriter = queryDB.writer
   val taskQueries = new TaskQueriesImpl(queryDB)
   val authorizationQueries = new AuthorizationQueriesImpl(queryDB)
+  val caseInstanceQueries = new CaseInstanceQueriesImpl(queryDB)
 
   val tenant = "tenant"
   val case33 = "33"
@@ -109,7 +110,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "filter all tasks with caseInstanceId" in {
-    val res = Await.result(taskQueries.getCaseTasks(case33, userWithAandB), 1.second)
+    val res = Await.result(caseInstanceQueries.getCaseTasks(case33, userWithAandB), 1.second)
     res.size must be(2)
   }
 

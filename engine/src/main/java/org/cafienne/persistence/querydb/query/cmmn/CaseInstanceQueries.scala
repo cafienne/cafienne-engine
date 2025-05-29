@@ -2,7 +2,7 @@ package org.cafienne.persistence.querydb.query.cmmn
 
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.persistence.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
-import org.cafienne.persistence.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemRecord}
+import org.cafienne.persistence.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemRecord, TaskRecord}
 
 import scala.concurrent.Future
 
@@ -24,4 +24,6 @@ trait CaseInstanceQueries {
   def getPlanItem(planItemId: String, user: UserIdentity): Future[PlanItemRecord]
 
   def getPlanItemDocumentation(planItemId: String, user: UserIdentity): Future[Documentation]
+
+  def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]]
 }

@@ -99,7 +99,7 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
   def getCaseTasks: Route = get {
     caseUser { user =>
       path("case" / Segment) {
-        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, user))
+        caseInstanceId => runListQuery(caseInstanceQueries.getCaseTasks(caseInstanceId, user))
       }
     }
   }

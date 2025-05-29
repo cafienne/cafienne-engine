@@ -35,8 +35,6 @@ trait TaskQueries {
 
   def getTasksWithCaseName(caseName: String, tenant: Option[String], user: UserIdentity): Future[Seq[TaskRecord]]
 
-  def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]]
-
   def getAllTasks(user: UserIdentity, filter: TaskFilter = TaskFilter(), area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[TaskRecord]]
 
   def getCountForUser(user: UserIdentity, tenant: Option[String]): Future[TaskCount]

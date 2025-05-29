@@ -3,8 +3,8 @@ package org.cafienne.persistence.querydb.query.cmmn.implementations
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.cmmn.filter.TaskFilter
-import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.persistence.querydb.query.cmmn.{TaskCount, TaskQueries}
+import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.TaskRecord
 import org.cafienne.persistence.querydb.schema.QueryDB
 
@@ -43,24 +43,6 @@ class TaskQueriesImpl(queryDB: QueryDB)
     } yield baseQuery._1
 
     db.run(query.distinct.result)
-  }
-
-  override def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = {
-    val query = for {
-      // Get the case
-      baseQuery <- TableQuery[TaskTable]
-        .filter(_.caseInstanceId === caseInstanceId)
-        // Note: join full may sound heavy, but it is actually only on the case id, and that MUST exist as well.
-        //  This helps distinguishing between case-not-found and no-tasks-found-on-existing-case-that-we-have-access-to
-        .joinFull(TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).map(_.id)).on(_.caseInstanceId === _)
-      // Access control query
-      _ <- membershipQuery(user, caseInstanceId)
-    } yield baseQuery
-
-    db.run(query.distinct.result).map(records => {
-      if (records.map(_._2).isEmpty) throw CaseSearchFailure(caseInstanceId)
-      records.map(_._1).filter(_.nonEmpty).map(_.get)
-    })
   }
 
   override def getAllTasks(user: UserIdentity, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
