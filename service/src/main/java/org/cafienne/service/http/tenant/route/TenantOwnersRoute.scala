@@ -202,7 +202,7 @@ class TenantOwnersRoute(override val httpService: CaseEngineHttpServer) extends 
   def getDisabledUserAccounts: Route = get {
     tenantUser { tenantOwner =>
       path("disabled-accounts") {
-        runListQuery(userQueries.getDisabledTenantUserAccounts(tenantOwner))
+        runListQuery(tenantQueries.getDisabledTenantUserAccounts(tenantOwner))
       }
     }
   }

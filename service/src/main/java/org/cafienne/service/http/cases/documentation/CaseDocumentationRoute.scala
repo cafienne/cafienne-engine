@@ -54,7 +54,7 @@ class CaseDocumentationRoute(override val httpService: CaseEngineHttpServer) ext
   def getPlanItemDocumentation: Route = get {
     caseUser { user =>
       path(Segment / "documentation" / "planitems" / Segment) {
-        (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, user))
+        (_, planItemId) => runQuery(caseInstanceQueries.getPlanItemDocumentation(planItemId, user))
       }
     }
   }
@@ -78,7 +78,7 @@ class CaseDocumentationRoute(override val httpService: CaseEngineHttpServer) ext
   def getCaseFileDocumentation: Route = get {
     caseUser { user =>
       path(Segment / "documentation" / "casefile") {
-        caseInstanceId => runQuery(caseQueries.getCaseFileDocumentation(caseInstanceId, user))
+        caseInstanceId => runQuery(caseInstanceQueries.getCaseFileDocumentation(caseInstanceId, user))
       }
     }
   }

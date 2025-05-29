@@ -61,7 +61,7 @@ class CaseTeamRoute(override val httpService: CaseEngineHttpServer) extends Case
   def getCaseTeam: Route = get {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam") {
-        runQuery(caseQueries.getCaseTeam(caseInstanceId, user))
+        runQuery(caseInstanceQueries.getCaseTeam(caseInstanceId, user))
       }
     }
   }

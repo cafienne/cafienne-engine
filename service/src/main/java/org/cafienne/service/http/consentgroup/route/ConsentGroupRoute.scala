@@ -20,33 +20,28 @@ package org.cafienne.service.http.consentgroup.route
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
-import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.persistence.querydb.query.UserQueries
-import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
+import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.persistence.querydb.query.tenant.ConsentGroupQueries
+import org.cafienne.persistence.querydb.query.tenant.implementation.ConsentGroupQueriesImpl
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait ConsentGroupRoute extends CommandRoute with QueryRoute {
   override val lastModifiedHeaderName: String = Headers.CONSENT_GROUP_LAST_MODIFIED
-  val userQueries: UserQueries
+  val consentGroupQueries: ConsentGroupQueries = new ConsentGroupQueriesImpl(caseSystem.queryDB)
 
   def consentGroupUser(subRoute: ConsentGroupUser => Route): Route = {
     authenticatedUser { user =>
       pathPrefix(Segment) { group =>
         readLastModifiedHeader(Headers.CONSENT_GROUP_LAST_MODIFIED) { lastModified =>
-          onComplete(getConsentGroupUser(user, group, lastModified)) {
+          onComplete(runSyncedQuery(consentGroupQueries.getConsentGroupUser(user, group), lastModified)) {
             case Success(groupUser) => subRoute(groupUser)
             case Failure(t) => throw t
           }
         }
       }
     }
-  }
-
-  def getConsentGroupUser(user: AuthenticatedUser, group: String, groupLastModified: LastModifiedHeader): Future[ConsentGroupUser] = {
-    runSyncedQuery(userQueries.getConsentGroupUser(user, group), groupLastModified)
   }
 
   def askConsentGroup(command: ConsentGroupCommand): Route = askModelActor(command)

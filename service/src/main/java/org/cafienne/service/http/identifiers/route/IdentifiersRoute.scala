@@ -25,8 +25,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.persistence.querydb.query.IdentifierQueriesImpl
-import org.cafienne.persistence.querydb.query.filter.IdentifierFilter
+import org.cafienne.persistence.querydb.query.cmmn.filter.IdentifierFilter
+import org.cafienne.persistence.querydb.query.cmmn.identifier.IdentifierQueriesImpl
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.identifiers.model.BusinessIdentifierFormat

@@ -59,7 +59,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
   def getCaseFile: Route = get {
     caseUser { user =>
       path(Segment / "casefile") {
-        caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, user))
+        caseInstanceId => runQuery(caseInstanceQueries.getCaseFile(caseInstanceId, user))
       }
     }
   }

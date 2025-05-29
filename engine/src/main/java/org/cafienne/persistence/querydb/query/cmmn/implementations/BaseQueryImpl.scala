@@ -15,10 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.implementations
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
+import org.cafienne.persistence.querydb.query.QueryDBReader
+import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseMembership
 import org.cafienne.persistence.querydb.record._
 import org.cafienne.persistence.querydb.schema.QueryDB
 
@@ -38,7 +40,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends QueryDBReader with LazyLogging
 
   val planItemTableQuery = TableQuery[PlanItemTable]
 
-  def getCaseMembership(caseInstanceId: String, user: UserIdentity, exception: String => Exception, msg: String): Future[CaseMembership] = {
+  def getCaseMembership(caseInstanceId:String, user: UserIdentity, exception: String => Exception, msg: String): Future[CaseMembership] = {
 //    if (msg == caseInstanceId) {
 //      println(s"Trying to fetch case '$caseInstanceId' ")
 //    } else {

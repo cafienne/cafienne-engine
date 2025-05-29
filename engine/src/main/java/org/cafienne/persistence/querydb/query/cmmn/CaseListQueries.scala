@@ -15,8 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn
 
 import org.cafienne.actormodel.identity.UserIdentity
+import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.querydb.query.cmmn.filter.CaseFilter
+import org.cafienne.persistence.querydb.record._
 
-case class CaseOwnership(override val id: String, val caseInstanceId: String, val tenant: String, val isOwner: Boolean) extends UserIdentity
+import scala.concurrent.Future
+
+trait CaseListQueries {
+
+  //  def getCasesStats(user: UserIdentity, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
+
+  def getCases(user: UserIdentity, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]]
+}

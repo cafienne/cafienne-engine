@@ -56,7 +56,7 @@ class PlanItemRoute(override val httpService: CaseEngineHttpServer) extends Case
   def getPlanItems: Route = get {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems") {
-        runListQuery(caseQueries.getPlanItems(caseInstanceId, user))
+        runListQuery(caseInstanceQueries.getPlanItems(caseInstanceId, user))
       }
     }
   }
@@ -81,7 +81,7 @@ class PlanItemRoute(override val httpService: CaseEngineHttpServer) extends Case
   def getPlanItem: Route = get {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems" / Segment) {
-        planItemId => runQuery(caseQueries.getPlanItem(planItemId, user))
+        planItemId => runQuery(caseInstanceQueries.getPlanItem(planItemId, user))
       }
     }
   }

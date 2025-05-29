@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs.{DELETE, PUT, Path, Produces}
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.{Directive, Route}
-import org.cafienne.persistence.querydb.query.CaseOwnership
+import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseOwnership
 import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
@@ -55,7 +55,7 @@ class CaseStorageRoute(override val httpService: CaseEngineHttpServer) extends C
     authenticatedUser { user =>
       pathMatcher(prefix) { caseInstanceId =>
         readLastModifiedHeader() { caseLastModified =>
-          onComplete(runSyncedQuery(caseQueries.getCaseOwnership(caseInstanceId, user), caseLastModified)) {
+          onComplete(runSyncedQuery(authorizationQueries.getCaseOwnership(caseInstanceId, user), caseLastModified)) {
             case Success(caseMember) =>
               if (caseMember.isOwner) subRoute(caseMember)
               else complete(StatusCodes.Unauthorized, failureMessage)

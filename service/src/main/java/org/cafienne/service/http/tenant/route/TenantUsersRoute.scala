@@ -63,7 +63,7 @@ class TenantUsersRoute(override val httpService: CaseEngineHttpServer) extends T
   def getTenantUsers: Route = get {
     tenantUser { platformUser =>
       path("users") {
-        runListQuery(userQueries.getTenantUsers(platformUser))
+        runListQuery(tenantQueries.getTenantUsers(platformUser))
       }
     }
   }
@@ -87,7 +87,7 @@ class TenantUsersRoute(override val httpService: CaseEngineHttpServer) extends T
   def getTenantUser: Route = get {
     tenantUser { tenantUser =>
       path("users" / Segment) { userId =>
-        onComplete(userQueries.getTenantUser(tenantUser, userId)) {
+        onComplete(tenantQueries.getTenantUser(tenantUser, userId)) {
           case Success(tenantUserInformation) =>
             if (tenantUserInformation.enabled) {
               completeJson(tenantUserInformation)

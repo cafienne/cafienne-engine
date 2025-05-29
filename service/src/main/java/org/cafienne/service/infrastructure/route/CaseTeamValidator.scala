@@ -23,14 +23,16 @@ import org.cafienne.actormodel.exception.MissingTenantException
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
-import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.tenant.{ConsentGroupQueries, TenantQueries}
+import org.cafienne.persistence.querydb.query.tenant.implementation.{ConsentGroupQueriesImpl, TenantQueriesImpl}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 trait CaseTeamValidator extends TenantValidator {
   implicit val ec: ExecutionContext
-  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
+  val tenantQueries: TenantQueries = new TenantQueriesImpl(caseSystem.queryDB)
+  val consentGroupQueries: ConsentGroupQueries = new ConsentGroupQueriesImpl(caseSystem.queryDB)
 
   def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
     val tenant = optionalTenant match {
@@ -49,7 +51,7 @@ trait CaseTeamValidator extends TenantValidator {
   def getUserOrigin(user: CaseTeamUser, tenant: String): Future[CaseTeamUser] = validateCaseTeamUsers(Seq(user), tenant).map(_.head)
 
   def getUserOrigin(user: String, tenant: String): Future[CaseUserIdentity] = {
-    userQueries
+    tenantQueries
       .determineOriginOfUsers(Seq(user), tenant)
       .map(_.headOption.fold(Origin.IDP)(_._2))
       .map(origin => CaseUserIdentity(user, origin))
@@ -73,7 +75,7 @@ trait CaseTeamValidator extends TenantValidator {
   }
 
   def validateCaseTeamUsers(users: Seq[CaseTeamUser], tenant: String): Future[Seq[CaseTeamUser]] = {
-    userQueries.determineOriginOfUsers(users.map(_.userId), tenant).map(origins => {
+    tenantQueries.determineOriginOfUsers(users.map(_.userId), tenant).map(origins => {
       val newTeam = users.map(user => {
         val origin = origins.find(_._1 == user.userId).fold(Origin.IDP)(_._2)
         user.copy(newOrigin = origin)
@@ -90,7 +92,7 @@ trait CaseTeamValidator extends TenantValidator {
 
   def validateConsentGroups(groups: Seq[CaseTeamGroup]): Future[Seq[CaseTeamGroup]] = {
     val groupIds = groups.map(_.groupId)
-    userQueries.getConsentGroups(groupIds).map(consentGroups => {
+    consentGroupQueries.getConsentGroups(groupIds).map(consentGroups => {
       if (consentGroups.size != groupIds.size) {
         val unfoundGroups = groupIds.filterNot(id => consentGroups.exists(user => user.id == id))
         val msg = {

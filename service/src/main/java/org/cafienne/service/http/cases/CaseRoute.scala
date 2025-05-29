@@ -33,7 +33,7 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
-import org.cafienne.persistence.querydb.query.filter.CaseFilter
+import org.cafienne.persistence.querydb.query.cmmn.filter.CaseFilter
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CaseAPIFormat._
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
@@ -74,7 +74,7 @@ class CaseRoute(override val httpService: CaseEngineHttpServer) extends CasesRou
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getCases(user, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
+            runListQuery(caselistQueries.getCases(user, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
@@ -130,7 +130,7 @@ class CaseRoute(override val httpService: CaseEngineHttpServer) extends CasesRou
   def getCase: Route = get {
     caseUser { user =>
       path(Segment) {
-        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, user))
+        caseInstanceId => runQuery(caseInstanceQueries.getFullCaseInstance(caseInstanceId, user))
       }
     }
   }
@@ -154,7 +154,7 @@ class CaseRoute(override val httpService: CaseEngineHttpServer) extends CasesRou
   def getCaseDefinition: Route = get {
     caseInstanceSubRoute("definition") { (user, caseInstanceId) =>
       readLastModifiedHeader() { lastModified =>
-        onComplete(runSyncedQuery(caseQueries.getCaseDefinition(caseInstanceId, user), lastModified)) {
+        onComplete(runSyncedQuery(caseInstanceQueries.getCaseDefinition(caseInstanceId, user), lastModified)) {
           case Success(record) => complete(StatusCodes.OK, HttpEntity(ContentTypes.`text/xml(UTF-8)`, record.content))
           case Failure(t) => handleFailure(t)
         }

@@ -26,8 +26,8 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
-import org.cafienne.persistence.querydb.query.TaskCount
-import org.cafienne.persistence.querydb.query.filter.TaskFilter
+import org.cafienne.persistence.querydb.query.cmmn.TaskCount
+import org.cafienne.persistence.querydb.query.cmmn.filter.TaskFilter
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tasks.TaskAPIFormat.TaskResponseFormat
 

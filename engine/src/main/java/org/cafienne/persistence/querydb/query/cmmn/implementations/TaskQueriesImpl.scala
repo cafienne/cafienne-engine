@@ -1,73 +1,21 @@
-/*
- * Copyright (C) 2014  Batav B.V.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.implementations
 
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.json.{CafienneJson, LongValue, Value, ValueMap}
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.persistence.querydb.query.cmmn.filter.TaskFilter
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, TaskSearchFailure}
-import org.cafienne.persistence.querydb.query.filter.TaskFilter
+import org.cafienne.persistence.querydb.query.cmmn.{TaskCount, TaskQueries}
 import org.cafienne.persistence.querydb.record.TaskRecord
 import org.cafienne.persistence.querydb.schema.QueryDB
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
-case class TaskCount(claimed: Long, unclaimed: Long) extends CafienneJson {
-  override def toValue: Value[_] = new ValueMap("claimed", new LongValue(claimed), "unclaimed", new LongValue(unclaimed))
-}
-
-trait TaskQueries {
-
-  def getCaseMembership(taskId: String, user: UserIdentity): Future[CaseMembership] = ???
-
-  def getTask(taskId: String, user: UserIdentity): Future[TaskRecord] = ???
-
-  def getTasksWithCaseName(caseName: String, tenant: Option[String], user: UserIdentity): Future[Seq[TaskRecord]] = ???
-
-  def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = ???
-
-  def getAllTasks(user: UserIdentity, filter: TaskFilter = TaskFilter(), area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[TaskRecord]] = ???
-
-  def getCountForUser(user: UserIdentity, tenant: Option[String]): Future[TaskCount] = ???
-}
-
 class TaskQueriesImpl(queryDB: QueryDB)
   extends BaseQueryImpl(queryDB)
     with TaskQueries {
 
   import dbConfig.profile.api._
-
-  override def getCaseMembership(taskId: String, user: UserIdentity): Future[CaseMembership] = {
-    val result = for {
-      caseId <- {
-        db.run(TableQuery[TaskTable].filter(_.id === taskId).map(_.caseInstanceId).result).map(records =>
-          if (records.isEmpty) throw TaskSearchFailure(taskId)
-          else records.head
-        )
-      }
-      membership <- getCaseMembership(caseId, user, TaskSearchFailure, taskId)
-    } yield (caseId, membership)
-    result.map(result => {
-//      println(s"Found membership for user ${user.id} on task $taskId in case ${result._1}")
-      result._2
-    })
-  }
 
   override def getTask(taskId: String, user: UserIdentity): Future[TaskRecord] = {
     val query = for {

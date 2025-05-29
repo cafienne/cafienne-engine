@@ -8,6 +8,8 @@ import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
+import org.cafienne.persistence.querydb.query.cmmn.authorization.AuthorizationQueriesImpl
+import org.cafienne.persistence.querydb.query.cmmn.implementations.TaskQueriesImpl
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
 import org.cafienne.persistence.querydb.schema.QueryDB
@@ -24,6 +26,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
   val queryDBWriter: QueryDBWriter = queryDB.writer
   val taskQueries = new TaskQueriesImpl(queryDB)
+  val authorizationQueries = new AuthorizationQueriesImpl(queryDB)
 
   val tenant = "tenant"
   val case33 = "33"
@@ -89,14 +92,14 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "retrieve a caseInstanceId and tenant by taskId" in {
     val res = Await.result({
       implicit val ec: ExecutionContextExecutor = scala.concurrent.ExecutionContext.global
-      taskQueries.getCaseMembership("1", testUser).map(m => (m.caseInstanceId, m.tenant))
+      authorizationQueries.getCaseMembershipForTask("1", testUser).map(m => (m.caseInstanceId, m.tenant))
     }, 1.second)
     res must be((case33, tenant))
   }
 
   it should "retrieve nothing by unknown taskId" in {
     assertThrows[TaskSearchFailure] {
-      Await.result(taskQueries.getCaseMembership("10", testUser), 1.second)
+      Await.result(authorizationQueries.getCaseMembershipForTask("10", testUser), 1.second)
     }
   }
 

@@ -15,8 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.filter
 
-import org.cafienne.actormodel.identity.{CaseUserIdentity, ConsentGroupMembership, Origin}
-
-class CaseMembership(override val id: String, override val origin: Origin, override val tenantRoles: Set[String], override val groups: Seq[ConsentGroupMembership], val caseInstanceId: String, val tenant: String) extends CaseUserIdentity
+case class TaskFilter(tenant: Option[String] = None,
+                      identifiers: Option[String] = None,
+                      caseName: Option[String] = None,
+                      taskName: Option[String] = None,
+                      taskState: Option[String] = None,
+                      assignee: Option[String] = None,
+                      owner: Option[String] = None,
+                      dueOn: Option[String] = None,
+                      dueBefore: Option[String] = None,
+                      dueAfter: Option[String] = None,
+                      timeZone: Option[String] = None)

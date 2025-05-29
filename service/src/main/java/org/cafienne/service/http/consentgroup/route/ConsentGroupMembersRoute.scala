@@ -24,15 +24,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")
 class ConsentGroupMembersRoute(override val httpService: CaseEngineHttpServer) extends ConsentGroupRoute {
-  override val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
-
   override def routes: Route = concat(getGroup, getMember)
 
   @Path("/{groupId}")
@@ -53,7 +50,7 @@ class ConsentGroupMembersRoute(override val httpService: CaseEngineHttpServer) e
   def getGroup: Route = get {
     consentGroupUser { user =>
       pathEndOrSingleSlash { // Need to use pathEnd here otherwise getMember route gets swallowed
-        runQuery(userQueries.getConsentGroup(user, user.groupId))
+        runQuery(consentGroupQueries.getConsentGroup(user, user.groupId))
       }
     }
   }
@@ -77,7 +74,7 @@ class ConsentGroupMembersRoute(override val httpService: CaseEngineHttpServer) e
   def getMember: Route = get {
     consentGroupUser { user =>
       path("members" / Segment) { userId =>
-        runQuery(userQueries.getConsentGroupMember(user, user.groupId, userId))
+        runQuery(consentGroupQueries.getConsentGroupMember(user, user.groupId, userId))
       }
     }
   }
