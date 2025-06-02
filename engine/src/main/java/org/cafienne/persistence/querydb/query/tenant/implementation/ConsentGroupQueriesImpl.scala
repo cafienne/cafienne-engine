@@ -21,12 +21,12 @@ class ConsentGroupQueriesImpl(val queryDB: QueryDB) extends QueryDBReader with C
 
   override def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = {
     val query = TableQuery[ConsentGroupTable].filter(_.id.inSet(groupIds))
-      .join(TableQuery[ConsentGroupMemberTable]).on(_.id === _.group)
+      .joinLeft(TableQuery[ConsentGroupMemberTable]).on(_.id === _.group)
 
     db.run(query.result).map(records => {
       val groups = records.map(_._1).map(g => (g.id, g.tenant)).toSet
-      val members = records.map(_._2).filter(_.role.isBlank)
-      val roles = records.map(_._2).filterNot(_.role.isBlank)
+      val members = records.map(_._2).filter(_.nonEmpty).map(_.get).filter(_.role.isBlank)
+      val roles = records.map(_._2).filter(_.nonEmpty).map(_.get).filterNot(_.role.isBlank)
       groups.map(group => {
         val groupUsers = members.filter(_.group == group._1)
         val groupMembers = groupUsers.map(member => {
