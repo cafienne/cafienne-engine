@@ -1,46 +1,28 @@
 package org.cafienne.persistence.querydb.query
 
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.testkit.TestKit
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.infrastructure.config.persistence.PersistenceConfig
-import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
-import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.materializer.tenant.TenantStorageTransaction
-import org.cafienne.persistence.querydb.query.cmmn.implementations.CaseInstanceQueriesImpl
 import org.cafienne.persistence.querydb.query.result.CaseList
 import org.cafienne.persistence.querydb.record.{CaseRecord, CaseTeamUserRecord, PlanItemRecord}
-import org.cafienne.persistence.querydb.schema.QueryDB
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.flatspec.AnyFlatSpecLike
-import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
 import java.util.UUID
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext}
 
-class CaseInstanceQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll {
-  val persistenceConfig: PersistenceConfig = new SystemConfig(TestConfig.config).cafienne.persistence
-  val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
-  val queryDBWriter: QueryDBWriter = queryDB.writer
-  val caseInstanceQueries = new CaseInstanceQueriesImpl(queryDB)
-  implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+class CaseInstanceQueriesImplTest extends QueryTestBaseClass("case-instance-queries") {
 
-  val tenant = "tenant"
+  private val idOfActiveCase = caseId("active")
+  private val idOfTerminatedCase = caseId("terminated")
+  private val idOfCompletedCase = caseId("completed")
+  private val activeCase: CaseRecord = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  private val terminatedCase: CaseRecord = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, caseName = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  private val completedCase: CaseRecord = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, caseName = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
 
-  val idOfActiveCase = "active"
-  val idOfTerminatedCase = "terminated"
-  val idOfCompletedCase = "completed"
-  val activeCase: CaseRecord = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-  val terminatedCase: CaseRecord = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, caseName = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-  val completedCase: CaseRecord = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, caseName = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-
-  val planItem1_1: PlanItemRecord = PlanItemRecord(id = UUID.randomUUID().toString, definitionId = "abc", caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
+  private val planItem1_1: PlanItemRecord = PlanItemRecord(id = UUID.randomUUID().toString, definitionId = "abc", caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
     modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 

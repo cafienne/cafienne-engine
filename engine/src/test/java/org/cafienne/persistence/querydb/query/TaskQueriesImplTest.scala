@@ -3,41 +3,29 @@ package org.cafienne.persistence.querydb.query
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.infrastructure.config.persistence.PersistenceConfig
-import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.persistence.querydb.materializer.slick.QueryDBWriter
 import org.cafienne.persistence.querydb.query.cmmn.authorization.AuthorizationQueriesImpl
 import org.cafienne.persistence.querydb.query.cmmn.implementations.TaskQueriesImpl
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.persistence.querydb.record.{CaseRecord, TaskRecord}
-import org.cafienne.persistence.querydb.schema.QueryDB
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
 
-class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
-  val persistenceConfig: PersistenceConfig = new SystemConfig(TestConfig.config).cafienne.persistence
-  val queryDB: QueryDB = new QueryDB(persistenceConfig, persistenceConfig.queryDB.jdbcConfig)
-  val queryDBWriter: QueryDBWriter = queryDB.writer
+class TaskQueriesImplTest extends QueryTestBaseClass("task-list-queries") {
   val taskQueries = new TaskQueriesImpl(queryDB)
   val authorizationQueries = new AuthorizationQueriesImpl(queryDB)
 
-  val tenant = "tenant"
-  val case33 = "33"
-  val case44 = "44"
-  val case55 = "55"
-  val case44Child = "44-child"
+  private val case33 = caseId("33")
+  private val case44 = caseId("44")
+  private val case55 = caseId("55")
+  private val case44Child = caseId("44-child")
 
-  val testUser: PlatformUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
-  val userWithAandB: PlatformUser = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
-  val userWithBandC: PlatformUser = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
-  val userWithC: PlatformUser = TestIdentityFactory.createPlatformUser("userC", tenant, Set("C"))
+  private val testUser: PlatformUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
+  private val userWithAandB: PlatformUser = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
+  private val userWithBandC: PlatformUser = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
+  private val userWithC: PlatformUser = TestIdentityFactory.createPlatformUser("userC", tenant, Set("C"))
 
   override def beforeAll(): Unit = {
 
