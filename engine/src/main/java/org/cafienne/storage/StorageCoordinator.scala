@@ -71,7 +71,8 @@ class StorageCoordinator(val caseSystem: CaseSystem)
 
   def runStream(): Future[Done] = {
     implicit val mat: Materializer = Materializer(context)
-
+    // Storage events are removed when the storage actions completed (so .noOffset)
+    // When there are other storage events available, we should restart these storage actions.
     journal().currentEventsByTag(StorageEvent.TAG, Offset.noOffset).mapAsync(1)(consumeModelEvent).runWith(Sink.ignore)
   }
 

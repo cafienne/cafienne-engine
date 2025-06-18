@@ -19,7 +19,6 @@ package org.cafienne.system
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
-import org.apache.pekko.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import org.cafienne.actormodel.identity.{CaseSystemIdentityRegistration, IdentityRegistration}
 import org.cafienne.infrastructure.EngineVersion
 import org.cafienne.infrastructure.config.CaseSystemConfig
@@ -28,7 +27,6 @@ import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.{CaseEngineGateway, ClusteredCaseEngineGateway, GatewayMessageRouter}
-import org.cafienne.timerservice.TimerService
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -57,24 +55,7 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   val gateway: GatewayMessageRouter = if (isClusterConfig) { new ClusteredCaseEngineGateway(this)} else { new CaseEngineGateway(this) }
 
   // Create singleton actors
-  val timerService: ActorRef = if (isClusterConfig) {
-  //TODO handle shutdown of timer service (now PoisonPill is sent to the timer service, but it is not handled)
-    //start the singleton
-    system.actorOf(
-      ClusterSingletonManager.props(
-        singletonProps = Props(classOf[TimerService], this),
-        terminationMessage = PoisonPill,
-        settings = ClusterSingletonManagerSettings(system)),
-      name = TimerService.CAFIENNE_TIMER_SERVICE)
-    //return access to the singleton actor
-    system.actorOf(
-      ClusterSingletonProxy.props(
-        singletonManagerPath = "/user/" + TimerService.CAFIENNE_TIMER_SERVICE,
-        settings = ClusterSingletonProxySettings(system)),
-      name = "timerServiceProxy")
-  } else {
-    system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
-  }
+  val timerService: ActorRef = gateway.createTimerService
 
   lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)
 

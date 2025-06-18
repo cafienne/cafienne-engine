@@ -27,6 +27,7 @@ import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
+import org.cafienne.timerservice.TimerService
 
 import scala.concurrent.Future
 
@@ -39,7 +40,6 @@ class CaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
   private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "tenants")
   private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "consent-groups")
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
-  private val storageCoordinator: ActorRef = caseSystem.system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
 
   def request(message: Any): Future[Any] = {
     import org.apache.pekko.pattern.ask
@@ -67,4 +67,14 @@ class CaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
       case _ => defaultRouterService
     }
   }
+
+  override def createTimerService: ActorRef = {
+    system.actorOf(Props.create(classOf[TimerService], caseSystem), TimerService.CAFIENNE_TIMER_SERVICE);
+  }
+
+  override def createStorageCoordinator: ActorRef = {
+    system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
+  }
+
+  private val storageCoordinator: ActorRef = createStorageCoordinator
 }

@@ -17,8 +17,9 @@
 
 package org.cafienne.system.router
 
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props, Terminated}
 import org.apache.pekko.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import org.apache.pekko.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import org.apache.pekko.util.Timeout
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.communication.CaseSystemCommunicationCommand
@@ -33,7 +34,9 @@ import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
 import org.cafienne.tenant.actorapi.command.TenantCommand
+import org.cafienne.timerservice.TimerService
 
+import scala.annotation.tailrec
 import scala.concurrent.Future
 
 class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
@@ -42,7 +45,6 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   final val processShardTypeName: String = "process"
   final val tenantShardTypeName: String = "tenant"
   final val consentGroupShardTypeName: String = "consentgroup"
-  final val storageShardTypeName: String = "storage"
 
   //pekko.cluster.sharding.number-of-shards
   private val numberOfPartitions = system.settings.config.getInt("pekko.cluster.sharding.number-of-shards")
@@ -92,7 +94,7 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     }
   }
 
-  private def startShard(typeName: String, clazz: Class[_]) = {
+  private def startShardingNode(typeName: String, clazz: Class[_]) = {
     ClusterSharding(caseSystem.system)
       .start(typeName = typeName,
         entityProps = Props(clazz, caseSystem),
@@ -102,11 +104,10 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   }
 
   // Start the shard system
-  private val clusteredCaseRegion = startShard(caseShardTypeName, classOf[Case])
-  private val clusteredProcessTaskRegion = startShard(processShardTypeName, classOf[ProcessTaskActor])
-  private val clusteredTenantRegion = startShard(tenantShardTypeName, classOf[TenantActor])
-  private val clusteredConsentGroupRegion = startShard(consentGroupShardTypeName, classOf[ConsentGroupActor])
-  private val clusteredStorageRegion = startShard(storageShardTypeName, classOf[StorageCoordinator])
+  private val clusteredCaseRegion = startShardingNode(caseShardTypeName, classOf[Case])
+  private val clusteredProcessTaskRegion = startShardingNode(processShardTypeName, classOf[ProcessTaskActor])
+  private val clusteredTenantRegion = startShardingNode(tenantShardTypeName, classOf[TenantActor])
+  private val clusteredConsentGroupRegion = startShardingNode(consentGroupShardTypeName, classOf[ConsentGroupActor])
 
   def request(message: Any): Future[Any] = {
     import org.apache.pekko.pattern.ask
@@ -119,9 +120,10 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     getRouter(message).map(actorRef => actorRef.tell(message, sender)).getOrElse(system.log.error(s"Cluster: No router found for message $message"))
   }
 
+  @tailrec
   private def getRouter(message: Any): Option[ActorRef] = {
     message match {
-      case _: StorageCommand => Some(clusteredStorageRegion)
+      case _: StorageCommand => Some(storageCoordinator)
       case modelActor: TerminateModelActor =>
         if (modelActor.clazz equals(classOf[TenantActor])) {
           Some(clusteredTenantRegion)
@@ -140,4 +142,38 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
       case _ => None
     }
   }
+
+  override def createTimerService: ActorRef = {
+    //TODO handle shutdown of timer service (now PoisonPill is sent to the timer service, but it is not handled)
+    //start the singleton
+    system.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = Props(classOf[TimerService], this.caseSystem),
+        terminationMessage = PoisonPill,
+        settings = ClusterSingletonManagerSettings(system)),
+      name = TimerService.CAFIENNE_TIMER_SERVICE)
+    //return access to the singleton actor
+    system.actorOf(
+      ClusterSingletonProxy.props(
+        singletonManagerPath = "/user/" + TimerService.CAFIENNE_TIMER_SERVICE,
+        settings = ClusterSingletonProxySettings(system)),
+      name = "timerServiceProxy")
+  }
+
+  override def createStorageCoordinator: ActorRef = {
+    system.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = Props(classOf[StorageCoordinator], this.caseSystem),
+        terminationMessage = PoisonPill,
+        settings = ClusterSingletonManagerSettings(system)),
+      name = "storage-coordinator")
+    //return access to the singleton actor
+    system.actorOf(
+      ClusterSingletonProxy.props(
+        singletonManagerPath = "/user/" + "storage-coordinator",
+        settings = ClusterSingletonProxySettings(system)),
+      name = "storageCoordinatorProxy")
+  }
+
+  private val storageCoordinator: ActorRef = createStorageCoordinator
 }
