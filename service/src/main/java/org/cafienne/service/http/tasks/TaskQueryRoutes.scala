@@ -29,7 +29,7 @@ import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.cmmn.TaskCount
 import org.cafienne.persistence.querydb.query.cmmn.filter.TaskFilter
 import org.cafienne.service.http.CaseEngineHttpServer
-import org.cafienne.service.http.tasks.TaskAPIFormat.TaskResponseFormat
+import org.cafienne.service.http.tasks.TaskAPIFormat.{CaseHumanTaskResponseFormat, TaskResponseFormat}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
@@ -92,7 +92,7 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Case Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TaskResponseFormat]))))),
+      new ApiResponse(description = "Case Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseHumanTaskResponseFormat]))))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
