@@ -70,3 +70,9 @@ final case class TaskRecord(id: String,
     v
   }
 }
+
+case class PerformableTaskRecord(task: TaskRecord, mayPerform: Boolean) extends CafienneJson {
+//  println("Task " + task.taskName +".performable === " + performable)
+  override def toValue: Value[_] = task.toValue.asMap().plus("mayPerform", mayPerform)
+}
+

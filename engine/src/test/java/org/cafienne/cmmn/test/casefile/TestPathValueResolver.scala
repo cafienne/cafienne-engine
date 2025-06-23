@@ -2,7 +2,7 @@ package org.cafienne.cmmn.test.casefile
 
 import org.cafienne.cmmn.instance.Path
 import org.cafienne.cmmn.instance.casefile.InvalidPathException
-import org.cafienne.json.{JSONReader, Value, ValueMap}
+import org.cafienne.json.{JSONReader, Value}
 import org.junit.Test
 
 class TestPathValueResolver {
@@ -32,7 +32,7 @@ class TestPathValueResolver {
   }
 
   @Test def testResolveNonExistentPath(): Unit = {
-    val result = assertResolveNonExistingValue("bbb")
+    assertResolveNonExistingValue("bbb")
   }
 
   private def assertResolveValue(path: String) = try {

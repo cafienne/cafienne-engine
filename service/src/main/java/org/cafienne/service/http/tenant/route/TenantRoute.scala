@@ -21,7 +21,8 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.persistence.infrastructure.lastmodified.{Headers, LastModifiedHeader}
-import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.tenant.TenantQueries
+import org.cafienne.persistence.querydb.query.tenant.implementation.TenantQueriesImpl
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 import org.cafienne.tenant.actorapi.command.TenantCommand
@@ -30,7 +31,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
-  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
+  val tenantQueries: TenantQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 
@@ -53,7 +54,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
   }
 
   def getTenantUser(user: AuthenticatedUser, tenant: String, lastModified: LastModifiedHeader): Future[TenantUser] = {
-    runSyncedQuery(userQueries.getTenantUser(user, tenant), lastModified)
+    runSyncedQuery(tenantQueries.getTenantUser(user, tenant), lastModified)
   }
 
   def askTenant(command: TenantCommand): Route = {

@@ -21,7 +21,9 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.HumanTaskCommand
-import org.cafienne.persistence.querydb.query._
+import org.cafienne.persistence.querydb.query.cmmn.TaskQueries
+import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseMembership
+import org.cafienne.persistence.querydb.query.cmmn.implementations.TaskQueriesImpl
 import org.cafienne.persistence.querydb.query.exception.TaskSearchFailure
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.infrastructure.route.CaseTeamValidator
@@ -32,7 +34,7 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
   val taskQueries: TaskQueries = new TaskQueriesImpl(caseSystem.queryDB)
 
   def askTaskWithAssignee(user: UserIdentity, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
-    onComplete(taskQueries.getCaseMembership(taskId, user)) {
+    onComplete(authorizationQueries.getCaseMembershipForTask(taskId, user)) {
       case Success(caseMember) =>
         val caseInstanceId = caseMember.caseInstanceId
         onComplete(getUserOrigin(assignee, caseMember.tenant)) {
@@ -51,7 +53,7 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
   }
 
   def askTask(user: UserIdentity, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
-    onComplete(taskQueries.getCaseMembership(taskId, user)) {
+    onComplete(authorizationQueries.getCaseMembershipForTask(taskId, user)) {
       case Success(caseMember) => askModelActor(createTaskCommand.apply(caseMember.caseInstanceId, caseMember))
       case Failure(error) => error match {
         case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)

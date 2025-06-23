@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query.filter
+package org.cafienne.persistence.querydb.query.cmmn.filter
 
-case class CaseFilter(tenant: Option[String] = None, caseName: Option[String] = None, status: Option[String] = None, identifiers: Option[String] = None)
+case class IdentifierFilter(tenant: Option[String] = None, name: Option[String] = None)

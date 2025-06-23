@@ -20,14 +20,15 @@ package org.cafienne.actormodel.identity
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
-import org.cafienne.persistence.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.persistence.querydb.query.tenant.TenantQueries
+import org.cafienne.persistence.querydb.query.tenant.implementation.TenantQueriesImpl
 import org.cafienne.persistence.querydb.record.TenantRecord
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CaseSystemIdentityRegistration(caseSystem: CaseSystem)(implicit val ec: ExecutionContext) extends IdentityRegistration with LazyLogging {
-  val userQueries: UserQueries = new TenantQueriesImpl(caseSystem.queryDB)
+  val tenantQueries: TenantQueries = new TenantQueriesImpl(caseSystem.queryDB)
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
@@ -60,14 +61,14 @@ class CaseSystemIdentityRegistration(caseSystem: CaseSystem)(implicit val ec: Ex
   private def executeUserQuery(user: UserIdentity): Future[PlatformUser] = {
     platformUserCache.get(user.id) match {
       case user: PlatformUser => Future(user)
-      case null => userQueries.getPlatformUser(user.id).map(cacheUser)
+      case null => tenantQueries.getPlatformUser(user.id).map(cacheUser)
     }
   }
 
   override def getTenant(tenantId: String): Future[TenantRecord] = {
     tenantCache.get(tenantId) match {
       case tenant: TenantRecord => Future(tenant)
-      case null => userQueries.getTenant(tenantId).map(tenant => {
+      case null => tenantQueries.getTenant(tenantId).map(tenant => {
         tenantCache.put(tenantId, tenant)
         tenant
       })

@@ -15,21 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.filter
 
-import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
-import org.cafienne.persistence.querydb.schema.QueryDB
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables, Views}
-
-/**
- * Expose tables available in the QueryDB
- */
-trait QueryDBReader extends SlickQueryExtensions
-  with TenantTables
-  with ConsentGroupTables
-  with CaseTables
-  with Views
-  with TaskTables {
-  val queryDB: QueryDB
-  val tablePrefix: String = queryDB.tablePrefix
-}
+case class CaseFilter(tenant: Option[String] = None, caseName: Option[String] = None, status: Option[String] = None, identifiers: Option[String] = None, rootCaseId: Option[String] = None)

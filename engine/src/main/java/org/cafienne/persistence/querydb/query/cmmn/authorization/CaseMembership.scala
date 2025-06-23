@@ -15,16 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.authorization
 
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.persistence.querydb.record.CaseBusinessIdentifierRecord
+import org.cafienne.actormodel.identity.{CaseUserIdentity, ConsentGroupMembership, Origin}
 
-final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
-  override def toValue: Value[_] = {
-    val list = new ValueList
-    records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.orNull)))
-    list
-  }
-}
-
+class CaseMembership(override val id: String, override val origin: Origin, override val tenantRoles: Set[String], override val groups: Seq[ConsentGroupMembership], val caseInstanceId: String, val tenant: String) extends CaseUserIdentity

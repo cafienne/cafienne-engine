@@ -22,15 +22,19 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
+import org.cafienne.persistence.querydb.query.cmmn.authorization.{AuthorizationQueries, AuthorizationQueriesImpl, CaseMembership}
+import org.cafienne.persistence.querydb.query.cmmn.implementations.{CaseInstanceQueriesImpl, CaseListQueriesImpl}
 import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
-import org.cafienne.persistence.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
+import org.cafienne.persistence.querydb.query.cmmn.{CaseInstanceQueries, CaseListQueries}
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl(caseSystem.queryDB)
+  val caseInstanceQueries: CaseInstanceQueries = new CaseInstanceQueriesImpl(caseSystem.queryDB)
+  val caselistQueries: CaseListQueries = new CaseListQueriesImpl(caseSystem.queryDB)
+  val authorizationQueries: AuthorizationQueries = new AuthorizationQueriesImpl(caseSystem.queryDB)
   override val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def caseUser(subRoute: AuthenticatedUser => Route): Route = {
@@ -83,7 +87,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
 
   def authorizeCaseAccess(user: UserIdentity, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      onComplete(runSyncedQuery(caseQueries.getCaseMembership(caseInstanceId, user), caseLastModified)) {
+      onComplete(runSyncedQuery(authorizationQueries.getCaseMembership(caseInstanceId, user), caseLastModified)) {
         case Success(membership) => subRoute(membership)
         case Failure(error) =>
           error match {

@@ -15,8 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.schema.table
 
-import org.cafienne.actormodel.identity.UserIdentity
+import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 
-case class CaseOwnership(override val id: String, val caseInstanceId: String, val tenant: String, val isOwner: Boolean) extends UserIdentity
+final case class CaseIdentifierRecord(id: String, parentCaseId: String, rootCaseId: String)
+
+trait Views extends SlickTableExtensions {
+
+  import dbConfig.profile.api._
+
+  class CaseIdentifierView(tag: Tag) extends CafienneTable[CaseIdentifierRecord](tag, "case_instance") {
+    lazy val id: Rep[String] = idColumn[String]("id", O.PrimaryKey)
+
+    lazy val parentCaseId: Rep[String] = idColumn[String]("parent_case_id")
+
+    lazy val rootCaseId: Rep[String] = idColumn[String]("root_case_id")
+
+    lazy val * = (id, parentCaseId, rootCaseId).mapTo[CaseIdentifierRecord]
+  }
+}

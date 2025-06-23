@@ -17,14 +17,12 @@
 
 package org.cafienne.persistence.querydb.schema.table
 
-import org.cafienne.persistence.infrastructure.jdbc.SlickTableExtensions
 import org.cafienne.persistence.querydb.record._
 import slick.lifted.ColumnOrdered
-import slick.relational.RelationalProfile.ColumnOption.Length
 
 import java.time.Instant
 
-trait CaseTables extends SlickTableExtensions {
+trait CaseTables extends CaseTeamTables {
 
   import dbConfig.profile.api._
 
@@ -45,33 +43,22 @@ trait CaseTables extends SlickTableExtensions {
       case "modifiedny" => modifiedBy
       case "createdon" => createdOn
       case "createdby" => createdBy
-      case "lastmodified" =>  lastModified
+      case "lastmodified" => lastModified
       case _ => lastModified
     }
 
-    lazy val id = idColumn[String]("id", O.PrimaryKey)
-
-    lazy val caseName = idColumn[String]("case_name")
-
-    lazy val state = stateColumn[String]("state")
-
-    lazy val failures = column[Int]("failures")
-
-    lazy val parentCaseId = idColumn[String]("parent_case_id")
-
-    lazy val rootCaseId = idColumn[String]("root_case_id")
-
-    lazy val lastModified = column[Instant]("last_modified")
-
-    lazy val modifiedBy = userColumn[String]("modified_by")
-
-    lazy val createdOn = column[Instant]("created_on")
-
-    lazy val createdBy = userColumn[String]("created_by")
-
-    lazy val caseInput = jsonColumn[String]("case_input")
-
-    lazy val caseOutput = jsonColumn[String]("case_output")
+    lazy val id: Rep[String] = idColumn[String]("id", O.PrimaryKey)
+    lazy val caseName: Rep[String] = idColumn[String]("case_name")
+    lazy val state: Rep[String] = stateColumn[String]("state")
+    lazy val failures: Rep[Int] = column[Int]("failures")
+    lazy val parentCaseId: Rep[String] = idColumn[String]("parent_case_id")
+    lazy val rootCaseId: Rep[String] = idColumn[String]("root_case_id")
+    lazy val lastModified: Rep[Instant] = column[Instant]("last_modified")
+    lazy val modifiedBy: Rep[String] = userColumn[String]("modified_by")
+    lazy val createdOn: Rep[Instant] = column[Instant]("created_on")
+    lazy val createdBy: Rep[String] = userColumn[String]("created_by")
+    lazy val caseInput: Rep[String] = jsonColumn[String]("case_input")
+    lazy val caseOutput: Rep[String] = jsonColumn[String]("case_output")
 
     // Some indexes to optimize GetCases queries
     lazy val indexState = oldStyleIndex(state)
@@ -86,64 +73,39 @@ trait CaseTables extends SlickTableExtensions {
 
   final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTenantTable[CaseDefinitionRecord](tag, "case_instance_definition") {
 
-    lazy val caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
-
-    lazy val name = idColumn[String]("name")
-
-    lazy val description = column[String]("description")
-
-    lazy val elementId = idColumn[String]("element_id")
-
-    lazy val content = column[String]("content")
-
-    lazy val lastModified = column[Instant]("last_modified")
-
-    lazy val modifiedBy = userColumn[String]("modified_by")
+    lazy val caseInstanceId: Rep[String] = idColumn[String]("caseInstanceId", O.PrimaryKey)
+    lazy val name: Rep[String] = idColumn[String]("name")
+    lazy val description: Rep[String] = column[String]("description")
+    lazy val elementId: Rep[String] = idColumn[String]("element_id")
+    lazy val content: Rep[String] = column[String]("content")
+    lazy val lastModified: Rep[Instant] = column[Instant]("last_modified")
+    lazy val modifiedBy: Rep[String] = userColumn[String]("modified_by")
 
     lazy val * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy).mapTo[CaseDefinitionRecord]
   }
 
   class PlanItemTable(tag: Tag) extends CafienneTenantTable[PlanItemRecord](tag, "plan_item") {
 
-    lazy val id = idColumn[String]("id", O.PrimaryKey)
-
-    lazy val definitionId = idColumn[String]("definition_id", O.Default(""))
-
-    lazy val stageId = idColumn[String]("stage_id")
-
-    lazy val name = column[String]("name")
-
-    lazy val index = column[Int]("index")
-
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val currentState = stateColumn[String]("current_state")
-
-    lazy val historyState = stateColumn[String]("history_state")
-
-    lazy val transition = stateColumn[String]("transition")
-
-    lazy val planItemType = stateColumn[String]("plan_item_type")
-
-    lazy val repeating = column[Boolean]("repeating")
-
-    lazy val required = column[Boolean]("required")
-
-    lazy val lastModified = column[Instant]("last_modified")
-
-    lazy val modifiedBy = userColumn[String]("modified_by")
-
-    lazy val createdOn = column[Instant]("created_on")
-
-    lazy val createdBy = userColumn[String]("created_by")
-
-    lazy val taskInput = jsonColumn[String]("task_input")
-
-    lazy val taskOutput = jsonColumn[String]("task_output")
-
-    lazy val mappedInput = jsonColumn[String]("mapped_input")
-
-    lazy val rawOutput = jsonColumn[String]("raw_output")
+    lazy val id: Rep[String] = idColumn[String]("id", O.PrimaryKey)
+    lazy val definitionId: Rep[String] = idColumn[String]("definition_id", O.Default(""))
+    lazy val stageId: Rep[String] = idColumn[String]("stage_id")
+    lazy val name: Rep[String] = column[String]("name")
+    lazy val index: Rep[Int] = column[Int]("index")
+    lazy val caseInstanceId: Rep[String] = idColumn[String]("case_instance_id")
+    lazy val currentState: Rep[String] = stateColumn[String]("current_state")
+    lazy val historyState: Rep[String] = stateColumn[String]("history_state")
+    lazy val transition: Rep[String] = stateColumn[String]("transition")
+    lazy val planItemType: Rep[String] = stateColumn[String]("plan_item_type")
+    lazy val repeating: Rep[Boolean] = column[Boolean]("repeating")
+    lazy val required: Rep[Boolean] = column[Boolean]("required")
+    lazy val lastModified: Rep[Instant] = column[Instant]("last_modified")
+    lazy val modifiedBy: Rep[String] = userColumn[String]("modified_by")
+    lazy val createdOn: Rep[Instant] = column[Instant]("created_on")
+    lazy val createdBy: Rep[String] = userColumn[String]("created_by")
+    lazy val taskInput: Rep[String] = jsonColumn[String]("task_input")
+    lazy val taskOutput: Rep[String] = jsonColumn[String]("task_output")
+    lazy val mappedInput: Rep[String] = jsonColumn[String]("mapped_input")
+    lazy val rawOutput: Rep[String] = jsonColumn[String]("raw_output")
 
     lazy val * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput).mapTo[PlanItemRecord]
 
@@ -154,12 +116,10 @@ trait CaseTables extends SlickTableExtensions {
 
   class CaseFileTable(tag: Tag) extends CafienneTenantTable[CaseFileRecord](tag, "case_file") {
 
-    lazy val caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
-
-    lazy val data = jsonColumn[String]("data")
+    lazy val caseInstanceId: Rep[String] = idColumn[String]("case_instance_id", O.PrimaryKey)
+    lazy val data: Rep[String] = jsonColumn[String]("data")
 
     lazy val * = (caseInstanceId, tenant, data).mapTo[CaseFileRecord]
-
     lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
@@ -172,19 +132,13 @@ trait CaseTables extends SlickTableExtensions {
       case _ => name
     }
 
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val name = idColumn[String]("name")
-
-    lazy val value = column[Option[String]]("value")
-
-    lazy val active = column[Boolean]("active")
-
-    lazy val path = column[String]("path")
+    lazy val caseInstanceId: Rep[String] = idColumn[String]("case_instance_id")
+    lazy val name: Rep[String] = idColumn[String]("name")
+    lazy val value: Rep[Option[String]] = column[Option[String]]("value")
+    lazy val active: Rep[Boolean] = column[Boolean]("active")
+    lazy val path: Rep[String] = column[String]("path")
 
     lazy val * = (caseInstanceId, tenant, name, value, active, path).mapTo[CaseBusinessIdentifierRecord]
-
-    lazy val caseInstanceTable = TableQuery[CaseInstanceTable]
 
     lazy val pk = primaryKey(pkName, (caseInstanceId, name))
 
@@ -194,76 +148,14 @@ trait CaseTables extends SlickTableExtensions {
 
   class CaseInstanceRoleTable(tag: Tag) extends CafienneTenantTable[CaseRoleRecord](tag, "case_instance_role") {
 
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val roleName = idColumn[String]("role_name")
-
-    lazy val assigned = column[Boolean]("assigned") // true if team members are assigned for this role
+    lazy val caseInstanceId: Rep[String] = idColumn[String]("case_instance_id")
+    lazy val roleName: Rep[String] = idColumn[String]("role_name")
+    lazy val assigned: Rep[Boolean] = column[Boolean]("assigned") // true if team members are assigned for this role
 
     lazy val pk = primaryKey(pkName, (caseInstanceId, roleName))
 
     lazy val * = (caseInstanceId, tenant, roleName, assigned).mapTo[CaseRoleRecord]
 
     lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
-  }
-
-  class CaseInstanceTeamUserTable(tag: Tag) extends CafienneTenantTable[CaseTeamUserRecord](tag, "case_instance_team_user") {
-
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val userId = userColumn[String]("user_id")
-
-    lazy val origin = column[String]("origin", Length(32), O.Default(""))
-
-    lazy val caseRole = idColumn[String]("case_role")
-
-    lazy val isOwner = column[Boolean]("isOwner")
-
-    lazy val pk = primaryKey(pkName, (caseInstanceId, caseRole, userId))
-
-    lazy val * = (caseInstanceId, tenant, userId, origin, caseRole, isOwner).mapTo[CaseTeamUserRecord]
-
-    lazy val indexCaseInstanceId = index(caseInstanceId)
-    lazy val indexUserId = index(userId)
-  }
-
-  class CaseInstanceTeamTenantRoleTable(tag: Tag) extends CafienneTenantTable[CaseTeamTenantRoleRecord](tag, "case_instance_team_tenant_role") {
-
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val tenantRole = userColumn[String]("tenant_role")
-
-    lazy val caseRole = idColumn[String]("case_role")
-
-    lazy val isOwner = column[Boolean]("isOwner")
-
-    lazy val pk = primaryKey(pkName, (caseInstanceId, tenant, tenantRole, caseRole))
-
-    lazy val * = (caseInstanceId, tenant, tenantRole, caseRole, isOwner).mapTo[CaseTeamTenantRoleRecord]
-
-    lazy val indexCaseInstanceId = index(caseInstanceId)
-    lazy val indexTenantRoles = index(ixName(tenantRole), (tenant, tenantRole))
-  }
-
-  class CaseInstanceTeamGroupTable(tag: Tag) extends CafienneTenantTable[CaseTeamGroupRecord](tag, "case_instance_team_group") {
-
-    lazy val caseInstanceId = idColumn[String]("case_instance_id")
-
-    lazy val groupId = idColumn[String]("group_id")
-
-    lazy val groupRole = idColumn[String]("group_role")
-
-    lazy val caseRole = idColumn[String]("case_role")
-
-    lazy val isOwner = column[Boolean]("isOwner")
-
-    lazy val pk = primaryKey(pkName, (caseInstanceId, groupId, groupRole, caseRole))
-
-    lazy val * = (caseInstanceId, tenant, groupId, groupRole, caseRole, isOwner).mapTo[CaseTeamGroupRecord]
-
-    lazy val indexCaseInstanceId = index(caseInstanceId)
-    lazy val indexGroupId = index(groupId)
-    lazy val indexCaseGroups = index(s"ix_case_id_group_id__$tableName", (caseInstanceId, groupId))
-    lazy val indexGroupMemberRole = index(ixName(groupRole), (caseInstanceId, groupId, groupRole))
   }
 }

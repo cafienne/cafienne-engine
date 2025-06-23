@@ -64,7 +64,7 @@ class TenantStorageRoute(override val httpService: CaseEngineHttpServer) extends
         if (!user.isOwner) {
           complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
         } else {
-          onComplete(userQueries.getTenantGroupsUsage(user, user.tenant)) {
+          onComplete(tenantQueries.getTenantGroupsUsage(user, user.tenant)) {
             case Success(usageResult) =>
               usageResult.size match {
                 case 0 => initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, user.tenant), actorType = ActorType.Tenant, actorId = user.tenant))

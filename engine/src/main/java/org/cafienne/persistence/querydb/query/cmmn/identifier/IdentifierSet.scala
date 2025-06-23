@@ -15,21 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.persistence.querydb.query
+package org.cafienne.persistence.querydb.query.cmmn.identifier
 
-import org.cafienne.persistence.infrastructure.jdbc.query.SlickQueryExtensions
-import org.cafienne.persistence.querydb.schema.QueryDB
-import org.cafienne.persistence.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables, Views}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import org.cafienne.persistence.querydb.record.CaseBusinessIdentifierRecord
 
-/**
- * Expose tables available in the QueryDB
- */
-trait QueryDBReader extends SlickQueryExtensions
-  with TenantTables
-  with ConsentGroupTables
-  with CaseTables
-  with Views
-  with TaskTables {
-  val queryDB: QueryDB
-  val tablePrefix: String = queryDB.tablePrefix
+final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+  override def toValue: Value[_] = {
+    val list = new ValueList
+    records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.orNull)))
+    list
+  }
 }
+

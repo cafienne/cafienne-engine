@@ -26,10 +26,10 @@ import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
-import org.cafienne.persistence.querydb.query.TaskCount
-import org.cafienne.persistence.querydb.query.filter.TaskFilter
+import org.cafienne.persistence.querydb.query.cmmn.TaskCount
+import org.cafienne.persistence.querydb.query.cmmn.filter.TaskFilter
 import org.cafienne.service.http.CaseEngineHttpServer
-import org.cafienne.service.http.tasks.TaskAPIFormat.TaskResponseFormat
+import org.cafienne.service.http.tasks.TaskAPIFormat.{CaseHumanTaskResponseFormat, TaskResponseFormat}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
@@ -88,10 +88,11 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "The id of the case to get the tasks from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "includeSubCaseTasks", description = "Whether to include tasks of subcases (defaults to false)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Boolean]), required = false),
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Case Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TaskResponseFormat]))))),
+      new ApiResponse(description = "Case Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseHumanTaskResponseFormat]))))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
@@ -99,7 +100,10 @@ class TaskQueryRoutes(override val httpService: CaseEngineHttpServer) extends Ta
   def getCaseTasks: Route = get {
     caseUser { user =>
       path("case" / Segment) {
-        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, user))
+        caseInstanceId =>
+          parameters("includeSubCaseTasks".?) { includeSubCaseTasks =>
+            runListQuery(caseInstanceQueries.getCaseTasks(caseInstanceId, user, includeSubCaseTasks.getOrElse("false").equals("true")))
+          }
       }
     }
   }
