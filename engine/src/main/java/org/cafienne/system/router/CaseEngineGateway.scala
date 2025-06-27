@@ -24,7 +24,7 @@ import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.storage.StorageCoordinator
-import org.cafienne.storage.actormodel.command.StorageCommand
+import org.cafienne.storage.actormodel.command.{ClearTimerData, StorageCommand}
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
 import org.cafienne.timerservice.TimerService
@@ -55,6 +55,7 @@ class CaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
   private def getRouter(message: Any): ActorRef = {
     message match {
       case _: StorageCommand => storageCoordinator
+      case _: ClearTimerData => timerService
       case command: ModelCommand =>
         val actorClass = command.actorClass()
         // Unfortunately for some reason we cannot use scala matching on the actor class.
@@ -68,13 +69,6 @@ class CaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageRouter {
     }
   }
 
-  override def createTimerService: ActorRef = {
-    system.actorOf(Props.create(classOf[TimerService], caseSystem), TimerService.CAFIENNE_TIMER_SERVICE);
-  }
-
-  override def createStorageCoordinator: ActorRef = {
-    system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
-  }
-
-  private val storageCoordinator: ActorRef = createStorageCoordinator
+  private val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], caseSystem), TimerService.IDENTIFIER)
+  private val storageCoordinator: ActorRef = system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
 }

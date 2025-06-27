@@ -18,8 +18,6 @@
 package org.cafienne.timerservice;
 
 import org.apache.pekko.actor.AbstractActor;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.storage.actormodel.command.ClearTimerData;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.timerservice.persistence.TimerStore;
 import org.cafienne.timerservice.persistence.TimerStoreProvider;
@@ -31,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimerService extends AbstractActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
-    public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
+    public static final String IDENTIFIER = "case-engine-timer-service";
     final CaseSystem caseSystem;
     final TimerStore storage;
     final TimerEventSink eventSink;

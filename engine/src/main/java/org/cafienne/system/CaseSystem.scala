@@ -54,9 +54,6 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
     */
   val gateway: GatewayMessageRouter = if (isClusterConfig) { new ClusteredCaseEngineGateway(this)} else { new CaseEngineGateway(this) }
 
-  // Create singleton actors
-  val timerService: ActorRef = gateway.createTimerService
-
   lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)
 
   // First, start platform bootstrap configuration

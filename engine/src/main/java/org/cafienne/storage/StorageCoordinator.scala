@@ -122,3 +122,7 @@ class StorageCoordinator(val caseSystem: CaseSystem)
     case other => logger.warn(s"StorageCoordinator received an unknown message of type ${other.getClass.getName}")
   }
 }
+
+object StorageCoordinator {
+  val IDENTIFIER = "storage-coordinator"
+}

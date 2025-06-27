@@ -30,7 +30,7 @@ import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.processtask.actorapi.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.storage.StorageCoordinator
-import org.cafienne.storage.actormodel.command.StorageCommand
+import org.cafienne.storage.actormodel.command.{ClearTimerData, StorageCommand}
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
 import org.cafienne.tenant.actorapi.command.TenantCommand
@@ -124,6 +124,7 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
   private def getRouter(message: Any): Option[ActorRef] = {
     message match {
       case _: StorageCommand => Some(storageCoordinator)
+      case _: ClearTimerData => Some(timerService)
       case modelActor: TerminateModelActor =>
         if (modelActor.clazz equals(classOf[TenantActor])) {
           Some(clusteredTenantRegion)
@@ -143,37 +144,21 @@ class ClusteredCaseEngineGateway(caseSystem: CaseSystem) extends GatewayMessageR
     }
   }
 
-  override def createTimerService: ActorRef = {
-    //TODO handle shutdown of timer service (now PoisonPill is sent to the timer service, but it is not handled)
-    //start the singleton
+  private def createSingleton(actorClass: Class[_], name: String): ActorRef = {
     system.actorOf(
       ClusterSingletonManager.props(
-        singletonProps = Props(classOf[TimerService], this.caseSystem),
+        singletonProps = Props(actorClass, this.caseSystem),
         terminationMessage = PoisonPill,
         settings = ClusterSingletonManagerSettings(system)),
-      name = TimerService.CAFIENNE_TIMER_SERVICE)
+      name = s"$name")
     //return access to the singleton actor
     system.actorOf(
       ClusterSingletonProxy.props(
-        singletonManagerPath = "/user/" + TimerService.CAFIENNE_TIMER_SERVICE,
+        singletonManagerPath = s"/user/$name",
         settings = ClusterSingletonProxySettings(system)),
-      name = "timerServiceProxy")
+      name = s"$name-proxy")
   }
 
-  override def createStorageCoordinator: ActorRef = {
-    system.actorOf(
-      ClusterSingletonManager.props(
-        singletonProps = Props(classOf[StorageCoordinator], this.caseSystem),
-        terminationMessage = PoisonPill,
-        settings = ClusterSingletonManagerSettings(system)),
-      name = "storage-coordinator")
-    //return access to the singleton actor
-    system.actorOf(
-      ClusterSingletonProxy.props(
-        singletonManagerPath = "/user/" + "storage-coordinator",
-        settings = ClusterSingletonProxySettings(system)),
-      name = "storageCoordinatorProxy")
-  }
-
-  private val storageCoordinator: ActorRef = createStorageCoordinator
+  private val timerService: ActorRef = createSingleton(classOf[TimerService], TimerService.IDENTIFIER)
+  private val storageCoordinator: ActorRef = createSingleton(classOf[StorageCoordinator], StorageCoordinator.IDENTIFIER)
 }
