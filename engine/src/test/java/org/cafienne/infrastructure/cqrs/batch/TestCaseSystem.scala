@@ -15,9 +15,9 @@ class TestCaseSystem(val actorSystem: ActorSystem) {
   // TODO: This code now directly accesses the Cafienne Gateway; it is intended to be replaced with going through the actual HTTP Routes
   def sendCommand(command: ModelCommand): Future[ModelResponse] = {
     println(s"Requesting gateway with $command")
-    caseSystem.gateway.request(command).map(response => {
+    caseSystem.engine.request(command).map(response => {
       println("Case System responded with " + response)
-      response.asInstanceOf[ModelResponse] // Hard cast. If it's not a ModelResponse, then anyway something is wrong
+      response
     })
   }
 

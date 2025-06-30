@@ -50,7 +50,7 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
     if (count > 1) {
       logger.warn(s"Attempt number $count to raise timer $timer in case ${timer.caseInstanceId}.")
     }
-    timerService.caseSystem.gateway.inform(command, timerService.self);
+    timerService.caseSystem.engine.inform(command, timerService.self);
     responseTracker.start()
   }
 

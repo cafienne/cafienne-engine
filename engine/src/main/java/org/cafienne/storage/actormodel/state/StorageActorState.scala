@@ -90,7 +90,7 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
    * ModelActor specific implementation to clean up the timers registered in the TimerService
    */
   def clearTimerData(): Unit = {
-    actor.caseSystem.timerService.tell(ClearTimerData(metadata), actor.self)
+    actor.caseSystem.service.informTimerService(ClearTimerData(metadata), actor.self)
   }
 
   /**

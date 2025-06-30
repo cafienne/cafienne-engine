@@ -42,7 +42,7 @@ trait CommandRoute extends AuthenticatedRoute {
 
 object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
   def askModelActor(caseSystem: CaseSystem, command: ModelCommand): Route = {
-    onComplete(caseSystem.gateway.request(command)) {
+    onComplete(caseSystem.engine.request(command)) {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
@@ -57,7 +57,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
           case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
           case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
           case value: ConsentGroupResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
-          case other => // Unknown new type of response that is not handled
+          case other => // Unknown new type of ModelResponse that is not handled
             logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getDescription}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.OK)
         }

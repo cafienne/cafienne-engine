@@ -45,7 +45,7 @@ trait StorageRoute extends AuthenticatedRoute {
   }
 
   private def askStorageCoordinator(command: StorageCommand): Route = {
-    onComplete(caseSystem.gateway.askStorageCoordinator(command)) {
+    onComplete(caseSystem.service.askStorageCoordinator(command)) {
       case Success(message: StorageMessage) => message match {
         case _: StorageRequestReceived =>
           complete(StatusCodes.Accepted)

@@ -5,8 +5,6 @@ import org.cafienne.actormodel.communication.request.command.RequestModelActor;
 import org.cafienne.actormodel.communication.request.event.ActorRequestCreated;
 import org.cafienne.actormodel.communication.request.event.ActorRequestDelivered;
 import org.cafienne.actormodel.communication.request.event.ModelActorReplyEvent;
-import org.cafienne.processtask.actorapi.command.MigrateProcessDefinition;
-import org.cafienne.processtask.actorapi.command.ReactivateProcess;
 
 public class Request {
     private final RemoteActorState<?> state;
@@ -46,7 +44,7 @@ public class Request {
 
     public void send() {
         //        System.out.println(this + ": request is not yet completed, sending it to " + state.targetActorId);
-        this.state.actor.caseSystem.gateway().inform(new RequestModelActor(creationEvent.command, state), state.actor.self());
+        this.state.actor.caseSystem.engine().inform(new RequestModelActor(creationEvent.command, state), state.actor.self());
         tracker.start();
     }
 
