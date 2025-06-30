@@ -31,7 +31,7 @@ import java.time.Instant
 /** Provide a scala base class that can be used as alternative for ModelEvent,
   * in order to generate events from ModelActor Data Removal pattern and have those events end up also in Cafienne Debugger.
   */
-trait StorageEvent extends CafienneJson with ModelEvent {
+trait StorageEvent extends StorageMessage with CafienneJson with ModelEvent {
   val metadata: ActorMetadata
   val user: StorageUser = metadata.user
   val tenant: String = user.tenant

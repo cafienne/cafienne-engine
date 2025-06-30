@@ -18,9 +18,10 @@
 package org.cafienne.storage.actormodel.command
 
 import org.cafienne.infrastructure.serialization.JacksonSerializable
+import org.cafienne.storage.actormodel.message.StorageMessage
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
 
-trait StorageCommand extends JacksonSerializable {
+trait StorageCommand extends StorageMessage with JacksonSerializable {
   val metadata: ActorMetadata
   val RootStorageActorClass: Class[_ <: RootStorageActor[_]]
 }

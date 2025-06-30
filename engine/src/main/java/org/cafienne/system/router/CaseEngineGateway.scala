@@ -25,10 +25,11 @@ import org.cafienne.consentgroup.ConsentGroupActor
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.command.StorageCommand
+import org.cafienne.storage.actormodel.message.StorageMessage
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.TenantActor
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CaseEngineGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
@@ -50,6 +51,12 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
 
   def inform(message: Any, sender: ActorRef = Actor.noSender): Unit = {
     getRouter(message).tell(message, sender)
+  }
+
+  def askStorageCoordinator(command: StorageCommand): Future[StorageMessage] = {
+    import org.apache.pekko.pattern.ask
+    implicit val timeout: Timeout = caseSystem.config.actor.askTimout
+    storageCoordinator.ask(command).asInstanceOf[Future[StorageMessage]]
   }
 
   private def getRouter(message: Any): ActorRef = {
