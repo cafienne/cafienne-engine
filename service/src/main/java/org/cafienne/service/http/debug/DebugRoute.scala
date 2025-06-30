@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs.{GET, PATCH, Path, Produces}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.infrastructure.cqrs.instance.ModelEventsReader
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.infrastructure.route.CommandRoute
@@ -98,7 +97,7 @@ class DebugRoute(override val httpService: CaseEngineHttpServer) extends Command
         if (!caseSystem.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          onComplete(caseSystem.gateway.request(TerminateModelActor(modelId))) {
+          onComplete(caseSystem.engine.awaitTermination(modelId)) {
             case Success(value) => complete(StatusCodes.OK, s"Forced recovery of $modelId")
             case Failure(err) => throw err;
           }

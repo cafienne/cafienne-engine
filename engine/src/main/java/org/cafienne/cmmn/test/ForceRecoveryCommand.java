@@ -17,9 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -47,7 +45,7 @@ public class ForceRecoveryCommand extends TestScriptCommand {
 
     @Override
     public void beforeSendCommand(TestScript testScript) {
-        testScript.getCaseSystem().gateway().inform(new TerminateModelActor(getActorId()), ActorRef.noSender());
+        testScript.getCaseSystem().engine().terminate(getActorId());
         // Give the system 500 ms to clean up the actor and the references
         waitSomeTime(500);
     }

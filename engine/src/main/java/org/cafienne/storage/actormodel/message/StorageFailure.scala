@@ -19,6 +19,6 @@ package org.cafienne.storage.actormodel.message
 
 import org.cafienne.infrastructure.serialization.JacksonSerializable
 
-trait StorageFailure extends JacksonSerializable {
+trait StorageFailure extends StorageMessage with JacksonSerializable {
   def getMessage: String
 }

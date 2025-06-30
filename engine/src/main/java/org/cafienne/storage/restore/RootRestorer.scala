@@ -46,7 +46,11 @@ class RootRestorer(caseSystem: CaseSystem, metadata: ActorMetadata) extends Root
     val senderRef = sender()
 
     def raiseFailure(throwable: Throwable): Unit = {
-      logger.warn(s"Cannot find archive ${command.metadata}", throwable)
+      if (logger.underlying.isDebugEnabled()) {
+        logger.debug(s"Cannot find archive ${command.metadata}", throwable)
+      } else {
+        logger.warn(s"Cannot find archive ${command.metadata}. Enable debug logging for full stack trace")
+      }
       senderRef ! ArchiveNotFound(command.metadata)
     }
 

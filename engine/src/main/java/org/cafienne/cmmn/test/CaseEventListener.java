@@ -33,7 +33,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
-import org.cafienne.system.router.CaseEngineGateway;
+import org.cafienne.system.CaseEngineGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public class CaseEventListener {
     CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
         // Case message router is used to send messages into the case system
-        this.caseMessageRouter = testScript.getCaseSystem().gateway();
+        this.caseMessageRouter = testScript.getCaseSystem().engine();
 
         final ActorSystem system = testScript.getCaseSystem().system();
         // Now create the callback mechanism for the case system

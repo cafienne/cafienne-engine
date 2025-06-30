@@ -15,17 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.system.router
+package org.cafienne.system
 
 import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
-import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
+import org.cafienne.actormodel.response.{ActorTerminated, ModelResponse}
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
 import org.cafienne.processtask.instance.ProcessTaskActor
-import org.cafienne.storage.StorageCoordinator
-import org.cafienne.storage.actormodel.command.StorageCommand
-import org.cafienne.system.CaseSystem
+import org.cafienne.system.router.LocalRouter
 import org.cafienne.tenant.TenantActor
 
 import scala.concurrent.Future
@@ -39,22 +38,31 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
   private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "tenants")
   private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "consent-groups")
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
-  private val storageCoordinator: ActorRef = caseSystem.system.actorOf(Props(classOf[StorageCoordinator], caseSystem))
 
-  def request(message: Any): Future[Any] = {
+  def request(message: ModelCommand): Future[ModelResponse] = {
     import org.apache.pekko.pattern.ask
     implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
-    getRouter(message).ask(message)
+    getRouter(message).ask(message).asInstanceOf[Future[ModelResponse]]
   }
 
-  def inform(message: Any, sender: ActorRef = Actor.noSender): Unit = {
+  def inform(message: ModelCommand, sender: ActorRef = Actor.noSender): Unit = {
     getRouter(message).tell(message, sender)
   }
 
-  private def getRouter(message: Any): ActorRef = {
+  def terminate(actorId: String): Unit = {
+    defaultRouterService.tell(TerminateModelActor(actorId), ActorRef.noSender)
+  }
+
+  def awaitTermination(actorId: String): Future[ActorTerminated] = {
+    import org.apache.pekko.pattern.ask
+    implicit val timeout: Timeout = caseSystem.config.actor.askTimout
+
+    defaultRouterService.ask(TerminateModelActor(actorId)).asInstanceOf[Future[ActorTerminated]]
+  }
+
+  private def getRouter(message: ModelCommand): ActorRef = {
     message match {
-      case _: StorageCommand => storageCoordinator
       case command: ModelCommand =>
         val actorClass = command.actorClass()
         // Unfortunately for some reason we cannot use scala matching on the actor class.

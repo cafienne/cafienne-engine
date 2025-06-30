@@ -23,7 +23,7 @@ import org.cafienne.service.infrastructure.route.AuthenticatedRoute
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.command.StorageCommand
 import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageFailure}
+import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageFailure, StorageMessage}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.RemovalCompleted
@@ -45,24 +45,23 @@ trait StorageRoute extends AuthenticatedRoute {
   }
 
   private def askStorageCoordinator(command: StorageCommand): Route = {
-    onComplete(caseSystem.gateway.request(command)) {
-      case Success(value) =>
-        value match {
-          case _: StorageRequestReceived =>
-            complete(StatusCodes.Accepted)
-          case _: StorageActionStarted =>
-            complete(StatusCodes.Accepted)
-          case rejection: StorageActionRejected =>
-            logger.error(s"Removal of ${command.metadata} is rejected with reason ${rejection.msg}")
-            complete(StatusCodes.NotFound)
-          case _: RemovalCompleted =>
-            complete(StatusCodes.NotFound, s"Cannot find ${command.metadata}")
-          case response: StorageFailure =>
-            complete(StatusCodes.NotFound, response.getMessage)
-          case other => // Unknown new type of response that is not handled
-            logger.error(s"Received an unexpected response after asking ${command.metadata} a command of type ${command.getClass.getSimpleName}. Response is of type ${other.getClass.getSimpleName}")
-            complete(StatusCodes.Accepted)
-        }
+    onComplete(caseSystem.service.askStorageCoordinator(command)) {
+      case Success(message: StorageMessage) => message match {
+        case _: StorageRequestReceived =>
+          complete(StatusCodes.Accepted)
+        case _: StorageActionStarted =>
+          complete(StatusCodes.Accepted)
+        case rejection: StorageActionRejected =>
+          logger.error(s"Removal of ${command.metadata} is rejected with reason ${rejection.msg}")
+          complete(StatusCodes.NotFound)
+        case _: RemovalCompleted =>
+          complete(StatusCodes.NotFound, s"Cannot find ${command.metadata}")
+        case response: StorageFailure =>
+          complete(StatusCodes.NotFound, response.getMessage)
+        case other =>
+          logger.error(s"Received an unexpected storage message after asking ${command.metadata} a command of type ${command.getClass.getSimpleName}. Response is of type ${other.getClass.getSimpleName}")
+          complete(StatusCodes.Accepted)
+      }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }
   }

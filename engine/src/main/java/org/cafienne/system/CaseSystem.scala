@@ -19,15 +19,13 @@ package org.cafienne.system
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor._
-import org.cafienne.actormodel.identity.{IdentityRegistration, CaseSystemIdentityRegistration}
+import org.cafienne.actormodel.identity.{CaseSystemIdentityRegistration, IdentityRegistration}
 import org.cafienne.infrastructure.EngineVersion
 import org.cafienne.infrastructure.config.CaseSystemConfig
 import org.cafienne.infrastructure.config.util.SystemConfig
 import org.cafienne.persistence.eventdb.EventDB
 import org.cafienne.persistence.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
-import org.cafienne.system.router.CaseEngineGateway
-import org.cafienne.timerservice.TimerService
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -52,10 +50,9 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
   /**
     * Retrieve a router for case messages. This will forward the messages to the correct case instance
     */
-  val gateway: CaseEngineGateway = new CaseEngineGateway(this)
+  val engine: CaseEngineGateway = new CaseEngineGateway(this)
 
-  // Create singleton actors
-  val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
+  val service: CaseServiceGateway = new CaseServiceGateway(this)
 
   lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)
 
