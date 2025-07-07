@@ -1,7 +1,6 @@
 package org.cafienne.actormodel.communication.request.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.communication.request.state.RemoteActorState;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -21,12 +20,12 @@ public class ActorRequestCreated extends ModelActorReplyEvent {
 
     public ActorRequestCreated(ValueMap json) {
         super(json);
-        this.command = json.readModelCommand(Fields.command);
+        this.command = json.readManifestField(Fields.command);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeOutgoingRequestEvent(generator);
-        writeField(generator, Fields.command, command);
+        writeManifestField(generator, Fields.command, command);
     }
 }

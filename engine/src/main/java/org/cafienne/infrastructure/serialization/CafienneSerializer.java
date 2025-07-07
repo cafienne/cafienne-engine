@@ -45,6 +45,11 @@ public class CafienneSerializer extends SerializerWithStringManifest {
     private final static Map<String, ManifestWrapper> manifests = new HashMap<>();
     private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap<>();
 
+    public static <T extends CafienneSerializable> T deserialize(ValueMap json) {
+        String manifest = json.readString(Fields.manifest);
+        return (T) new CafienneSerializer().fromJson(json.readMap(Fields.content), manifest);
+    }
+
     static {
         EventSerializers.register();
         CommandSerializers.register();

@@ -25,10 +25,7 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
-import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
+import org.cafienne.infrastructure.serialization.*;
 import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
 
 import java.io.IOException;
@@ -415,8 +412,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(fieldName), tClass);
     }
 
-    public <T extends ModelCommand> T readModelCommand(Object fieldName) {
-        return CommandSerializers.deserializeModelCommand(readMap(fieldName));
+    public <T extends CafienneSerializable> T readManifestField(Object fieldName) {
+        return CafienneSerializer.deserialize(readMap(fieldName));
     }
 
     public Path readPath(Object fieldName, String ...value) {

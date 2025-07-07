@@ -111,18 +111,6 @@ public interface CafienneSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Object fieldName, ModelCommand value) throws IOException {
-        if (value == null) {
-            generator.writeNullField(String.valueOf(fieldName));
-        } else {
-            generator.writeObjectFieldStart(String.valueOf(fieldName));
-                generator.writeStringField(Fields.manifest.toString(), CafienneSerializer.getManifestString(value));
-                generator.writeFieldName(Fields.content.toString());
-                value.writeThisObject(generator);
-            generator.writeEndObject();
-        }
-    }
-
     default void writeField(JsonGenerator generator, Object fieldName, Value<?> value) throws IOException {
         if (value == null) {
             generator.writeNullField(String.valueOf(fieldName));
@@ -179,6 +167,18 @@ public interface CafienneSerializable {
         } else {
             generator.writeFieldName(String.valueOf(fieldName));
             value.writeThisObject(generator);
+        }
+    }
+
+    default void writeManifestField(JsonGenerator generator, Object fieldName, CafienneSerializable value) throws IOException {
+        if (value == null) {
+            generator.writeNullField(String.valueOf(fieldName));
+        } else {
+            generator.writeObjectFieldStart(String.valueOf(fieldName));
+            generator.writeStringField(Fields.manifest.toString(), CafienneSerializer.getManifestString(value));
+            generator.writeFieldName(Fields.content.toString());
+            value.writeThisObject(generator);
+            generator.writeEndObject();
         }
     }
 }

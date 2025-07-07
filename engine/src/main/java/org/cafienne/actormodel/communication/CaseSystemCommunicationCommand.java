@@ -20,7 +20,7 @@ public abstract class CaseSystemCommunicationCommand extends BaseModelCommand<Mo
 
     protected CaseSystemCommunicationCommand(ValueMap json) {
         super(json);
-        this.command = json.readModelCommand(Fields.command);
+        this.command = json.readManifestField(Fields.command);
     }
 
     @Override
@@ -45,6 +45,6 @@ public abstract class CaseSystemCommunicationCommand extends BaseModelCommand<Mo
 
     protected void writeActorCommand(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
-        writeField(generator, Fields.command, command);
+        writeManifestField(generator, Fields.command, command);
     }
 }

@@ -29,8 +29,6 @@ object ModelEventSerializer {
   }
 
   def deserializeEvent(json: ValueMap): AnyRef = {
-    val manifest = json.readString(Fields.manifest)
-    val content = json.readMap(Fields.content)
-    new CafienneSerializer().fromJson(content, manifest)
+    CafienneSerializer.deserialize(json)
   }
 }
