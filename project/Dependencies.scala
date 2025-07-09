@@ -20,8 +20,8 @@ import sbt._
 object Dependencies {
 
   val pekkoHttpVersion    = "1.2.0"
-  val pekkoVersion        = "1.1.2"
-  val pekkoPersistenceVersion = "1.1.2"
+  val pekkoVersion        = "1.1.4"
+  val pekkoPersistenceVersion = "1.1.4"
   val jacksonVersion     = "2.18.4"
   val enumeratumVersion  = "1.9.0"
   val swaggerVersion     = "2.2.34"
