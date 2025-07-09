@@ -19,13 +19,13 @@ import sbt._
 
 object Dependencies {
 
-  val pekkoHttpVersion    = "1.1.0"
+  val pekkoHttpVersion    = "1.2.0"
   val pekkoVersion        = "1.1.2"
   val pekkoPersistenceVersion = "1.1.2"
-  val jacksonVersion     = "2.18.3"
-  val enumeratumVersion  = "1.7.5"
-  val swaggerVersion     = "2.2.28"
-  val slickVersion       = "3.5.2"
+  val jacksonVersion     = "2.18.4"
+  val enumeratumVersion  = "1.9.0"
+  val swaggerVersion     = "2.2.34"
+  val slickVersion       = "3.6.1"
   val jasperVersion      = "6.20.0"
 
   def pekkoModule(name: String, version: String = pekkoVersion): ModuleID = "org.apache.pekko" %% s"pekko-$name" % version
@@ -45,20 +45,20 @@ object Dependencies {
     // JDBC Persistence support
     , pekkoPersistenceModule("jdbc", version = "1.1.0")
     , "com.h2database"          %  "h2"                                   % "2.3.232"
-    , "org.postgresql"          %  "postgresql"                           % "42.7.4"
+    , "org.postgresql"          %  "postgresql"                           % "42.7.7"
     , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
     // Cassandra Persistence support
     , pekkoPersistenceModule("cassandra", version = "1.0.0")
     , "com.datastax.oss"        %  "java-driver-core"                     % "4.17.0"
     , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.17.0"
     // In-Memory persistence support
-    , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.2.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+    , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.3.0"  excludeAll ExclusionRule(organization = "org.apache.pekko")
     // Config & logging
     , pekkoModule("slf4j")
     , "com.typesafe"            %  "config"                               % "1.4.3"
     , "com.typesafe.scala-logging" %% "scala-logging"                     % "3.9.5"
-    , "ch.qos.logback"          %  "logback-classic"                      % "1.5.17"
-    , "org.apache.commons"      %  "commons-text"                         % "1.13.0" // StrSubstitutor usage inside process tasks
+    , "ch.qos.logback"          %  "logback-classic"                      % "1.5.18"
+    , "org.apache.commons"      %  "commons-text"                         % "1.13.1" // StrSubstitutor usage inside process tasks
     , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
     , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.2" // Used in StringValue xsd date conversions
     // DB Schema
@@ -66,9 +66,9 @@ object Dependencies {
     , "org.flywaydb"            %  "flyway-sqlserver"                     % "9.22.3"
     , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
     , "com.typesafe.slick"      %% "slick"                                % slickVersion
-    , "com.zaxxer"              %  "HikariCP"                             % "6.2.1"
+    , "com.zaxxer"              %  "HikariCP"                             % "6.3.0"
     , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.11.0"
-    , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.10.0"
+    , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.11.1"
     // JSON support
     , jacksonModule("core")
     , jacksonModule("databind")
@@ -108,19 +108,19 @@ object Dependencies {
     , "io.swagger.core.v3"      %  "swagger-core"                         % swaggerVersion
     , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
     , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
-    , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2" excludeAll ExclusionRule(organization = "org.apache.pekko")
-    , "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.12.3" excludeAll ExclusionRule(organization = "org.apache.pekko")
+    , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.14.0" excludeAll ExclusionRule(organization = "org.apache.pekko")
+    , "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.13.1" excludeAll ExclusionRule(organization = "org.apache.pekko")
     , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http
     , "org.yaml"                %"snakeyaml"                              % "2.4"
     // JWT Support
     , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
     , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-    , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "10.0.2"
-    , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.23.1"
+    , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "10.3.1"
+    , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.26"
   )
 
   val testEngine: Seq[ModuleID] = Seq(
-    "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.11.3"
+    "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.13.3"
     , "com.novocode"            %  "junit-interface"                      % "0.11"
     , "org.scalamock"           %% "scalamock"                            % "6.0.0"
     , "org.scalatest"           %% "scalatest"                            % "3.2.19"
@@ -128,7 +128,7 @@ object Dependencies {
     , pekkoModule("testkit")
     , pekkoModule("persistence-testkit")
     , pekkoModule("multi-node-testkit")
-    , "io.github.alstanchev"    %% "pekko-persistence-inmemory"           % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+    , "io.github.alstanchev"    %% "pekko-persistence-inmemory"           % "1.3.0"  excludeAll ExclusionRule(organization = "org.apache.pekko")
     , "com.github.tomakehurst"  %  "wiremock"                             % "3.0.1"
     , "org.hsqldb"              %  "hsqldb"                               % "2.7.4"
   ).map(dep => dep % Test)
