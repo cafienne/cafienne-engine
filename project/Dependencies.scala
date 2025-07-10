@@ -25,7 +25,7 @@ object Dependencies {
   val jacksonVersion     = "2.18.4"
   val enumeratumVersion  = "1.9.0"
   val swaggerVersion     = "2.2.34"
-  val slickVersion       = "3.6.1"
+  val slickVersion       = "3.5.2"
   val jasperVersion      = "6.20.0"
 
   def pekkoModule(name: String, version: String = pekkoVersion): ModuleID = "org.apache.pekko" %% s"pekko-$name" % version
@@ -46,7 +46,8 @@ object Dependencies {
     , pekkoPersistenceModule("jdbc", version = "1.1.0")
     , "com.h2database"          %  "h2"                                   % "2.3.232"
     , "org.postgresql"          %  "postgresql"                           % "42.7.7"
-    , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
+    , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.10.0.jre11"
+    , "com.azure"               %  "azure-identity"                       % "1.16.2"
     // Cassandra Persistence support
     , pekkoPersistenceModule("cassandra", version = "1.0.0")
     , "com.datastax.oss"        %  "java-driver-core"                     % "4.17.0"
@@ -55,7 +56,7 @@ object Dependencies {
     , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.3.0"  excludeAll ExclusionRule(organization = "org.apache.pekko")
     // Config & logging
     , pekkoModule("slf4j")
-    , "com.typesafe"            %  "config"                               % "1.4.3"
+    , "com.typesafe"            %  "config"                               % "1.4.4"
     , "com.typesafe.scala-logging" %% "scala-logging"                     % "3.9.5"
     , "ch.qos.logback"          %  "logback-classic"                      % "1.5.18"
     , "org.apache.commons"      %  "commons-text"                         % "1.13.1" // StrSubstitutor usage inside process tasks
@@ -68,7 +69,7 @@ object Dependencies {
     , "com.typesafe.slick"      %% "slick"                                % slickVersion
     , "com.zaxxer"              %  "HikariCP"                             % "6.3.0"
     , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.11.0"
-    , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.11.1"
+    , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.10.0"
     // JSON support
     , jacksonModule("core")
     , jacksonModule("databind")

@@ -4,7 +4,7 @@ import sbt.Keys.localStaging
  * Global settings
  */
 val basicSettings = {
-  val scala213 = "2.13.15"
+  val scala213 = "2.13.16"
   val supportedScalaVersions = List(scala213)
 
   Seq(
