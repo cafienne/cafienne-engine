@@ -91,7 +91,7 @@ lazy val engineRoot = (project in file("."))
     publish / skip := true,
     crossScalaVersions := Nil,
     jacocoAggregateReportSettings := JacocoReportSettings(
-      title = "Foo Project Coverage",
+      title = "Case Engine Coverage",
       formats = Seq(JacocoReportFormats.ScalaHTML, JacocoReportFormats.XML)
     ),
     jacocoExcludes := Seq("org.cafienne.BuildInfo$")
@@ -140,7 +140,7 @@ val service = (project in file("service"))
     Docker / version := "latest",
     Docker / maintainer := """Cafienne <info@cafienne.io>""",
     Docker / defaultLinuxInstallLocation := "/opt/cafienne",
-    dockerBaseImage := "eclipse-temurin:21.0.4_7-jre-jammy",
+    dockerBaseImage := "eclipse-temurin:21.0.7_6-jre-jammy",
     dockerExposedPorts := Seq(2027, 9999),
     bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value,
     bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
