@@ -21,7 +21,7 @@ import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.MissingTenantException
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
+import org.cafienne.engine.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
 import org.cafienne.persistence.querydb.query.exception.SearchFailure
 import org.cafienne.persistence.querydb.query.tenant.{ConsentGroupQueries, TenantQueries}
 import org.cafienne.persistence.querydb.query.tenant.implementation.{ConsentGroupQueriesImpl, TenantQueriesImpl}

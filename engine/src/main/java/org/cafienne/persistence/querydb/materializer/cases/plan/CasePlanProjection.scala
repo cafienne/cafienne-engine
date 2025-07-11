@@ -18,11 +18,11 @@
 package org.cafienne.persistence.querydb.materializer.cases.plan
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.CaseModified
-import org.cafienne.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigrated}
-import org.cafienne.cmmn.actorapi.event.plan._
-import org.cafienne.humantask.actorapi.event._
-import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
+import org.cafienne.engine.cmmn.actorapi.event.CaseModified
+import org.cafienne.engine.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigrated}
+import org.cafienne.engine.cmmn.actorapi.event.plan._
+import org.cafienne.engine.humantask.actorapi.event._
+import org.cafienne.engine.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
 import org.cafienne.persistence.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
 import org.cafienne.persistence.querydb.record.{PlanItemRecord, TaskRecord}
 

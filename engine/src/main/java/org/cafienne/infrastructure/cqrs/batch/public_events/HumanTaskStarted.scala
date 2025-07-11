@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.instance.Path
-import org.cafienne.humantask.actorapi.event.{HumanTaskActivated, HumanTaskEvent, HumanTaskInputSaved}
+import org.cafienne.engine.cmmn.instance.Path
+import org.cafienne.engine.humantask.actorapi.event.{HumanTaskActivated, HumanTaskEvent, HumanTaskInputSaved}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{JSONReader, StringValue, Value, ValueMap}
 

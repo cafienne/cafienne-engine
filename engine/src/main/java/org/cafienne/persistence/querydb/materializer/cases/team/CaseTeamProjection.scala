@@ -18,8 +18,8 @@
 package org.cafienne.persistence.querydb.materializer.cases.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.team._
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
+import org.cafienne.engine.cmmn.actorapi.event.team._
+import org.cafienne.engine.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
 import org.cafienne.persistence.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
 
 class CaseTeamProjection(override val batch: CaseEventBatch) extends CaseEventMaterializer with LazyLogging {

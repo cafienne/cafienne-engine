@@ -1,11 +1,11 @@
 package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.engine.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.engine.cmmn.instance.Case;
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent;
-import org.cafienne.processtask.actorapi.event.ProcessEvent;
-import org.cafienne.processtask.instance.ProcessTaskActor;
+import org.cafienne.engine.processtask.actorapi.event.ProcessEvent;
+import org.cafienne.engine.processtask.instance.ProcessTaskActor;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.event.TenantEvent;

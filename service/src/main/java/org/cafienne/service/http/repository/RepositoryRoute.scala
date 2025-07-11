@@ -28,8 +28,8 @@ import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server._
 import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
-import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
+import org.cafienne.engine.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
+import org.cafienne.engine.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.json.ValueMap
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CaseAPIFormat.CaseDefinitionFormat

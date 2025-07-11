@@ -1,8 +1,8 @@
 package org.cafienne.persistence.querydb.query.cmmn.implementations
 
 import org.cafienne.actormodel.identity.{Origin, UserIdentity}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser, GroupRoleMapping}
-import org.cafienne.cmmn.definition.CMMNElementDefinition
+import org.cafienne.engine.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser, GroupRoleMapping}
+import org.cafienne.engine.cmmn.definition.CMMNElementDefinition
 import org.cafienne.persistence.querydb.query.cmmn.CaseInstanceQueries
 import org.cafienne.persistence.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.persistence.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}

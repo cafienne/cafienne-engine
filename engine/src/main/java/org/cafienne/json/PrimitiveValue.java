@@ -18,8 +18,8 @@
 package org.cafienne.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.expression.spel.SpelPropertyValueProvider;
+import org.cafienne.engine.cmmn.definition.casefile.PropertyDefinition;
+import org.cafienne.engine.cmmn.expression.spel.SpelPropertyValueProvider;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 

@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.materializer.cases.file
 
-import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
+import org.cafienne.engine.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
 import org.cafienne.persistence.querydb.record.CaseBusinessIdentifierRecord
 
 object CaseIdentifierMerger {

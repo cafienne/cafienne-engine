@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
+import org.cafienne.engine.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute

@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.query.result
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam
+import org.cafienne.engine.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value}
 

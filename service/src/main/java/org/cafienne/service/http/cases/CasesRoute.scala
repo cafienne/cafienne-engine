@@ -20,7 +20,7 @@ package org.cafienne.service.http.cases
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.cmmn.actorapi.command._
+import org.cafienne.engine.cmmn.actorapi.command._
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.cmmn.authorization.{AuthorizationQueries, AuthorizationQueriesImpl, CaseMembership}
 import org.cafienne.persistence.querydb.query.cmmn.implementations.{CaseInstanceQueriesImpl, CaseListQueriesImpl}

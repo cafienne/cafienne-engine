@@ -1,6 +1,6 @@
 package org.cafienne.persistence.querydb.materializer.cases
 
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
+import org.cafienne.engine.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.querydb.materializer.TestQueryDBTransaction
 import org.cafienne.persistence.querydb.materializer.cases.team.CaseTeamMemberKey

@@ -26,9 +26,9 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.actorapi.command.team.removemember._
-import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
+import org.cafienne.engine.cmmn.actorapi.command.team._
+import org.cafienne.engine.cmmn.actorapi.command.team.removemember._
+import org.cafienne.engine.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute

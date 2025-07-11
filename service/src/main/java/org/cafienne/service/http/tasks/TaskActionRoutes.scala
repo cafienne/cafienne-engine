@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.humantask.actorapi.command._
+import org.cafienne.engine.humantask.actorapi.command._
 import org.cafienne.json.ValueMap
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tasks.TaskAPIFormat._

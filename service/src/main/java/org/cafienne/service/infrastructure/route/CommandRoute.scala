@@ -24,9 +24,9 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.ActorType
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
-import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
+import org.cafienne.engine.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse
+import org.cafienne.engine.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception._
 import org.cafienne.system.CaseSystem

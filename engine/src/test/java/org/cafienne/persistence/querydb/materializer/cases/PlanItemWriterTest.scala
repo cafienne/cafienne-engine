@@ -1,7 +1,7 @@
 package org.cafienne.persistence.querydb.materializer.cases
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated
-import org.cafienne.cmmn.instance.PlanItemType
+import org.cafienne.engine.cmmn.actorapi.event.plan.PlanItemCreated
+import org.cafienne.engine.cmmn.instance.PlanItemType
 import org.cafienne.persistence.querydb.materializer.TestQueryDB
 
 import java.time.Instant

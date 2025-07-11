@@ -19,9 +19,9 @@ package org.cafienne.persistence.querydb.materializer.cases.team
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.Origin
-import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.cmmn.actorapi.event.team.deprecated.member._
-import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeamUserEvent, TeamMemberAdded}
+import org.cafienne.engine.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
+import org.cafienne.engine.cmmn.actorapi.event.team.deprecated.member._
+import org.cafienne.engine.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeamUserEvent, TeamMemberAdded}
 import org.cafienne.persistence.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.persistence.querydb.record.{CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 

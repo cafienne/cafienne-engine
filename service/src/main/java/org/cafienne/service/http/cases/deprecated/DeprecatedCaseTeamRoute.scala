@@ -18,8 +18,8 @@
 package org.cafienne.service.http.cases.deprecated
 
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
-import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
+import org.cafienne.engine.cmmn.actorapi.command.team.DeprecatedUpsert
+import org.cafienne.engine.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.cases.team.CaseTeamAPI.Compatible._

@@ -4,9 +4,9 @@ import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.event.{Logging, LoggingAdapter}
 import org.apache.pekko.testkit.{TestKit, TestProbe}
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.test.TestScript.loadCaseDefinition
+import org.cafienne.engine.cmmn.actorapi.event.CaseEvent
+import org.cafienne.engine.cmmn.definition.CaseDefinition
+import org.cafienne.engine.cmmn.test.TestScript.loadCaseDefinition
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.config.TestConfig
 import org.cafienne.persistence.querydb.materializer.{EventFactory, TestQueryDB}

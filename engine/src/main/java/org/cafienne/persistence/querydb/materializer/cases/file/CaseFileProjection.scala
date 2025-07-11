@@ -18,8 +18,8 @@
 package org.cafienne.persistence.querydb.materializer.cases.file
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.file._
-import org.cafienne.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
+import org.cafienne.engine.cmmn.actorapi.event.file._
+import org.cafienne.engine.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
 import org.cafienne.json.{JSONReader, ValueMap}
 import org.cafienne.persistence.querydb.materializer.cases.{CaseEventBatch, CaseStorageTransaction}
 import org.cafienne.persistence.querydb.record.{CaseBusinessIdentifierRecord, CaseFileRecord}

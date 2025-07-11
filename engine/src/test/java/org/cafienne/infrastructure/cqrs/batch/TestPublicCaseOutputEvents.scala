@@ -7,11 +7,11 @@ import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.apache.pekko.stream.RestartSettings
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import org.apache.pekko.testkit.TestKit
-import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.test.TestScript
-import org.cafienne.cmmn.test.TestScript.{loadCaseDefinition, testUser}
-import org.cafienne.humantask.actorapi.command.CompleteHumanTask
+import org.cafienne.engine.cmmn.actorapi.command.StartCase
+import org.cafienne.engine.cmmn.definition.CaseDefinition
+import org.cafienne.engine.cmmn.test.TestScript
+import org.cafienne.engine.cmmn.test.TestScript.{loadCaseDefinition, testUser}
+import org.cafienne.engine.humantask.actorapi.command.CompleteHumanTask
 import org.cafienne.infrastructure.config.TestConfig
 import org.cafienne.infrastructure.cqrs.batch.public_events.{CaseCompleted, HumanTaskCompleted, HumanTaskStarted, PublicCaseEventBatch}
 import org.cafienne.json.ValueMap

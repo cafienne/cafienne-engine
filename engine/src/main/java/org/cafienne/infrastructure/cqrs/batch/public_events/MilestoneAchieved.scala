@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
-import org.cafienne.cmmn.instance.{Path, State}
+import org.cafienne.engine.cmmn.actorapi.event.plan.PlanItemTransitioned
+import org.cafienne.engine.cmmn.instance.{Path, State}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 

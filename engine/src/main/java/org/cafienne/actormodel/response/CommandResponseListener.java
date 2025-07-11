@@ -17,9 +17,9 @@
 
 package org.cafienne.actormodel.response;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.engine.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.engine.cmmn.actorapi.response.CaseResponse;
+import org.cafienne.engine.cmmn.instance.Case;
 
 /**
  * When sending a message to another model instance from within a model,

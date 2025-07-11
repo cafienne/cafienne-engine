@@ -1,7 +1,7 @@
 package org.cafienne.persistence.querydb.query
 
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.cmmn.instance.State
+import org.cafienne.engine.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.persistence.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.persistence.querydb.query.cmmn.authorization.AuthorizationQueriesImpl

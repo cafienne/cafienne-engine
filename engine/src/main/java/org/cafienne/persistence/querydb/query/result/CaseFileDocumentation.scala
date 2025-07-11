@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.query.result
 
-import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
+import org.cafienne.engine.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.persistence.querydb.record.CaseDefinitionRecord
 

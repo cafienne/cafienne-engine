@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events.migration
 
-import org.cafienne.cmmn.instance.Path
+import org.cafienne.engine.cmmn.instance.Path
 import org.cafienne.infrastructure.cqrs.batch.public_events.{CafiennePublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
@@ -38,7 +38,7 @@ object HumanTaskDropped {
   def deserialize(json: ValueMap): HumanTaskDropped = HumanTaskDropped(taskId = json.readString(Fields.taskId), path = json.readPath(Fields.path), taskName = json.readString(Fields.taskName), caseInstanceId = json.readString(Fields.caseInstanceId), parentStage = json.readString(Fields.parentStage))
 
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
-    .filterMap(classOf[org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped])
+    .filterMap(classOf[org.cafienne.engine.humantask.actorapi.event.migration.HumanTaskDropped])
     .map(event => {
       val taskId = event.getTaskId
       val path = event.path

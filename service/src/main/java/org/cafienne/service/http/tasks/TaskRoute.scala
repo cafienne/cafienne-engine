@@ -20,7 +20,7 @@ package org.cafienne.service.http.tasks
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
-import org.cafienne.humantask.actorapi.command.HumanTaskCommand
+import org.cafienne.engine.humantask.actorapi.command.HumanTaskCommand
 import org.cafienne.persistence.querydb.query.cmmn.TaskQueries
 import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseMembership
 import org.cafienne.persistence.querydb.query.cmmn.implementations.TaskQueriesImpl

@@ -20,10 +20,10 @@ package org.cafienne.persistence.querydb.materializer.cases
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent
-import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent
-import org.cafienne.cmmn.actorapi.event.{CaseAppliedPlatformUpdate, CaseEvent, CaseModified}
+import org.cafienne.engine.cmmn.actorapi.event.file.CaseFileEvent
+import org.cafienne.engine.cmmn.actorapi.event.plan.CasePlanEvent
+import org.cafienne.engine.cmmn.actorapi.event.team.CaseTeamEvent
+import org.cafienne.engine.cmmn.actorapi.event.{CaseAppliedPlatformUpdate, CaseEvent, CaseModified}
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.querydb.materializer.cases.file.CaseFileProjection

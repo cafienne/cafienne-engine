@@ -20,7 +20,7 @@ package org.cafienne.service.timerservice
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.{Cancellable, Scheduler}
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
-import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
+import org.cafienne.engine.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global

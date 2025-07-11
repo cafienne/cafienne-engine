@@ -25,8 +25,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs._
 import org.apache.pekko.http.scaladsl.server.Route
-import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
-import org.cafienne.cmmn.instance
+import org.cafienne.engine.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
+import org.cafienne.engine.cmmn.instance
 import org.cafienne.json.Value
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.service.http.CaseEngineHttpServer
@@ -182,7 +182,7 @@ class CaseFileRoute(override val httpService: CaseEngineHttpServer) extends Case
     */
   private def withCaseFilePath(subRoute: instance.Path => Route): Route = {
     // Creating a "cafienne-path" will validate the syntax
-    import org.cafienne.cmmn.instance.Path
+    import org.cafienne.engine.cmmn.instance.Path
     pathEndOrSingleSlash {
       subRoute(new Path(""))
     } ~ path(Remaining) { rawPath =>

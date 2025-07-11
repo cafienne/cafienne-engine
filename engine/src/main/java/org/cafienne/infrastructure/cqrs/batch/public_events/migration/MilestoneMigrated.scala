@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events.migration
 
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
-import org.cafienne.cmmn.instance.Path
+import org.cafienne.engine.cmmn.actorapi.event.migration.PlanItemMigrated
+import org.cafienne.engine.cmmn.instance.Path
 import org.cafienne.infrastructure.cqrs.batch.public_events.{CafiennePublicEventContent, PublicCaseEventBatch, PublicEventWrapper}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}

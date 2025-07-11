@@ -21,10 +21,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.engine.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.engine.cmmn.expression.spel.SpelReadable;
+import org.cafienne.engine.cmmn.instance.Path;
+import org.cafienne.engine.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.infrastructure.serialization.*;
 import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
 

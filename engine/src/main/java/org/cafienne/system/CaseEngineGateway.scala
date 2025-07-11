@@ -21,9 +21,9 @@ import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.{ActorTerminated, ModelResponse}
-import org.cafienne.cmmn.instance.Case
+import org.cafienne.engine.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
-import org.cafienne.processtask.instance.ProcessTaskActor
+import org.cafienne.engine.processtask.instance.ProcessTaskActor
 import org.cafienne.system.router.LocalRouter
 import org.cafienne.tenant.TenantActor
 

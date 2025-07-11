@@ -22,7 +22,7 @@ import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
-import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.engine.cmmn.actorapi.command.StartCase
 import org.cafienne.service.infrastructure.route.CaseServiceRoute
 
 import scala.util.{Failure, Success}

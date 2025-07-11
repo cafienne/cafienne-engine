@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled
-import org.cafienne.cmmn.instance.Path
+import org.cafienne.engine.cmmn.actorapi.event.plan.task.TaskOutputFilled
+import org.cafienne.engine.cmmn.instance.Path
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
@@ -31,7 +31,7 @@ case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, case
 
 object HumanTaskCompleted {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
-    .filterMap(classOf[org.cafienne.humantask.actorapi.event.HumanTaskCompleted])
+    .filterMap(classOf[org.cafienne.engine.humantask.actorapi.event.HumanTaskCompleted])
     .map(event => {
       val output = batch.filterMap(classOf[TaskOutputFilled]).filter(_.getTaskId == event.getTaskId).head.getTaskOutputParameters
       PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskCompleted(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId, output))

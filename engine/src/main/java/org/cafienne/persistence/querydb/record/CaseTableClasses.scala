@@ -17,7 +17,7 @@
 
 package org.cafienne.persistence.querydb.record
 
-import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
+import org.cafienne.engine.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.json._
 
 import java.time.Instant

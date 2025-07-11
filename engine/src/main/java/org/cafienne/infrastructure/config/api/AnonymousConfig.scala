@@ -19,8 +19,8 @@ package org.cafienne.infrastructure.config.api
 
 import com.typesafe.config.{Config, ConfigObject}
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
-import org.cafienne.cmmn.definition.CaseDefinition
+import org.cafienne.engine.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
+import org.cafienne.engine.cmmn.definition.CaseDefinition
 import org.cafienne.infrastructure.config.RepositoryConfig
 import org.cafienne.infrastructure.config.util.{ChildConfigReader, ConfigReader}
 

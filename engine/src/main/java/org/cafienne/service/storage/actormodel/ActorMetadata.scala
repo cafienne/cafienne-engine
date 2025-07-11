@@ -18,7 +18,7 @@
 package org.cafienne.service.storage.actormodel
 
 import org.cafienne.actormodel.ActorType
-import org.cafienne.cmmn.instance.Path
+import org.cafienne.engine.cmmn.instance.Path
 import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.service.storage.StorageUser
