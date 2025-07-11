@@ -28,8 +28,8 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.ActorType
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.tenant.route.TenantRoute
-import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.service.storage.StorageUser
+import org.cafienne.service.storage.actormodel.ActorMetadata
 
 import scala.util.{Failure, Success}
 

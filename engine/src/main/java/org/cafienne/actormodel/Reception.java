@@ -30,7 +30,7 @@ import org.cafienne.actormodel.response.ActorExistsFailure;
 import org.cafienne.actormodel.response.ActorInStorage;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
-import org.cafienne.storage.actormodel.message.StorageEvent;
+import org.cafienne.service.storage.actormodel.message.StorageEvent;
 
 /**
  * All actor system incoming traffic (either during recovery or upon receiving incoming messages)

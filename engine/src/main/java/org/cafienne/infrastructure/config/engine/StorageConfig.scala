@@ -18,8 +18,8 @@
 package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.storage.archive.Storage
-import org.cafienne.storage.archive.file.FileBasedStorage
+import org.cafienne.service.storage.archive.Storage
+import org.cafienne.service.storage.archive.file.FileBasedStorage
 
 import java.io.File
 

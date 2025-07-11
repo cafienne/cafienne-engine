@@ -20,14 +20,14 @@ package org.cafienne.service.http.storage
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.service.infrastructure.route.AuthenticatedRoute
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.command.StorageCommand
-import org.cafienne.storage.actormodel.event.StorageRequestReceived
-import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageFailure, StorageMessage}
-import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.RemovalCompleted
-import org.cafienne.storage.restore.command.RestoreActorData
+import org.cafienne.service.storage.actormodel.ActorMetadata
+import org.cafienne.service.storage.actormodel.command.StorageCommand
+import org.cafienne.service.storage.actormodel.event.StorageRequestReceived
+import org.cafienne.service.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageFailure, StorageMessage}
+import org.cafienne.service.storage.archival.command.ArchiveActorData
+import org.cafienne.service.storage.deletion.command.RemoveActorData
+import org.cafienne.service.storage.deletion.event.RemovalCompleted
+import org.cafienne.service.storage.restore.command.RestoreActorData
 
 import scala.util.{Failure, Success}
 

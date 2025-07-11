@@ -20,10 +20,10 @@ package org.cafienne.system
 
 import org.apache.pekko.actor.{ActorRef, Props}
 import org.apache.pekko.util.Timeout
-import org.cafienne.storage.StorageCoordinator
-import org.cafienne.storage.actormodel.command.{ClearTimerData, StorageCommand}
-import org.cafienne.storage.actormodel.message.StorageMessage
-import org.cafienne.timerservice.TimerService
+import org.cafienne.service.storage.StorageCoordinator
+import org.cafienne.service.storage.actormodel.command.{ClearTimerData, StorageCommand}
+import org.cafienne.service.storage.actormodel.message.StorageMessage
+import org.cafienne.service.timerservice.TimerService
 
 import scala.concurrent.Future
 

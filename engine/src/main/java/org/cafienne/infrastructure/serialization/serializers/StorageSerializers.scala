@@ -18,14 +18,14 @@
 package org.cafienne.infrastructure.serialization.serializers
 
 import org.cafienne.infrastructure.serialization.CafienneSerializer
-import org.cafienne.storage.actormodel.event.{ChildrenReceived, TimerDataCleared}
-import org.cafienne.storage.archival.event._
-import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
-import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
-import org.cafienne.storage.deletion.event._
-import org.cafienne.storage.deletion.response.RemovalRejected
-import org.cafienne.storage.restore.command.RestoreArchive
-import org.cafienne.storage.restore.event._
+import org.cafienne.service.storage.actormodel.event.{ChildrenReceived, TimerDataCleared}
+import org.cafienne.service.storage.archival.event._
+import org.cafienne.service.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
+import org.cafienne.service.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
+import org.cafienne.service.storage.deletion.event._
+import org.cafienne.service.storage.deletion.response.RemovalRejected
+import org.cafienne.service.storage.restore.command.RestoreArchive
+import org.cafienne.service.storage.restore.event._
 
 object StorageSerializers {
   def register(): Unit = {

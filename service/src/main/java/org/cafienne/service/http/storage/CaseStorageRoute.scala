@@ -31,8 +31,8 @@ import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.tenant.route.TenantRoute
-import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.service.storage.StorageUser
+import org.cafienne.service.storage.actormodel.ActorMetadata
 
 import scala.util.{Failure, Success}
 
