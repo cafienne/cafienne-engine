@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  sonarcloud: sonarsource/sonarcloud@2.0.0
+  sonarcloud: sonarsource/sonarcloud@3.0
 jobs:
   branch-build:
     working_directory: ~/cafienne-engine
@@ -90,7 +90,7 @@ commands:
           command: sbt compile
       - run:
           name: Unit tests
-          command: cat /dev/null | sbt coverage test coverageReport
+          command: cat /dev/null | sbt jacocoAggregate 
       - run:
           name: Compile CMMN Test Framwork
           command: |

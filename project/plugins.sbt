@@ -12,7 +12,9 @@ addDependencyTreePlugin // "sbt-dependency-graph"
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.0")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.2.2")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.3.1")
+
+addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.5.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.1.2")
 

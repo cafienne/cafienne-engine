@@ -89,7 +89,13 @@ lazy val engineRoot = (project in file("."))
   .settings(basicSettings: _*)
   .settings(publishArtifact := false,
     publish / skip := true,
-    crossScalaVersions := Nil)
+    crossScalaVersions := Nil,
+    jacocoAggregateReportSettings := JacocoReportSettings(
+      title = "Foo Project Coverage",
+      formats = Seq(JacocoReportFormats.ScalaHTML, JacocoReportFormats.XML)
+    ),
+    jacocoExcludes := Seq("org.cafienne.BuildInfo$")
+  )
   .enablePlugins(BuildInfoPlugin, GitPlugin, GitVersioning, GitBranchPrompt)
 //  .enablePlugins(AutomateHeaderPlugin)
   .aggregate(engine, plugins, service)
@@ -111,6 +117,7 @@ val plugins = (project in file("plugins"))
     name := "case-plugins",
     publishArtifact := true,
     publish / skip := true,
+    jacocoExcludes := Seq("org.cafienne.BuildInfo$"),
     libraryDependencies ++= Dependencies.plugins ++ Dependencies.engine ++ Dependencies.testEngine)
 
 val service = (project in file("service"))
@@ -122,6 +129,7 @@ val service = (project in file("service"))
     name := "case-service",
     libraryDependencies ++= Dependencies.plugins ++ Dependencies.service ++ Dependencies.testService,
     Compile / mainClass := Some("org.cafienne.service.Main"),
+    jacocoExcludes := Seq("org.cafienne.BuildInfo$"),
     // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
     packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("org.cafienne.service.Main"),
 
