@@ -17,9 +17,9 @@
 
 package org.cafienne.processtask.implementation;
 
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;

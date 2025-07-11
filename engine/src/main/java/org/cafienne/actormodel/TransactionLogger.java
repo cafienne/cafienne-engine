@@ -1,7 +1,7 @@
 package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.cafienne.json.Value;
 import org.slf4j.Logger;

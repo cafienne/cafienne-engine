@@ -15,14 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.response;
+package org.cafienne.actormodel.debug;
 
-
-/**
- * Thrown when invalid CaseLastModified content is present in the request header
- */
-public class InvalidCaseLastModifiedException extends Exception {
-    public InvalidCaseLastModifiedException(String msg) {
-        super(msg);
-    }
+@FunctionalInterface
+public interface DebugInfoAppender {
+    Object info();
 }

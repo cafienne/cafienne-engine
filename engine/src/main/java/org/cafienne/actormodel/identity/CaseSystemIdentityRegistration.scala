@@ -18,12 +18,12 @@
 package org.cafienne.actormodel.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
 import org.cafienne.persistence.querydb.query.tenant.TenantQueries
 import org.cafienne.persistence.querydb.query.tenant.implementation.TenantQueriesImpl
 import org.cafienne.persistence.querydb.record.TenantRecord
 import org.cafienne.system.CaseSystem
+import org.cafienne.util.SimpleLRUCache
 
 import scala.concurrent.{ExecutionContext, Future}
 

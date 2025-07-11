@@ -17,8 +17,8 @@
 
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 
 import java.util.ArrayList;
 import java.util.List;

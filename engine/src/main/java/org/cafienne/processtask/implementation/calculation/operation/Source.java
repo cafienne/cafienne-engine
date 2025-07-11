@@ -17,7 +17,7 @@
 
 package org.cafienne.processtask.implementation.calculation.operation;
 
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;

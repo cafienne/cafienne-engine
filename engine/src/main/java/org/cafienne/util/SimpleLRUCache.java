@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.repository.file;
+package org.cafienne.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,9 +17,9 @@
 
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.DefinitionElement;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 
 public class CMMNElement<T extends DefinitionElement> {
     private final Case caseInstance;

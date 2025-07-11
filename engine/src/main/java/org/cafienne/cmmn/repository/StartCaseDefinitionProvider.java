@@ -21,8 +21,8 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
-import org.cafienne.cmmn.repository.file.SimpleLRUCache;
 import org.cafienne.infrastructure.config.RepositoryConfig;
+import org.cafienne.util.SimpleLRUCache;
 import org.cafienne.util.XMLHelper;
 import org.xml.sax.SAXException;
 

@@ -26,6 +26,7 @@ import org.cafienne.cmmn.repository.WriteDefinitionException;
 import org.cafienne.infrastructure.config.CaseSystemConfig;
 import org.cafienne.infrastructure.config.RepositoryConfig;
 import org.cafienne.infrastructure.config.util.SystemConfig;
+import org.cafienne.util.SimpleLRUCache;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

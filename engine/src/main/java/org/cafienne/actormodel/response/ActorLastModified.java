@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel.response;
 
-import org.cafienne.cmmn.actorapi.response.InvalidCaseLastModifiedException;
+import org.cafienne.actormodel.exception.InvalidLastModifiedException;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -41,7 +41,7 @@ public class ActorLastModified {
         return lastModified == null ? null : lastModified + SEPARATOR + actorId;
     }
 
-    public ActorLastModified(String name, String lastModifiedContent) throws InvalidCaseLastModifiedException {
+    public ActorLastModified(String name, String lastModifiedContent) throws InvalidLastModifiedException {
         try {
             String[] lastModifiedHeaderParts = lastModifiedContent.split(SEPARATOR);
             this.lastModified = java.time.Instant.parse(lastModifiedHeaderParts[0]);
@@ -49,9 +49,9 @@ public class ActorLastModified {
             this.string = asString();
         } catch (ArrayIndexOutOfBoundsException | DateTimeParseException | NullPointerException ex) {
             if (ex instanceof DateTimeParseException) {
-                throw new InvalidCaseLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in " + name + " header");
+                throw new InvalidLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in " + name + " header");
             } else {
-                throw new InvalidCaseLastModifiedException("Provide a valid " + name + " header");
+                throw new InvalidLastModifiedException("Provide a valid " + name + " header");
             }
         }
     }

@@ -26,17 +26,14 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
@@ -155,7 +152,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     /**
-     * Returns the correlation id of this command, that can be used to relate a {@link CaseResponse} back to this
+     * Returns the correlation id of this command, that can be used to relate a {@link ModelResponse} back to this
      * original command.
      */
     public String getMessageId() {

@@ -17,11 +17,8 @@
 
 package org.cafienne.actormodel.exception;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.Case;
-
 /**
- * This exception is typically raised during the {@link CaseCommand#process(Case)} method.
+ * This exception is typically raised during the {@link org.cafienne.actormodel.command.ModelCommand#processCommand(org.cafienne.actormodel.ModelActor)} method.
  * The case instance checks for this exception around its invocation of the process method.
  *
  */

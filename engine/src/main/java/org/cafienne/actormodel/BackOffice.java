@@ -17,9 +17,9 @@
 
 package org.cafienne.actormodel;
 
+import org.cafienne.actormodel.debug.DebugInfoAppender;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.slf4j.Logger;
 
