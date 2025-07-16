@@ -20,7 +20,6 @@ package org.cafienne.infrastructure.serialization.serializers;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.SentryEvent;
-import org.cafienne.consentgroup.actorapi.event.*;
 import org.cafienne.engine.cmmn.actorapi.event.*;
 import org.cafienne.engine.cmmn.actorapi.event.file.*;
 import org.cafienne.engine.cmmn.actorapi.event.migration.*;
@@ -50,15 +49,16 @@ import org.cafienne.engine.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.engine.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.engine.processtask.actorapi.event.*;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.tenant.actorapi.event.TenantAppliedPlatformUpdate;
-import org.cafienne.tenant.actorapi.event.TenantModified;
-import org.cafienne.tenant.actorapi.event.deprecated.*;
-import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
-import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
-import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
-import org.cafienne.tenant.actorapi.event.user.TenantUserAdded;
-import org.cafienne.tenant.actorapi.event.user.TenantUserChanged;
-import org.cafienne.tenant.actorapi.event.user.TenantUserRemoved;
+import org.cafienne.userregistration.consentgroup.actorapi.event.*;
+import org.cafienne.userregistration.tenant.actorapi.event.TenantAppliedPlatformUpdate;
+import org.cafienne.userregistration.tenant.actorapi.event.TenantModified;
+import org.cafienne.userregistration.tenant.actorapi.event.deprecated.*;
+import org.cafienne.userregistration.tenant.actorapi.event.platform.TenantCreated;
+import org.cafienne.userregistration.tenant.actorapi.event.platform.TenantDisabled;
+import org.cafienne.userregistration.tenant.actorapi.event.platform.TenantEnabled;
+import org.cafienne.userregistration.tenant.actorapi.event.user.TenantUserAdded;
+import org.cafienne.userregistration.tenant.actorapi.event.user.TenantUserChanged;
+import org.cafienne.userregistration.tenant.actorapi.event.user.TenantUserRemoved;
 
 public class EventSerializers {
     public static void register() {

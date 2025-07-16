@@ -18,7 +18,7 @@
 package org.cafienne.persistence.querydb.materializer.consentgroup
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.consentgroup.actorapi.event._
+import org.cafienne.userregistration.consentgroup.actorapi.event._
 import org.cafienne.persistence.querydb.record.ConsentGroupMemberRecord
 
 import scala.jdk.CollectionConverters.SetHasAsScala

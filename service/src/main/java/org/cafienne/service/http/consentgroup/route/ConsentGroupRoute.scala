@@ -19,7 +19,7 @@ package org.cafienne.service.http.consentgroup.route
 
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.ConsentGroupUser
-import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
+import org.cafienne.userregistration.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.tenant.ConsentGroupQueries
 import org.cafienne.persistence.querydb.query.tenant.implementation.ConsentGroupQueriesImpl

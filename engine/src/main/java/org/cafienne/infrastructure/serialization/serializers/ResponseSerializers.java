@@ -18,16 +18,16 @@
 package org.cafienne.infrastructure.serialization.serializers;
 
 import org.cafienne.actormodel.response.*;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.engine.cmmn.actorapi.response.*;
 import org.cafienne.engine.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.engine.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.engine.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.engine.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.tenant.actorapi.response.TenantOwnersResponse;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
+import org.cafienne.userregistration.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
+import org.cafienne.userregistration.consentgroup.actorapi.response.ConsentGroupResponse;
+import org.cafienne.userregistration.tenant.actorapi.response.TenantOwnersResponse;
+import org.cafienne.userregistration.tenant.actorapi.response.TenantResponse;
 
 public class ResponseSerializers {
     public static void register() {

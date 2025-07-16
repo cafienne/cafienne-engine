@@ -26,10 +26,6 @@ import org.cafienne.actormodel.communication.request.event.ActorRequestCreated;
 import org.cafienne.actormodel.communication.request.event.ActorRequestDelivered;
 import org.cafienne.actormodel.communication.request.response.ActorRequestDeliveryReceipt;
 import org.cafienne.actormodel.communication.request.response.ActorRequestFailure;
-import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
-import org.cafienne.consentgroup.actorapi.command.RemoveConsentGroupMember;
-import org.cafienne.consentgroup.actorapi.command.ReplaceConsentGroup;
-import org.cafienne.consentgroup.actorapi.command.SetConsentGroupMember;
 import org.cafienne.engine.cmmn.actorapi.command.ReactivateCase;
 import org.cafienne.engine.cmmn.actorapi.command.StartCase;
 import org.cafienne.engine.cmmn.actorapi.command.casefile.CreateCaseFileItem;
@@ -58,13 +54,17 @@ import org.cafienne.engine.cmmn.actorapi.command.team.setmember.SetCaseTeamUser;
 import org.cafienne.engine.humantask.actorapi.command.*;
 import org.cafienne.engine.processtask.actorapi.command.*;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.tenant.actorapi.command.GetTenantOwners;
-import org.cafienne.tenant.actorapi.command.RemoveTenantUser;
-import org.cafienne.tenant.actorapi.command.ReplaceTenant;
-import org.cafienne.tenant.actorapi.command.SetTenantUser;
-import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
-import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
-import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
+import org.cafienne.userregistration.consentgroup.actorapi.command.CreateConsentGroup;
+import org.cafienne.userregistration.consentgroup.actorapi.command.RemoveConsentGroupMember;
+import org.cafienne.userregistration.consentgroup.actorapi.command.ReplaceConsentGroup;
+import org.cafienne.userregistration.consentgroup.actorapi.command.SetConsentGroupMember;
+import org.cafienne.userregistration.tenant.actorapi.command.GetTenantOwners;
+import org.cafienne.userregistration.tenant.actorapi.command.RemoveTenantUser;
+import org.cafienne.userregistration.tenant.actorapi.command.ReplaceTenant;
+import org.cafienne.userregistration.tenant.actorapi.command.SetTenantUser;
+import org.cafienne.userregistration.tenant.actorapi.command.platform.CreateTenant;
+import org.cafienne.userregistration.tenant.actorapi.command.platform.DisableTenant;
+import org.cafienne.userregistration.tenant.actorapi.command.platform.EnableTenant;
 
 public class CommandSerializers {
     public static void register() {

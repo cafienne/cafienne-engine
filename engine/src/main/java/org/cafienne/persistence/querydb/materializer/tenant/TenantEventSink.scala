@@ -21,7 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.persistence.query.Offset
 import org.cafienne.persistence.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
 import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.event.TenantEvent
+import org.cafienne.userregistration.tenant.actorapi.event.TenantEvent
 
 import scala.concurrent.Future
 

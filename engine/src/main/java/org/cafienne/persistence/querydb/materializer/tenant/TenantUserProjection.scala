@@ -20,8 +20,8 @@ package org.cafienne.persistence.querydb.materializer.tenant
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.persistence.querydb.record.{UserRoleKey, UserRoleRecord}
-import org.cafienne.tenant.actorapi.event.deprecated._
-import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
+import org.cafienne.userregistration.tenant.actorapi.event.deprecated._
+import org.cafienne.userregistration.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
 
 class TenantUserProjection(override val batch: TenantEventBatch) extends TenantEventMaterializer with LazyLogging {
   private val deprecatedUserEventRecords = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()

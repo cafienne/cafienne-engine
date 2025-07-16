@@ -19,7 +19,7 @@ package org.cafienne.persistence.querydb.materializer.consentgroup
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.persistence.query.Offset
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
+import org.cafienne.userregistration.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.persistence.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
 import org.cafienne.system.CaseSystem
 

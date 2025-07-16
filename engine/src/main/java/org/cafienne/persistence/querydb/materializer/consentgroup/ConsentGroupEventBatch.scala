@@ -19,7 +19,7 @@ package org.cafienne.persistence.querydb.materializer.consentgroup
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}
+import org.cafienne.userregistration.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}

@@ -25,7 +25,7 @@ import org.cafienne.persistence.querydb.query.tenant.TenantQueries
 import org.cafienne.persistence.querydb.query.tenant.implementation.TenantQueriesImpl
 import org.cafienne.service.infrastructure.authentication.AuthenticatedUser
 import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
-import org.cafienne.tenant.actorapi.command.TenantCommand
+import org.cafienne.userregistration.tenant.actorapi.command.TenantCommand
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

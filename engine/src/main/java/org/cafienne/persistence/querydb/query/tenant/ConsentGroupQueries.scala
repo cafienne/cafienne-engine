@@ -1,7 +1,7 @@
 package org.cafienne.persistence.querydb.query.tenant
 
 import org.cafienne.actormodel.identity.{ConsentGroupUser, UserIdentity}
-import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
+import org.cafienne.userregistration.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 
 import scala.concurrent.Future
 

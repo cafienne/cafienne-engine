@@ -19,7 +19,7 @@ package org.cafienne.service.http.consentgroup.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.actormodel.identity.ConsentGroupUser
-import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
+import org.cafienne.userregistration.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 import org.cafienne.service.infrastructure.payload.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.infrastructure.payload.PayloadValidator
 import org.cafienne.util.Guid

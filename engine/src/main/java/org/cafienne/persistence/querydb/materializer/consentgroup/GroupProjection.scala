@@ -18,7 +18,7 @@
 package org.cafienne.persistence.querydb.materializer.consentgroup
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupCreated
+import org.cafienne.userregistration.consentgroup.actorapi.event.ConsentGroupCreated
 import org.cafienne.persistence.querydb.record.ConsentGroupRecord
 
 class GroupProjection(override val batch: ConsentGroupEventBatch) extends ConsentGroupEventMaterializer with LazyLogging {

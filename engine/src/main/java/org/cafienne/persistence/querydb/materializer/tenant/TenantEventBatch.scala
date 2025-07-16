@@ -23,10 +23,10 @@ import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.persistence.querydb.materializer.{QueryDBEventBatch, QueryDBStorage}
-import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
-import org.cafienne.tenant.actorapi.event.platform.PlatformEvent
-import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
-import org.cafienne.tenant.actorapi.event.{TenantAppliedPlatformUpdate, TenantModified}
+import org.cafienne.userregistration.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
+import org.cafienne.userregistration.tenant.actorapi.event.platform.PlatformEvent
+import org.cafienne.userregistration.tenant.actorapi.event.user.TenantMemberEvent
+import org.cafienne.userregistration.tenant.actorapi.event.{TenantAppliedPlatformUpdate, TenantModified}
 
 class TenantEventBatch(val sink: TenantEventSink, override val persistenceId: String, storage: QueryDBStorage) extends QueryDBEventBatch with LazyLogging {
   val dBTransaction: TenantStorageTransaction = storage.createTenantTransaction(persistenceId)
