@@ -44,5 +44,5 @@ trait ConsentGroupRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askConsentGroup(command: ConsentGroupCommand): Route = askModelActor(command)
+  def askConsentGroup(command: ConsentGroupCommand): Route = askUserRegistration(command)
 }

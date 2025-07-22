@@ -21,6 +21,7 @@ import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.ConsentGroupUser;
+import org.cafienne.userregistration.actorapi.command.UserRegistrationCommand;
 import org.cafienne.userregistration.consentgroup.ConsentGroupActor;
 import org.cafienne.userregistration.consentgroup.actorapi.ConsentGroupMessage;
 import org.cafienne.userregistration.consentgroup.actorapi.exception.ConsentGroupException;
@@ -30,7 +31,7 @@ import org.cafienne.json.ValueMap;
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam
  */
-public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, ConsentGroupUser> implements ConsentGroupMessage {
+public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, ConsentGroupUser> implements ConsentGroupMessage, UserRegistrationCommand {
     /**
      * Create a new command that can be sent to the group.
      *

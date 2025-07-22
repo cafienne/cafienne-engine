@@ -141,6 +141,6 @@ class PlatformRoute(override val httpService: CaseEngineHttpServer) extends Comm
   }
 
   def askPlatform(command: PlatformTenantCommand): Route = {
-    askModelActor(command)
+    askUserRegistration(command)
   }
 }

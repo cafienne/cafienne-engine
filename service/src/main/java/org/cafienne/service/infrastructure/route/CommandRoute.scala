@@ -24,25 +24,27 @@ import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.ActorType
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
+import org.cafienne.engine.cmmn.actorapi.command.CaseCommand
 import org.cafienne.engine.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
-import org.cafienne.userregistration.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.engine.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception._
-import org.cafienne.system.CaseSystem
+import org.cafienne.userregistration.actorapi.command.UserRegistrationCommand
+import org.cafienne.userregistration.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.userregistration.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait CommandRoute extends AuthenticatedRoute {
-  def askModelActor(command: ModelCommand): Route = {
-    CommandRouteExecutor.askModelActor(caseSystem, command)
-  }
+  def askCaseEngine(command: CaseCommand): Route = CommandRouteExecutor.askModelActor(command, caseSystem.engine.request(command))
+
+  def askUserRegistration(command: UserRegistrationCommand): Route = CommandRouteExecutor.askModelActor(command, caseSystem.userRegistration.request(command))
 }
 
 object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
-  def askModelActor(caseSystem: CaseSystem, command: ModelCommand): Route = {
-    onComplete(caseSystem.engine.request(command)) {
+  def askModelActor(command: ModelCommand, question: => Future[ModelResponse]): Route = {
+    onComplete(question) {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)

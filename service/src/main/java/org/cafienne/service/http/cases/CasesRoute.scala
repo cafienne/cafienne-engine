@@ -99,6 +99,6 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   }
 
   def askCase(user: UserIdentity, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
-    authorizeCaseAccess(user, caseInstanceId, caseMember => askModelActor(createCaseCommand.apply(caseMember)))
+    authorizeCaseAccess(user, caseInstanceId, caseMember => askCaseEngine(createCaseCommand.apply(caseMember)))
   }
 }

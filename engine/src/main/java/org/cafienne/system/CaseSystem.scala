@@ -52,6 +52,8 @@ class CaseSystem(val systemConfig: SystemConfig, val system: ActorSystem, val qu
     */
   val engine: CaseEngineGateway = new CaseEngineGateway(this)
 
+  val userRegistration: UserRegistrationGateway = new UserRegistrationGateway(this)
+
   val service: CaseServiceGateway = new CaseServiceGateway(this)
 
   lazy val identityRegistration: IdentityRegistration = new CaseSystemIdentityRegistration(this)

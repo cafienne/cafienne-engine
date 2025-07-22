@@ -22,6 +22,7 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.json.ValueMap;
+import org.cafienne.userregistration.actorapi.command.UserRegistrationCommand;
 import org.cafienne.userregistration.tenant.TenantActor;
 import org.cafienne.userregistration.tenant.actorapi.TenantMessage;
 import org.cafienne.userregistration.tenant.actorapi.exception.TenantException;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 /**
  * Base class for sending commands to a TenantActor
  */
-public abstract class TenantCommand extends BaseModelCommand<TenantActor, TenantUser> implements TenantMessage {
+public abstract class TenantCommand extends BaseModelCommand<TenantActor, TenantUser> implements TenantMessage, UserRegistrationCommand {
     /**
      * Create a new command that can be sent to the tenant.
      *

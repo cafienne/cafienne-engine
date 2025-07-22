@@ -159,7 +159,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
   private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant): Future[Unit] = {
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-    caseSystem.engine.request(bootstrapTenant).map {
+    caseSystem.userRegistration.request(bootstrapTenant).map {
       case _: ActorExistsFailure => logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info (even if it is updated)")
       case e: CommandFailure => logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
       case _: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")

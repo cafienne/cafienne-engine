@@ -17,22 +17,11 @@
 
 package org.cafienne.actormodel.message;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
-
-import java.io.IOException;
-import java.io.StringWriter;
 
 /**
  * A UserMessage carries user information

@@ -177,7 +177,7 @@ class TenantOwnersRoute(override val httpService: CaseEngineHttpServer) extends 
           } else {
             val group = newGroup.asGroup(tenantOwner.tenant)
             val groupOwner = new ConsentGroupUser(id = tenantOwner.id, tenant = tenantOwner.tenant, groupId = group.id)
-            askModelActor(new CreateConsentGroup(groupOwner, group))
+            askUserRegistration(new CreateConsentGroup(groupOwner, group))
           }
         }
       }

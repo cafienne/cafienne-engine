@@ -20,13 +20,14 @@ package org.cafienne.engine.processtask.actorapi.command;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.engine.actorapi.command.CaseEngineCommand;
 import org.cafienne.json.ValueMap;
 import org.cafienne.engine.processtask.actorapi.ProcessActorMessage;
 import org.cafienne.engine.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.engine.processtask.implementation.SubProcess;
 import org.cafienne.engine.processtask.instance.ProcessTaskActor;
 
-public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> implements ProcessActorMessage {
+public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> implements ProcessActorMessage, CaseEngineCommand {
     protected ProcessCommand(UserIdentity user, String id) {
         super(user, id);
     }

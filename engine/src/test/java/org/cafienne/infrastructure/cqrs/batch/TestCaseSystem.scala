@@ -1,8 +1,8 @@
 package org.cafienne.infrastructure.cqrs.batch
 
 import org.apache.pekko.actor.ActorSystem
-import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.ModelResponse
+import org.cafienne.engine.actorapi.command.CaseEngineCommand
 import org.cafienne.system.CaseSystem
 
 import scala.collection.mutable.ListBuffer
@@ -13,7 +13,7 @@ class TestCaseSystem(val actorSystem: ActorSystem) {
   implicit val dispatcher: ExecutionContextExecutor = actorSystem.dispatcher
 
   // TODO: This code now directly accesses the Cafienne Gateway; it is intended to be replaced with going through the actual HTTP Routes
-  def sendCommand(command: ModelCommand): Future[ModelResponse] = {
+  def sendCommand(command: CaseEngineCommand): Future[ModelResponse] = {
     println(s"Requesting gateway with $command")
     caseSystem.engine.request(command).map(response => {
       println("Case System responded with " + response)
@@ -21,7 +21,7 @@ class TestCaseSystem(val actorSystem: ActorSystem) {
     })
   }
 
-  def runCommands(commands: Seq[ModelCommand]): Future[Seq[ModelResponse]] = {
+  def runCommands(commands: Seq[CaseEngineCommand]): Future[Seq[ModelResponse]] = {
     val responses: ListBuffer[ModelResponse] = ListBuffer()
     val sendCommandChain = {
       var chainOfSendCommandFutures: Future[Any] = Future {}

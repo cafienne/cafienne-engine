@@ -58,6 +58,6 @@ trait TenantRoute extends CommandRoute with QueryRoute {
   }
 
   def askTenant(command: TenantCommand): Route = {
-    askModelActor(command)
+    askUserRegistration(command)
   }
 }

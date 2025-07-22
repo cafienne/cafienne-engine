@@ -44,6 +44,8 @@ trait StorageEvent extends StorageMessage with CafienneJson with ModelEvent {
     new ValueMap(Fields.modelEvent, asModelEvent(), Fields.user, user, Fields.actorId, actorId, Fields.tenant, tenant)
   )
 
+  override def actorClass(): Class[_] = metadata.actorType.actorClass
+
   override def toValue: Value[_] = json
 
   def writeStorageEvent(generator: JsonGenerator): Unit = {

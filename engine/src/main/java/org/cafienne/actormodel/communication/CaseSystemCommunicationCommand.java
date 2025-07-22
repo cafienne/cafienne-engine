@@ -5,12 +5,13 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.engine.actorapi.command.CaseEngineCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class CaseSystemCommunicationCommand extends BaseModelCommand<ModelActor, UserIdentity> implements CaseSystemCommunicationMessage {
+public abstract class CaseSystemCommunicationCommand extends BaseModelCommand<ModelActor, UserIdentity> implements CaseSystemCommunicationMessage, CaseEngineCommand {
     public final ModelCommand command;
 
     protected CaseSystemCommunicationCommand(ModelCommand command) {

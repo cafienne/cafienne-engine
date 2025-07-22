@@ -49,10 +49,10 @@ class ConsentGroupOwnersRoute(override val httpService: CaseEngineHttpServer) ex
     )
   )
   @RequestBody(description = "Group to replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ReplaceConsentGroupFormat]))))
-  @Consumes(Array("application/json"))  def replaceGroup: Route = post {
+  @Consumes(Array("application/json")) def replaceGroup: Route = post {
     consentGroupUser { groupOwner =>
         entity(as[ConsentGroupFormat]) { newGroup =>
-          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup(groupOwner)))
+          askUserRegistration(new ReplaceConsentGroup(groupOwner, newGroup.asGroup(groupOwner)))
         }
     }
   }

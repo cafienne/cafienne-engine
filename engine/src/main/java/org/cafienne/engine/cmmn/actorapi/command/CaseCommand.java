@@ -20,6 +20,7 @@ package org.cafienne.engine.cmmn.actorapi.command;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.engine.actorapi.command.CaseEngineCommand;
 import org.cafienne.engine.cmmn.actorapi.CaseMessage;
 import org.cafienne.engine.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.engine.cmmn.actorapi.event.CaseEvent;
@@ -32,7 +33,7 @@ import org.cafienne.json.ValueMap;
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link BaseModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
  * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
-public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentity> implements CaseMessage {
+public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentity> implements CaseMessage, CaseEngineCommand {
     /**
      * Create a new command that can be sent to the case.
      *

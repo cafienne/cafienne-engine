@@ -40,7 +40,7 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
         onComplete(getUserOrigin(assignee, caseMember.tenant)) {
           case Success(assigneeIdentity) =>
 //            println(s"Found origin $origin for assignee $assignee")
-            askModelActor(createTaskCommand.apply(caseInstanceId, caseMember, assigneeIdentity))
+            askCaseEngine(createTaskCommand.apply(caseInstanceId, caseMember, assigneeIdentity))
           case Failure(t: Throwable) =>
             logger.warn(s"An error happened while retrieving user information on user '$assignee'", t)
             complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$assignee'")
@@ -54,7 +54,7 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
 
   def askTask(user: UserIdentity, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
     onComplete(authorizationQueries.getCaseMembershipForTask(taskId, user)) {
-      case Success(caseMember) => askModelActor(createTaskCommand.apply(caseMember.caseInstanceId, caseMember))
+      case Success(caseMember) => askCaseEngine(createTaskCommand.apply(caseMember.caseInstanceId, caseMember))
       case Failure(error) => error match {
         case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
         case _ => throw error
