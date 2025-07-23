@@ -26,16 +26,21 @@ import jakarta.ws.rs.{GET, PATCH, Path, Produces}
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.infrastructure.cqrs.instance.ModelEventsReader
+import org.cafienne.persistence.infrastructure.lastmodified.LastModifiedHeader
+import org.cafienne.persistence.querydb.query.system.{SystemQueries, SystemQueriesImpl}
 import org.cafienne.service.http.CaseEngineHttpServer
-import org.cafienne.service.infrastructure.route.CommandRoute
+import org.cafienne.service.infrastructure.route.{CommandRoute, QueryRoute}
 
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute(override val httpService: CaseEngineHttpServer) extends CommandRoute {
+class DebugRoute(override val httpService: CaseEngineHttpServer) extends CommandRoute with QueryRoute {
+
+  override val lastModifiedHeaderName: String = ""
 
   private val modelEventsReader = new ModelEventsReader(caseSystem)
+  private val systemQueries: SystemQueries = new SystemQueriesImpl(caseSystem.queryDB)
 
   // NOTE: although documented with Swagger, this route is not exposed in the public Swagger documentation!
   //  Reason: avoid too easily using this route in development of applications, as that introduces a potential security issue.
@@ -97,9 +102,20 @@ class DebugRoute(override val httpService: CaseEngineHttpServer) extends Command
         if (!caseSystem.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          onComplete(caseSystem.engine.awaitTermination(modelId)) {
+          val termination = for {
+            metadata <- runSyncedQuery(systemQueries.findActor(user, modelId), LastModifiedHeader.NONE)
+            termination <- {
+              if (metadata.isModel) {
+                caseSystem.engine.awaitTermination(modelId, metadata.actorType.actorClass)
+              } else {
+                caseSystem.userRegistration.awaitTermination(modelId)
+              }
+            }
+          } yield termination
+
+          onComplete(termination) {
             case Success(value) => complete(StatusCodes.OK, s"Forced recovery of $modelId")
-            case Failure(err) => throw err;
+            case Failure(err) => throw err
           }
         }
       }
