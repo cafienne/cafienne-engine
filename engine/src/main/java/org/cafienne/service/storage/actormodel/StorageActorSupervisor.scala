@@ -55,9 +55,16 @@ trait StorageActorSupervisor extends Actor with LazyLogging {
     * Upon successful termination, the followup action will be triggered.
     */
   def terminateModelActor(metadata: ActorMetadata, followUpAction: => Unit = {}): Unit = {
-    caseSystem.engine.awaitTermination(metadata.actorId).onComplete{
-      case Success(value) => followUpAction
-      case Failure(exception) => logger.warn(s"Failure upon termination of model actor $metadata", exception)
+    if (metadata.isModel) {
+      caseSystem.engine.awaitTermination(metadata.actorId).onComplete{
+        case Success(value) => followUpAction
+        case Failure(exception) => logger.warn(s"Failure upon termination of model actor $metadata", exception)
+      }
+    } else {
+      caseSystem.userRegistration.awaitTermination(metadata.actorId).onComplete{
+        case Success(value) => followUpAction
+        case Failure(exception) => logger.warn(s"Failure upon termination of model actor $metadata", exception)
+      }
     }
   }
 }

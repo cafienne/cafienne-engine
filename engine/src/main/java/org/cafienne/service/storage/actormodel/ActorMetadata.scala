@@ -34,6 +34,8 @@ case class ActorMetadata(user: StorageUser, actorType: ActorType, actorId: Strin
     }
   }
 
+  lazy val isModel: Boolean = actorType == ActorType.Case || actorType == ActorType.Process
+
   val hasParent: Boolean = parent != null
 
   val isRoot: Boolean = !hasParent
