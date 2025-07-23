@@ -11,9 +11,11 @@ import scala.concurrent.duration.Duration
 class ModelActorMonitor(val actor: ModelActor) {
   private var selfCleaner: Option[Cancellable] = None
 
-  def setBusy(): Unit = {
+  def cancelTimer(): Unit = {
     selfCleaner.foreach(c => c.cancel())
   }
+
+  def setBusy(): Unit = cancelTimer()
 
   def setFree(): Unit = {
     if (actor.hasAutoShutdown) {

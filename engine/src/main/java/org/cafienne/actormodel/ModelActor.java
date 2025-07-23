@@ -112,6 +112,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
         this.scheduler = new CaseScheduler(this);
     }
 
+    @Override
+    public void postStop() throws Exception {
+        monitor.cancelTimer(); // Clear in mem scheduler to stop the actor after idle time
+        super.postStop();
+    }
+
     abstract protected boolean supportsCommand(Object msg);
 
     abstract protected boolean supportsEvent(ModelEvent msg);
