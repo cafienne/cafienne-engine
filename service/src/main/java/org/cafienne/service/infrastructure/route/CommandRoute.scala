@@ -39,7 +39,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait CommandRoute extends AuthenticatedRoute {
-  def askCaseEngine(user: CaseMembership, command: CaseCommand): Route = CommandRouteExecutor.askModelActor(command, caseSystem.engine.request(CaseFamily(user.rootCaseId), command))
+  def askCaseEngine(user: CaseMembership, command: CaseCommand): Route = CommandRouteExecutor.askModelActor(command, caseSystem.engine.request(user.caseFamily, command))
 
   def askCaseEngine(command: CaseCommand): Route = CommandRouteExecutor.askModelActor(command, caseSystem.engine.request(CaseFamily(command.actorId), command))
 

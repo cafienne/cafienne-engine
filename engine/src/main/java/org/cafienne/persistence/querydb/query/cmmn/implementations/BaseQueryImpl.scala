@@ -19,6 +19,7 @@ package org.cafienne.persistence.querydb.query.cmmn.implementations
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
+import org.cafienne.engine.actorapi.CaseFamily
 import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseMembership
 import org.cafienne.persistence.querydb.query.cmmn.implementations.basequeries.{IdentifierFilterQuery, TaskAccessHelper, TenantRegistrationQueries}
 import org.cafienne.persistence.querydb.record._
@@ -107,7 +108,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends TenantRegistrationQueries with
         fail // Again, case apparently does not exist (then why do we have a head in the first place ??? Perhaps it is filled with all NULL values???
       }
 
-      val rootCaseId = originRecords.head._1.get._4
+      val caseFamily = CaseFamily(originRecords.head._1.get._4)
       val caseId = originRecords.head._1.get._1
       val tenantId = originRecords.head._1.get._2
 //      println(" Case id: " + caseId)
@@ -149,7 +150,7 @@ class BaseQueryImpl(val queryDB: QueryDB) extends TenantRegistrationQueries with
         fail
       }
 
-      new CaseMembership(id = user.id, origin = origin, tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId, rootCaseId = rootCaseId)
+      new CaseMembership(id = user.id, origin = origin, tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId, caseFamily = caseFamily)
 
     })
   }
