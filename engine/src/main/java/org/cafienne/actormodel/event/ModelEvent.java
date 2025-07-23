@@ -18,6 +18,7 @@
 package org.cafienne.actormodel.event;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.engine.actorapi.CaseFamily;
 import org.cafienne.actormodel.message.UserMessage;
 import org.cafienne.json.ValueMap;
 
@@ -49,4 +50,6 @@ public interface ModelEvent extends UserMessage {
     Instant getTimestamp();
 
     ValueMap rawJson();
+
+    CaseFamily family();
 }

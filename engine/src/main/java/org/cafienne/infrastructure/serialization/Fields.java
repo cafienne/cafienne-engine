@@ -24,6 +24,7 @@ public enum Fields {
     messageId,
     actor,
     actorId,
+    family,
     user,
 
     lastModified,
