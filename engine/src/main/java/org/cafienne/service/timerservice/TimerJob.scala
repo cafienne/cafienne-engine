@@ -20,6 +20,7 @@ package org.cafienne.service.timerservice
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.{Cancellable, Scheduler}
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
+import org.cafienne.engine.actorapi.CaseFamily
 import org.cafienne.engine.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 
 import java.util.concurrent.TimeUnit
@@ -50,7 +51,7 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
     if (count > 1) {
       logger.warn(s"Attempt number $count to raise timer $timer in case ${timer.caseInstanceId}.")
     }
-    timerService.caseSystem.engine.inform(command, timerService.self);
+    timerService.caseSystem.engine.inform(new CaseFamily(timer.rootCaseId), command, timerService.self);
     responseTracker.start()
   }
 

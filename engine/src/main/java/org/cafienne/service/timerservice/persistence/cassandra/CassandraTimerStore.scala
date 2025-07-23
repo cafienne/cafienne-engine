@@ -59,6 +59,7 @@ class CassandraTimerStore(val caseSystem: CaseSystem, readJournal: CassandraRead
       rows.map(row => {
         val timerId = row.getString("timerid")
         val caseInstanceId = row.getString("caseinstanceid")
+        val rootCaseId = row.getString("rootcaseid")
         val tenant = row.getString("tenant")
         val userId = row.getString("user")
         val moment = row.getInstant("moment")
@@ -66,7 +67,7 @@ class CassandraTimerStore(val caseSystem: CaseSystem, readJournal: CassandraRead
           logger.error(s"Cassandra database table contains an invalid record ($timerId, $caseInstanceId, $tenant, $userId, $moment). Record will be ignored")
           null
         } else {
-          Timer(caseInstanceId, timerId, moment, userId)
+          Timer(caseInstanceId, rootCaseId, timerId, moment, userId)
         }
       }).filter(_ != null) // Filter out the records that have missing column information
     })
@@ -86,6 +87,7 @@ class CassandraTimerStore(val caseSystem: CaseSystem, readJournal: CassandraRead
     val insert = QueryBuilder.insertInto(keyspace, timerTable)
       .value("timerid", literal(job.timerId))
       .value("caseinstanceid", literal(job.caseInstanceId))
+      .value("rootcaseid", literal(job.rootCaseId))
       .value("tenant", literal(""))
       .value("user", literal(job.userId))
       .value("moment", literal(job.moment)).build()

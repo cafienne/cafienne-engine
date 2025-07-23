@@ -41,12 +41,12 @@ class JDBCTimerStore(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix:
 
   override def getTimers(window: Instant): Future[Seq[Timer]] = {
     val query = TableQuery[TimerServiceTable].filter(_.moment <= window)
-    db.run(query.distinct.result).map(records => records.map(record => Timer(record.caseInstanceId, record.timerId, record.moment, record.user)))
+    db.run(query.distinct.result).map(records => records.map(record => Timer(record.caseInstanceId, record.rootCaseId, record.timerId, record.moment, record.user)))
   }
 
   override def storeTimer(job: Timer, offset: Option[Offset]): Future[Done] = {
     logger.debug("Storing JDBC timer " + job.timerId + " for timestamp " + job.moment)
-    val record = TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = "", user = job.userId)
+    val record = TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, rootCaseId = job.rootCaseId, moment = job.moment, tenant = "", user = job.userId)
     commit(offset, TableQuery[TimerServiceTable].insertOrUpdate(record))
   }
 
@@ -68,7 +68,7 @@ class JDBCTimerStore(val dbConfig: DatabaseConfig[JdbcProfile], val tablePrefix:
 
   override def importTimers(list: Seq[Timer]): Unit = {
     val tx = list
-      .map(job => TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = "", user = job.userId))
+      .map(job => TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, rootCaseId = job.rootCaseId, moment = job.moment, tenant = "", user = job.userId))
       .map(record => TableQuery[TimerServiceTable].insertOrUpdate(record))
     Await.result(db.run(DBIO.sequence(tx).transactionally), 30.seconds)
   }

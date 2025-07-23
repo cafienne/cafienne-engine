@@ -106,7 +106,7 @@ class DebugRoute(override val httpService: CaseEngineHttpServer) extends Command
             metadata <- runSyncedQuery(systemQueries.findActor(user, modelId), LastModifiedHeader.NONE)
             termination <- {
               if (metadata.isModel) {
-                caseSystem.engine.awaitTermination(modelId, metadata.actorType.actorClass)
+                caseSystem.engine.awaitTermination(modelId)
               } else {
                 caseSystem.userRegistration.awaitTermination(modelId)
               }

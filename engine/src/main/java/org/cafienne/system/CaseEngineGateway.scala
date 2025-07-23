@@ -17,10 +17,11 @@
 
 package org.cafienne.system
 
-import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
+import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
 import org.apache.pekko.util.Timeout
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.response.{ActorTerminated, ModelResponse}
+import org.cafienne.engine.actorapi.CaseFamily
 import org.cafienne.engine.actorapi.command.CaseEngineCommand
 import org.cafienne.engine.cmmn.instance.Case
 import org.cafienne.engine.processtask.instance.ProcessTaskActor
@@ -36,18 +37,18 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
   private val processTaskService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "process-tasks")
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-engine-router")
 
-  def request(message: CaseEngineCommand): Future[ModelResponse] = {
+  def request(family: CaseFamily, message: CaseEngineCommand): Future[ModelResponse] = {
     import org.apache.pekko.pattern.ask
     implicit val timeout: Timeout = caseSystem.config.actor.askTimout
 
     getRouter(message).ask(message).asInstanceOf[Future[ModelResponse]]
   }
 
-  def inform(message: CaseEngineCommand, sender: ActorRef = Actor.noSender): Unit = {
-    getRouter(message).tell(message, sender)
+  def inform(family: CaseFamily, message: CaseEngineCommand, replyTo: ActorRef = ActorRef.noSender): Unit = {
+    getRouter(message).tell(message, replyTo)
   }
 
-  def terminate(actorId: String): Unit = {
+  def terminate(family: CaseFamily, actorId: String): Unit = {
     defaultRouterService.tell(TerminateModelActor(actorId), ActorRef.noSender)
   }
 
@@ -59,11 +60,11 @@ class CaseEngineGateway(caseSystem: CaseSystem) {
   }
 
   private def getRouter(message: CaseEngineCommand): ActorRef = {
-      val actorClass = message.actorClass()
-      // Unfortunately for some reason we cannot use scala matching on the actor class.
-      // Unclear why (most probably lack of scala knowledge ;))
-      if (actorClass == classOf[Case]) return caseService
-      if (actorClass == classOf[ProcessTaskActor]) return processTaskService
-      defaultRouterService
+    val actorClass = message.actorClass()
+    // Unfortunately for some reason we cannot use scala matching on the actor class.
+    // Unclear why (most probably lack of scala knowledge ;))
+    if (actorClass == classOf[Case]) return caseService
+    if (actorClass == classOf[ProcessTaskActor]) return processTaskService
+    defaultRouterService
   }
 }

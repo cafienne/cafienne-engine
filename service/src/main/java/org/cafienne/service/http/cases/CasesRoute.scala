@@ -20,7 +20,7 @@ package org.cafienne.service.http.cases
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.engine.cmmn.actorapi.command._
+import org.cafienne.engine.cmmn.actorapi.command.CaseCommand
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.cmmn.authorization.{AuthorizationQueries, AuthorizationQueriesImpl, CaseMembership}
 import org.cafienne.persistence.querydb.query.cmmn.implementations.{CaseInstanceQueriesImpl, CaseListQueriesImpl}
@@ -99,6 +99,6 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   }
 
   def askCase(user: UserIdentity, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
-    authorizeCaseAccess(user, caseInstanceId, caseMember => askCaseEngine(createCaseCommand.apply(caseMember)))
+    authorizeCaseAccess(user, caseInstanceId, caseMember => askCaseEngine(caseMember, createCaseCommand.apply(caseMember)))
   }
 }

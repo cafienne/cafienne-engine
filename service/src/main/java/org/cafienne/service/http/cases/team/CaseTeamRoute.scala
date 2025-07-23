@@ -87,7 +87,7 @@ class CaseTeamRoute(override val httpService: CaseEngineHttpServer) extends Case
       path("caseteam") {
         entity(as[Compatible.TeamFormat]) { input =>
           val teamInput = input.asTeam
-          authorizeCaseAccess(user, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askCaseEngine(new SetCaseTeam(member, caseInstanceId, team))))
+          authorizeCaseAccess(user, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askCaseEngine(member, new SetCaseTeam(member, caseInstanceId, team))))
         }
       }
     }
@@ -118,7 +118,7 @@ class CaseTeamRoute(override val httpService: CaseEngineHttpServer) extends Case
             member => {
               val newTeamMember = input.asCaseTeamUser
               onComplete(getUserOrigin(newTeamMember, member.tenant)) {
-                case Success(enrichedUser: CaseTeamUser) => askCaseEngine(new SetCaseTeamUser(member, caseInstanceId, enrichedUser))
+                case Success(enrichedUser: CaseTeamUser) => askCaseEngine(member, new SetCaseTeamUser(member, caseInstanceId, enrichedUser))
                 case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
               }
             }

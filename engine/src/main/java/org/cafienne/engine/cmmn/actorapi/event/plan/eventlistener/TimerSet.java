@@ -33,11 +33,13 @@ import java.time.Instant;
 public class TimerSet extends TimerBaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(TimerSet.class);
 
+    public final String rootCaseId;
     private final Instant targetMoment;
     private transient TimerEvent timerEvent;
 
     public TimerSet(TimerEvent timerEvent) {
         super(timerEvent);
+        this.rootCaseId = timerEvent.getCaseInstance().getRootCaseId();
         this.timerEvent = timerEvent;
         this.targetMoment = timerEvent.getDefinition().getMoment(timerEvent);
     }
@@ -45,6 +47,7 @@ public class TimerSet extends TimerBaseEvent {
     public TimerSet(ValueMap json) {
         super(json);
         this.targetMoment = json.readInstant(Fields.targetMoment);
+        this.rootCaseId = json.readString(Fields.rootCaseId);
     }
 
     public Instant getTargetMoment() {
@@ -67,6 +70,7 @@ public class TimerSet extends TimerBaseEvent {
     public void write(JsonGenerator generator) throws IOException {
         super.writeTimerEvent(generator);
         writeField(generator, Fields.targetMoment, targetMoment);
+        writeField(generator, Fields.rootCaseId, rootCaseId);
     }
 
     @Override

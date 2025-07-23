@@ -2,6 +2,7 @@ package org.cafienne.infrastructure.cqrs.batch
 
 import org.apache.pekko.actor.ActorSystem
 import org.cafienne.actormodel.response.ModelResponse
+import org.cafienne.engine.actorapi.CaseFamily
 import org.cafienne.engine.actorapi.command.CaseEngineCommand
 import org.cafienne.system.CaseSystem
 
@@ -15,7 +16,7 @@ class TestCaseSystem(val actorSystem: ActorSystem) {
   // TODO: This code now directly accesses the Cafienne Gateway; it is intended to be replaced with going through the actual HTTP Routes
   def sendCommand(command: CaseEngineCommand): Future[ModelResponse] = {
     println(s"Requesting gateway with $command")
-    caseSystem.engine.request(command).map(response => {
+    caseSystem.engine.request(new CaseFamily(command.actorId), command).map(response => {
       println("Case System responded with " + response)
       response
     })

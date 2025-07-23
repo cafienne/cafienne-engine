@@ -17,13 +17,16 @@
 
 package org.cafienne.engine.cmmn.test;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.IOException;
+
+import org.cafienne.engine.actorapi.CaseFamily;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.engine.cmmn.instance.Case;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * This is a helper class for the case unit test framework. Within a case, one can use timer events. When running a case unit test, sometimes after triggering a command a timer will run. The test may
@@ -45,7 +48,7 @@ public class ForceRecoveryCommand extends TestScriptCommand {
 
     @Override
     public void beforeSendCommand(TestScript testScript) {
-        testScript.getCaseSystem().engine().terminate(getActorId());
+        testScript.getCaseSystem().engine().terminate(new CaseFamily(getActorId()), getActorId());
         // Give the system 500 ms to clean up the actor and the references
         waitSomeTime(500);
     }

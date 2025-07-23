@@ -43,8 +43,7 @@ public class Request {
     }
 
     public void send() {
-        //        System.out.println(this + ": request is not yet completed, sending it to " + state.targetActorId);
-        this.state.actor.caseSystem.engine().inform(new RequestModelActor(creationEvent.command, state), state.actor.self());
+        this.state.actor.caseSystem.engine().inform(creationEvent.family(), new RequestModelActor(creationEvent.command, state), state.actor.self());
         tracker.start();
     }
 

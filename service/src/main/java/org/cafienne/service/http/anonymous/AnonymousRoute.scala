@@ -22,6 +22,7 @@ import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
+import org.cafienne.engine.actorapi.CaseFamily
 import org.cafienne.engine.cmmn.actorapi.command.StartCase
 import org.cafienne.service.infrastructure.route.CaseServiceRoute
 
@@ -32,7 +33,7 @@ trait AnonymousRoute extends CaseServiceRoute {
   val defaultErrorMessage = "Your request bumped into an internal configuration issue and cannot be handled"
 
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
-    onComplete(caseSystem.engine.request(command)) {
+    onComplete(caseSystem.engine.request(CaseFamily(command.actorId), command)) {
       case Success(value) =>
         if (value.getClass.isAssignableFrom(expectedResponseClass)) {
           expectedResponseHandler(value.asInstanceOf[T])

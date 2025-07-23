@@ -17,10 +17,14 @@
 
 package org.cafienne.engine.cmmn.test;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Props;
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.engine.actorapi.CaseFamily;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.engine.actorapi.command.CaseEngineCommand;
 import org.cafienne.engine.cmmn.actorapi.event.CaseModified;
@@ -37,10 +41,6 @@ import org.cafienne.engine.cmmn.test.filter.EventFilter;
 import org.cafienne.system.CaseEngineGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The CaseEventListener reads and stores ModelEvents
@@ -70,7 +70,7 @@ public class CaseEventListener {
 
     void sendCommand(CaseEngineCommand command) {
         newEvents = new ArrayList<>();
-        caseMessageRouter.inform(command, responseHandlingActor);
+        caseMessageRouter.inform(new CaseFamily(command.actorId()), command, responseHandlingActor);
     }
 
     void handle(Object object) {
