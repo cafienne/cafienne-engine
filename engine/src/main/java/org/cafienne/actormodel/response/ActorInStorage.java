@@ -22,20 +22,21 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
+import org.cafienne.actormodel.ActorType;
 
 import java.io.IOException;
 
 @Manifest
 public class ActorInStorage extends BaseModelResponse {
-    public final String actorType;
-    public ActorInStorage(ModelCommand command, String actorType) {
+    public final ActorType actorType;
+    public ActorInStorage(ModelCommand command, ActorType actorType) {
         super(command);
         this.actorType = actorType;
     }
 
     public ActorInStorage(ValueMap json) {
         super(json);
-        this.actorType = json.readString(Fields.type, "");
+        this.actorType = json.readEnum(Fields.type, ActorType.class);
     }
 
     @Override

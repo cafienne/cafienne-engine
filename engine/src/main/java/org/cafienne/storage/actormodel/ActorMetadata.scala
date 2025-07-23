@@ -17,15 +17,13 @@
 
 package org.cafienne.storage.actormodel
 
-import org.cafienne.cmmn.instance.{Case, Path}
-import org.cafienne.consentgroup.ConsentGroupActor
+import org.cafienne.actormodel.ActorType
+import org.cafienne.cmmn.instance.Path
 import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.storage.StorageUser
-import org.cafienne.tenant.TenantActor
 
-case class ActorMetadata(user: StorageUser, actorType: String, actorId: String, parent: ActorMetadata = null) extends JacksonSerializable with CafienneJson {
+case class ActorMetadata(user: StorageUser, actorType: ActorType, actorId: String, parent: ActorMetadata = null) extends JacksonSerializable with CafienneJson {
   override def toValue: Value[_] = new ValueMap(Fields.actor, toString(), Fields.path, path)
 
   def path: String = {
@@ -48,7 +46,7 @@ case class ActorMetadata(user: StorageUser, actorType: String, actorId: String, 
 
   def groupMember(groupId: String): ActorMetadata = member(groupId, ActorType.Group)
 
-  private def member(memberId: String, memberType: String): ActorMetadata = this.copy(actorType = memberType, actorId = memberId, parent = this)
+  private def member(memberId: String, memberType: ActorType): ActorMetadata = this.copy(actorType = memberType, actorId = memberId, parent = this)
 }
 
 object ActorMetadata {
@@ -78,7 +76,7 @@ object ActorMetadata {
   def parseType(element: String, user: StorageUser = null): ActorMetadata = {
     val openingBracket = element.indexOf("[")
     val closingBracket = element.indexOf("]")
-    val actorType = element.substring(0, openingBracket)
+    val actorType = ActorType.getEnum(element.substring(0, openingBracket))
     val actorId = element.substring(openingBracket + 1, closingBracket)
     ActorMetadata(user, actorType, actorId)
   }
@@ -97,7 +95,7 @@ object ActorMetadata {
     * Convert a JSON object to an ActorMetadata instance
     */
   def deserialize(user: StorageUser, json: ValueMap): ActorMetadata = {
-    val actorType = json.readString(Fields.`type`)
+    val actorType = json.readEnum(Fields.`type`, classOf[ActorType])
     val actorId = json.readString(Fields.actorId)
 
     val parentActor: ActorMetadata = if (json.get(Fields.parent) != Value.NULL) {
@@ -107,11 +105,4 @@ object ActorMetadata {
     }
     ActorMetadata(user = user, actorType = actorType, actorId = actorId, parent = parentActor)
   }
-}
-
-object ActorType {
-  val Case: String = classOf[Case].getSimpleName
-  val Process: String = classOf[ProcessTaskActor].getSimpleName
-  val Group: String = classOf[ConsentGroupActor].getSimpleName
-  val Tenant: String = classOf[TenantActor].getSimpleName
 }

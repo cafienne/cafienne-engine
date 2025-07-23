@@ -44,7 +44,7 @@ class Reception {
     private boolean isBroken = false;
     private String recoveryFailureInformation = "";
     private boolean isInStorageProcess = false;
-    private String actorType = "";
+    private ActorType actorType;
     private final RecoveryRoom recoveryRoom;
     private final BackOffice backOffice;
 

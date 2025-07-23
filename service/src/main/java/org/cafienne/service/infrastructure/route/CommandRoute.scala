@@ -21,6 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
 import org.apache.pekko.http.scaladsl.server.Route
+import org.cafienne.actormodel.ActorType
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
@@ -28,7 +29,6 @@ import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse,
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.persistence.infrastructure.lastmodified.Headers
 import org.cafienne.persistence.querydb.query.exception._
-import org.cafienne.storage.actormodel.ActorType
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
@@ -65,7 +65,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
     }
   }
 
-  def readSearchFailure(actorType: String, actorId: String): SearchFailure = {
+  def readSearchFailure(actorType: ActorType, actorId: String): SearchFailure = {
     actorType match {
       case ActorType.Case => CaseSearchFailure(actorId)
       case ActorType.Tenant => TenantSearchFailure(actorId)

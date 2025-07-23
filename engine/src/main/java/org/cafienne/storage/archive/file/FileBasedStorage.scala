@@ -41,7 +41,7 @@ class FileBasedStorage(val config: FileStorageConfig) extends Storage with LazyL
   }
 
   def getFile(metadata: ActorMetadata): File = {
-    val fileName = s"${File.separator}archive-${metadata.actorType.toLowerCase()}-${metadata.actorId}.json"
+    val fileName = s"${File.separator}archive-${metadata.actorType.value.toLowerCase()}-${metadata.actorId}.json"
     new File(directory.getAbsolutePath + fileName)
   }
 

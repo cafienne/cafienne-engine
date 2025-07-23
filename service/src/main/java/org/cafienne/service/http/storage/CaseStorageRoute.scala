@@ -25,13 +25,14 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import jakarta.ws.rs.{DELETE, PUT, Path, Produces}
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.apache.pekko.http.scaladsl.server.{Directive, Route}
+import org.cafienne.actormodel.ActorType
 import org.cafienne.persistence.querydb.query.cmmn.authorization.CaseOwnership
 import org.cafienne.persistence.querydb.query.exception.CaseSearchFailure
 import org.cafienne.service.http.CaseEngineHttpServer
 import org.cafienne.service.http.cases.CasesRoute
 import org.cafienne.service.http.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
+import org.cafienne.storage.actormodel.ActorMetadata
 
 import scala.util.{Failure, Success}
 

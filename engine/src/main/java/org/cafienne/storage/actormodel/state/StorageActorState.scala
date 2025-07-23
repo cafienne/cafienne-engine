@@ -20,16 +20,12 @@ package org.cafienne.storage.actormodel.state
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorRef
 import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.processtask.actorapi.event.ProcessEvent
 import org.cafienne.storage.actormodel.command.ClearTimerData
 import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared, TimerDataCleared}
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
+import org.cafienne.storage.actormodel.{ActorMetadata, BaseStorageActor}
 import org.cafienne.storage.archival.event.ArchivalStarted
 import org.cafienne.storage.querydb.QueryDBStorage
-import org.cafienne.tenant.actorapi.event.TenantEvent
 
 trait StorageActorState extends ModelEventCollection with LazyLogging {
   def dbStorage: QueryDBStorage
@@ -39,13 +35,6 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
 
   val metadata: ActorMetadata = actor.metadata
   val actorId: String = metadata.actorId
-  val expectedEventClass: Class[_ <: ModelEvent] = metadata.actorType match {
-    case ActorType.Tenant => classOf[TenantEvent]
-    case ActorType.Case => classOf[CaseEvent]
-    case ActorType.Process => classOf[ProcessEvent]
-    case ActorType.Group => classOf[ConsentGroupEvent]
-    case _ => throw new RuntimeException(s"Cannot handle actions on events of unknown actor type $metadata")
-  }
 
   def originalModelActorEvents: Seq[ModelEvent] = events.filterNot(_.isInstanceOf[StorageEvent]).toSeq
 
@@ -149,5 +138,5 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
     * Check if we have recovered events of the expected type of ModelActor
     * (to e.g. avoid deleting a case if we're expecting to delete a tenant)
     */
-  def hasExpectedEvents: Boolean = events.exists(event => expectedEventClass.isAssignableFrom(event.getClass))
+  def hasExpectedEvents: Boolean = events.exists(event => metadata.actorType.actorEventClass.isAssignableFrom(event.getClass))
 }
