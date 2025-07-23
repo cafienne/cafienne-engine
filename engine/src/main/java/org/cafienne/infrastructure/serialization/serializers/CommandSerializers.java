@@ -54,6 +54,7 @@ import org.cafienne.engine.cmmn.actorapi.command.team.setmember.SetCaseTeamUser;
 import org.cafienne.engine.humantask.actorapi.command.*;
 import org.cafienne.engine.processtask.actorapi.command.*;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
+import org.cafienne.system.router.cluster.MessageEnvelope;
 import org.cafienne.userregistration.consentgroup.actorapi.command.CreateConsentGroup;
 import org.cafienne.userregistration.consentgroup.actorapi.command.RemoveConsentGroupMember;
 import org.cafienne.userregistration.consentgroup.actorapi.command.ReplaceConsentGroup;
@@ -68,6 +69,7 @@ import org.cafienne.userregistration.tenant.actorapi.command.platform.EnableTena
 
 public class CommandSerializers {
     public static void register() {
+        CafienneSerializer.addManifestWrapper(MessageEnvelope.class, MessageEnvelope::deserialize);
         CafienneSerializer.addManifestWrapper(RequestModelActor.class, RequestModelActor::new);
         CafienneSerializer.addManifestWrapper(RunActorRequest.class, RunActorRequest::new);
         CafienneSerializer.addManifestWrapper(ActorRequestCreated.class, ActorRequestCreated::new);
